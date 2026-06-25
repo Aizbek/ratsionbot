@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Ratsion · правильное питание</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.mjs" type="module"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --green:#3FB069; --green-d:#2E8E52; --green-l:#EAF6EE;
+  --amber:#F5A623; --amber-d:#E0921A;
+  --bg:#F6F7F4; --card:#FFFFFF; --ink:#1F2A24; --muted:#8A938D;
+  --line:rgba(31,42,36,.07); --shadow:0 10px 30px -12px rgba(31,42,36,.18);
+  --shadow-lg:0 24px 50px -20px rgba(31,42,36,.28);
+  --r:20px; --r-sm:14px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{
+  font-family:'Manrope',system-ui,sans-serif;background:var(--bg);color:var(--ink);
+  overflow-x:hidden;line-height:1.45;-webkit-font-smoothing:antialiased;
+}
+.app{max-width:480px;margin:0 auto;min-height:100vh;position:relative;overflow:hidden}
+
+/* ---------- screen system ---------- */
+.screen{position:absolute;inset:0;padding:0 18px 120px;overflow-y:auto;
+  opacity:0;transform:translateX(40px) scale(.98);pointer-events:none;
+  transition:opacity .45s cubic-bezier(.22,.61,.36,1),transform .45s cubic-bezier(.22,.61,.36,1);
+  -webkit-overflow-scrolling:touch}
+.screen.active{opacity:1;transform:none;pointer-events:auto}
+.screen.back-exit{transform:translateX(40px) scale(.98)}
+
+/* ---------- shared bits ---------- */
+.topbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:12px;
+  padding:16px 2px 14px;background:linear-gradient(180deg,var(--bg) 70%,rgba(246,247,244,0));backdrop-filter:blur(6px)}
+.back-btn{width:42px;height:42px;border-radius:13px;border:1px solid var(--line);background:var(--card);
+  display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;
+  transition:transform .2s,box-shadow .2s;box-shadow:0 2px 8px -4px rgba(31,42,36,.2)}
+.back-btn:active{transform:scale(.92)}
+.topbar h2{font-size:19px;font-weight:700;letter-spacing:-.02em}
+.ic{width:22px;height:22px;display:inline-block;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;vertical-align:middle}
+
+.card{background:var(--card);border-radius:var(--r);border:1px solid var(--line);box-shadow:var(--shadow)}
+
+.cta{width:100%;border:none;border-radius:16px;padding:17px;font-family:inherit;font-size:16px;font-weight:700;
+  color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px;letter-spacing:-.01em;
+  position:relative;overflow:hidden;transition:transform .18s,box-shadow .25s}
+.cta:active{transform:scale(.975)}
+.cta-amber{background:linear-gradient(135deg,#FBB13C,var(--amber));box-shadow:0 12px 26px -10px rgba(245,166,35,.65)}
+.cta-green{background:linear-gradient(135deg,#4CC079,var(--green));box-shadow:0 12px 26px -10px rgba(63,176,105,.55)}
+.cta-ghost{background:transparent;color:var(--muted);font-weight:600;font-size:14px;box-shadow:none;padding:13px}
+.cta::after{content:'';position:absolute;top:0;left:-60%;width:40%;height:100%;
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.35),transparent);
+  transform:skewX(-18deg);transition:left .7s}
+.cta:not(.cta-ghost):hover::after{left:130%}
+
+.fade-up{opacity:0;transform:translateY(18px);animation:fadeUp .6s forwards}
+@keyframes fadeUp{to{opacity:1;transform:none}}
+.d1{animation-delay:.05s}.d2{animation-delay:.13s}.d3{animation-delay:.21s}.d4{animation-delay:.29s}.d5{animation-delay:.37s}.d6{animation-delay:.45s}
+
+/* ---------- WELCOME ---------- */
+#welcome{padding-top:0;display:flex;flex-direction:column;min-height:100vh}
+.hero{position:relative;margin:0 -18px;padding:64px 26px 50px;
+  background:radial-gradient(120% 100% at 50% 0%,#54C683 0%,var(--green) 45%,var(--green-d) 100%);
+  border-radius:0 0 34px 34px;overflow:hidden;color:#fff;text-align:center}
+.hero::before,.hero::after{content:'';position:absolute;border-radius:50%;background:rgba(255,255,255,.09)}
+.hero::before{width:240px;height:240px;top:-90px;right:-70px}
+.hero::after{width:170px;height:170px;bottom:-70px;left:-50px}
+.logo-badge{width:78px;height:78px;border-radius:24px;background:rgba(255,255,255,.16);
+  border:1px solid rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;margin:0 auto 18px;
+  backdrop-filter:blur(4px);box-shadow:0 14px 30px -12px rgba(0,0,0,.3)}
+.logo-badge .ic{width:40px;height:40px;stroke-width:1.7}
+.hero h1{font-size:30px;font-weight:800;letter-spacing:-.03em;position:relative}
+.hero .sub{font-size:14px;opacity:.9;font-weight:500;margin-top:4px;letter-spacing:.04em;text-transform:uppercase;position:relative}
+.welcome-body{flex:1;padding:26px 4px 0}
+.welcome-body .lead{font-size:16px;color:var(--ink);font-weight:600;margin-bottom:18px;letter-spacing:-.01em}
+.feat{display:flex;gap:13px;align-items:center;padding:14px 16px;margin-bottom:11px;background:var(--card);
+  border-radius:var(--r-sm);border:1px solid var(--line);box-shadow:0 4px 14px -10px rgba(31,42,36,.3);
+  transition:transform .25s,box-shadow .25s}
+.feat:hover{transform:translateY(-3px);box-shadow:0 14px 26px -14px rgba(31,42,36,.35)}
+.feat-ic{width:44px;height:44px;border-radius:13px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.feat-ic .ic{width:23px;height:23px}
+.feat p{font-size:14.5px;font-weight:600;letter-spacing:-.01em}
+.welcome-foot{position:sticky;bottom:0;padding:16px 0 26px;margin-top:14px;
+  background:linear-gradient(180deg,rgba(246,247,244,0),var(--bg) 38%)}
+
+/* ---------- MENU ---------- */
+.menu-logo-row{display:flex;flex-direction:column;align-items:center;padding:34px 2px 26px}
+.menu-logo{height:84px;width:auto;display:block;filter:drop-shadow(0 6px 16px rgba(176,141,58,.20))}
+.menu-logo-fallback{font-family:Georgia,serif;font-style:italic;font-size:44px;font-weight:500;
+  background:linear-gradient(95deg,#E7C66B,#B08D3A);-webkit-background-clip:text;background-clip:text;color:transparent}
+.menu-head{padding:8px 4px 18px}
+.menu-head .hi{font-size:13px;color:var(--muted);font-weight:600;letter-spacing:.02em}
+.menu-head h1{font-size:26px;font-weight:800;letter-spacing:-.03em;margin-top:2px}
+.menu-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.tile{position:relative;background:var(--card);border-radius:var(--r);border:1px solid var(--line);
+  padding:18px 16px 16px;cursor:pointer;overflow:hidden;box-shadow:var(--shadow);
+  transition:transform .28s cubic-bezier(.34,1.56,.64,1),box-shadow .28s;min-height:128px;
+  display:flex;flex-direction:column;justify-content:space-between}
+.tile:active{transform:scale(.96)}
+.tile:hover{transform:translateY(-5px);box-shadow:var(--shadow-lg)}
+.tile-ic{width:48px;height:48px;border-radius:15px;display:flex;align-items:center;justify-content:center;margin-bottom:14px}
+.tile-ic .ic{width:25px;height:25px}
+.tile h3{font-size:16px;font-weight:700;letter-spacing:-.02em}
+.tile p{font-size:12px;color:var(--muted);font-weight:500;margin-top:3px;line-height:1.3}
+.tile .glow{position:absolute;top:-40px;right:-40px;width:110px;height:110px;border-radius:50%;opacity:.5;filter:blur(6px)}
+.tile.wide{grid-column:1/-1;min-height:auto;flex-direction:row;align-items:center;gap:14px;padding:16px}
+.tile.wide .tile-ic{margin:0}
+.tile.wide .arrow{margin-left:auto;color:var(--muted)}
+
+/* color variants */
+.v-green .tile-ic,.v-green.feat-ic{background:var(--green-l);color:var(--green-d)}
+.v-green .glow{background:var(--green)}
+.v-amber .tile-ic,.v-amber.feat-ic{background:#FDF1DD;color:var(--amber-d)}
+.v-amber .glow{background:var(--amber)}
+.v-blue .tile-ic,.v-blue.feat-ic{background:#E6F0FB;color:#2C6FB5}
+.v-blue .glow{background:#3C82D6}
+.v-pink .tile-ic,.v-pink.feat-ic{background:#FCEAF0;color:#C24C73}
+.v-pink .glow{background:#D85A85}
+.v-violet .tile-ic,.v-violet.feat-ic{background:#EFEBFB;color:#6A52C2}
+.v-violet .glow{background:#7E63D8}
+
+/* program-list icons get their colour too */
+.v-green .prog-ic{background:var(--green-l);color:var(--green-d)}
+.v-amber .prog-ic{background:#FDF1DD;color:var(--amber-d)}
+.v-blue .prog-ic{background:#E6F0FB;color:#2C6FB5}
+.v-pink .prog-ic{background:#FCEAF0;color:#C24C73}
+.v-violet .prog-ic{background:#EFEBFB;color:#6A52C2}
+
+/* photo cards (real food images fill the whole tile) */
+.ptile{position:relative;border-radius:var(--r);overflow:hidden;cursor:pointer;min-height:152px;
+  box-shadow:var(--shadow);background-color:#EAE7DE;isolation:isolate;
+  display:flex;flex-direction:column;justify-content:flex-end;
+  transition:transform .28s cubic-bezier(.34,1.56,.64,1),box-shadow .28s}
+.ptile:hover{transform:translateY(-5px);box-shadow:var(--shadow-lg)}
+.ptile:active{transform:scale(.97)}
+/* fallback icon shown when the photo file isn't there yet (behind the image layer) */
+.ptile-fallback{position:absolute;inset:0;z-index:0;display:flex;align-items:center;justify-content:center;border-radius:inherit}
+.ptile-fallback .ic{width:46px;height:46px;opacity:.8}
+.v-green.ptile-fallback{background:var(--green-l);color:var(--green-d)}
+.v-amber.ptile-fallback{background:#FDF1DD;color:var(--amber-d)}
+.v-pink.ptile-fallback{background:#FCEAF0;color:#C24C73}
+.v-violet.ptile-fallback{background:#EFEBFB;color:#6A52C2}
+/* the photo itself: a layer above the fallback. If the file 404s, this stays invisible
+   (no background renders) and the fallback icon shows through. */
+.ptile::before{content:'';position:absolute;inset:0;z-index:1;border-radius:inherit;
+  background-image:var(--img);background-size:cover;background-position:center;background-repeat:no-repeat}
+/* dark gradient so white text stays readable over any photo (stronger at the bottom third) */
+.ptile-shade{position:absolute;inset:0;z-index:2;border-radius:inherit;
+  background:linear-gradient(180deg,rgba(0,0,0,0) 30%,rgba(0,0,0,.30) 58%,rgba(0,0,0,.70) 82%,rgba(0,0,0,.80) 100%)}
+.ptile-txt{position:relative;z-index:3;padding:16px}
+.ptile-txt h3{font-size:17px;font-weight:800;letter-spacing:-.02em;color:#fff;text-shadow:0 1px 8px rgba(0,0,0,.55)}
+.ptile-txt p{font-size:12px;font-weight:600;margin-top:2px;color:rgba(255,255,255,.92);text-shadow:0 1px 7px rgba(0,0,0,.55)}
+/* gold logo used as the Контакты icon */
+.tile-logo-ic{width:48px;height:48px;object-fit:contain;flex-shrink:0}
+
+/* off-hours toast */
+#offhours{position:fixed;top:14px;left:14px;right:14px;max-width:452px;margin:0 auto;z-index:900;
+  display:flex;align-items:flex-start;gap:11px;padding:13px 15px;border-radius:14px;
+  background:#FFF7E6;border:1px solid #F2DCA6;box-shadow:0 10px 28px -12px rgba(120,90,20,.35);
+  transform:translateY(-130%);opacity:0;transition:transform .5s cubic-bezier(.22,.61,.36,1),opacity .5s}
+#offhours.show{transform:none;opacity:1}
+#offhours .oh-ic{color:var(--amber-d);flex-shrink:0;margin-top:1px}
+#offhours .oh-ic .ic{width:20px;height:20px}
+#offhours .oh-body b{font-size:13.5px;font-weight:700;color:#7A5E1A;display:block}
+#offhours .oh-body span{font-size:12px;color:#9A7B2E;font-weight:500;line-height:1.4}
+#offhours .oh-x{margin-left:auto;color:#C2A55A;font-size:18px;cursor:pointer;flex-shrink:0;line-height:1}
+
+/* ---------- PREMIUM LOADING SCREEN (Lottie handwriting + brand) ---------- */
+#loader{position:fixed;inset:0;z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:radial-gradient(125% 90% at 50% 38%,#FFFDF8 0%,#FAF4E6 55%,#F1E6CC 100%);
+  transition:opacity .7s ease,visibility .7s}
+#loader.hide{opacity:0;visibility:hidden;pointer-events:none}
+.ld-anim{display:flex;align-items:center;justify-content:center}
+.ld-brand{margin-top:6px;font-family:Georgia,'Times New Roman',serif;font-weight:700;font-size:40px;letter-spacing:.01em;
+  background:linear-gradient(95deg,#E7C66B,#B08D3A 50%,#D4AF52);-webkit-background-clip:text;background-clip:text;color:transparent;
+  opacity:0;transform:translateY(10px);transition:opacity .9s ease,transform .9s ease}
+.ld-brand.show{opacity:1;transform:none}
+.ld-tag{margin-top:14px;font-size:11px;font-weight:700;letter-spacing:.36em;text-transform:uppercase;color:rgba(176,141,58,.75);
+  opacity:0;transform:translateY(8px);transition:opacity .9s ease .15s,transform .9s ease .15s}
+.ld-tag.show{opacity:1;transform:none}
+
+/* ---------- CALCULATOR ---------- */
+.progress-wrap{padding:6px 2px 18px}
+.progress-track{height:7px;background:#E7EAE6;border-radius:99px;overflow:hidden}
+.progress-bar{height:100%;width:16%;border-radius:99px;background:linear-gradient(90deg,var(--green),#54C683);
+  transition:width .5s cubic-bezier(.22,.61,.36,1)}
+.step-label{font-size:12px;color:var(--muted);font-weight:600;margin-top:9px;display:flex;justify-content:space-between}
+.q{font-size:23px;font-weight:800;letter-spacing:-.03em;margin:6px 2px 22px;line-height:1.2}
+.opt-grid{display:grid;gap:12px}
+.opt-grid.two{grid-template-columns:1fr 1fr}
+.opt{background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-sm);padding:18px 16px;cursor:pointer;
+  display:flex;align-items:center;gap:13px;font-size:15px;font-weight:600;letter-spacing:-.01em;
+  transition:transform .2s,border-color .2s,box-shadow .25s,background .2s;box-shadow:0 3px 12px -9px rgba(31,42,36,.3)}
+.opt:hover{transform:translateY(-3px);box-shadow:0 14px 24px -14px rgba(31,42,36,.32)}
+.opt:active{transform:scale(.97)}
+.opt.sel{border-color:var(--green);background:var(--green-l)}
+.opt.center{flex-direction:column;text-align:center;gap:9px;padding:22px 12px}
+.opt .o-ic{width:42px;height:42px;border-radius:13px;background:var(--green-l);color:var(--green-d);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.opt .o-ic .ic{width:23px;height:23px}
+.opt .o-sub{font-size:11.5px;color:var(--muted);font-weight:500;margin-top:1px}
+.num-field{background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-sm);padding:8px 18px;
+  display:flex;align-items:center;gap:10px;transition:border-color .25s,box-shadow .25s}
+.num-field:focus-within{border-color:var(--green);box-shadow:0 0 0 4px rgba(63,176,105,.13)}
+.num-field input{flex:1;border:none;outline:none;font-family:inherit;font-size:34px;font-weight:800;color:var(--ink);
+  background:transparent;width:100%;letter-spacing:-.03em}
+.num-field input::placeholder{color:#C9CEC9}
+.num-field .unit{font-size:15px;color:var(--muted);font-weight:700}
+.slider-readout{text-align:center;margin:6px 0 20px}
+.slider-readout b{font-size:46px;font-weight:800;letter-spacing:-.04em;color:var(--ink)}
+.slider-readout span{font-size:16px;color:var(--muted);font-weight:600;margin-left:4px}
+input[type=range]{-webkit-appearance:none;width:100%;height:8px;border-radius:99px;
+  background:linear-gradient(90deg,var(--green) var(--p,40%),#E7EAE6 var(--p,40%));outline:none;margin:8px 0 4px}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:28px;height:28px;border-radius:50%;
+  background:#fff;border:5px solid var(--green);cursor:pointer;box-shadow:0 4px 12px -2px rgba(63,176,105,.5);transition:transform .15s}
+input[type=range]::-webkit-slider-thumb:active{transform:scale(1.18)}
+.range-ends{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);font-weight:600}
+
+/* result */
+.result-hero{position:relative;margin:4px 0 14px;padding:30px 22px;border-radius:26px;text-align:center;color:#fff;overflow:hidden;
+  background:radial-gradient(130% 120% at 50% 0%,#54C683,var(--green) 55%,var(--green-d));box-shadow:0 20px 44px -18px rgba(63,176,105,.6)}
+.result-hero::before{content:'';position:absolute;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.1);top:-80px;right:-60px}
+.result-hero .lbl{font-size:13px;opacity:.92;font-weight:600;letter-spacing:.03em;position:relative}
+.result-hero .big{font-size:58px;font-weight:800;letter-spacing:-.04em;line-height:1;margin:6px 0 2px;position:relative}
+.result-hero .big small{font-size:18px;font-weight:700;opacity:.85;margin-left:5px}
+.stat-row{display:flex;gap:11px;margin-bottom:20px}
+.stat{flex:1;background:var(--card);border:1px solid var(--line);border-radius:var(--r-sm);padding:14px;text-align:center;box-shadow:0 4px 14px -10px rgba(31,42,36,.3)}
+.stat .sv{font-size:21px;font-weight:800;letter-spacing:-.02em}
+.stat .sl{font-size:11px;color:var(--muted);font-weight:600;margin-top:2px;text-transform:uppercase;letter-spacing:.03em}
+.sec-title{font-size:13px;color:var(--muted);font-weight:700;margin:0 2px 11px;text-transform:uppercase;letter-spacing:.04em}
+
+/* ---------- PROGRAMS ---------- */
+.prog{position:relative;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px;margin-bottom:13px;
+  cursor:pointer;overflow:hidden;box-shadow:var(--shadow);transition:transform .28s,box-shadow .28s}
+.prog:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg)}
+.prog:active{transform:scale(.98)}
+.prog.rec{border:1.5px solid var(--green)}
+.prog .rec-badge{position:absolute;top:14px;right:14px;background:var(--green-l);color:var(--green-d);
+  font-size:11px;font-weight:700;padding:5px 11px;border-radius:99px;letter-spacing:.01em}
+.prog-top{display:flex;align-items:center;gap:14px;margin-bottom:14px}
+.prog-ic{width:54px;height:54px;border-radius:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.prog-ic .ic{width:28px;height:28px}
+.prog h3{font-size:18px;font-weight:800;letter-spacing:-.02em}
+.prog .kcal{font-size:13px;color:var(--muted);font-weight:600;margin-top:1px}
+.prog-meta{display:flex;gap:18px;padding-top:13px;border-top:1px solid var(--line)}
+.prog-meta div{font-size:12px;color:var(--muted);font-weight:500}
+.prog-meta b{display:block;font-size:14px;color:var(--ink);font-weight:700;margin-top:1px}
+
+/* ---------- ORDER ---------- */
+.field-label{font-size:13px;font-weight:700;color:var(--ink);margin:0 2px 9px;letter-spacing:-.01em}
+.t-input{width:100%;background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-sm);
+  padding:15px 16px;font-family:inherit;font-size:15px;font-weight:600;color:var(--ink);outline:none;
+  transition:border-color .25s,box-shadow .25s}
+.t-input::placeholder{color:#B9BEB9;font-weight:500}
+.t-input:focus{border-color:var(--green);box-shadow:0 0 0 4px rgba(63,176,105,.13)}
+.chip-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:6px}
+.chip{flex:1;min-width:calc(50% - 5px);background:var(--card);border:1.5px solid var(--line);border-radius:13px;
+  padding:14px 10px;text-align:center;cursor:pointer;font-size:14px;font-weight:700;letter-spacing:-.01em;
+  transition:transform .18s,border-color .2s,background .2s}
+.chip:active{transform:scale(.96)}
+.chip.sel{border-color:var(--green);background:var(--green-l);color:var(--green-d)}
+.chip small{display:block;font-size:11px;color:var(--muted);font-weight:500;margin-top:2px}
+.chip.sel small{color:var(--green-d)}
+.summary{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:6px 18px;box-shadow:var(--shadow);margin-bottom:16px}
+.total-box{background:var(--green-l);border:1px solid #D8EBC9;border-radius:var(--r);padding:14px 18px;margin-bottom:16px}
+.total-line{display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:600;color:var(--ink);padding:3px 0}
+.total-line.disc{color:#C24C73}
+.total-line.grand{border-top:1px dashed #BFD9A8;margin-top:6px;padding-top:10px;font-size:17px;font-weight:800;color:var(--green-d)}
+.sum-row{display:flex;justify-content:space-between;align-items:center;padding:13px 0;border-bottom:1px solid var(--line);gap:12px}
+.sum-row:last-child{border-bottom:none}
+.sum-row .k{font-size:13px;color:var(--muted);font-weight:600;flex-shrink:0}
+.sum-row .vv{font-size:14px;font-weight:700;text-align:right;letter-spacing:-.01em}
+.pay-note{display:flex;gap:11px;align-items:flex-start;background:#FDF1DD;border:1px solid #F5DFB0;border-radius:var(--r-sm);
+  padding:14px 15px;margin-bottom:18px}
+.pay-note .ic{color:var(--amber-d);flex-shrink:0;margin-top:1px}
+.pay-note p{font-size:12.5px;color:#8A6A22;font-weight:600;line-height:1.45}
+
+/* success */
+.success-wrap{text-align:center;padding-top:40px}
+.check-ring{width:104px;height:104px;border-radius:50%;background:var(--green-l);display:flex;align-items:center;justify-content:center;
+  margin:0 auto 24px;position:relative;animation:pop .5s cubic-bezier(.34,1.56,.64,1)}
+@keyframes pop{0%{transform:scale(0)}100%{transform:scale(1)}}
+.check-ring::after{content:'';position:absolute;inset:-8px;border-radius:50%;border:2px solid var(--green);opacity:.3;animation:ring 1.6s ease-out infinite}
+@keyframes ring{0%{transform:scale(.9);opacity:.5}100%{transform:scale(1.25);opacity:0}}
+.check-ring .ic{width:50px;height:50px;color:var(--green-d);stroke-width:2.5}
+.success-wrap h1{font-size:25px;font-weight:800;letter-spacing:-.03em;margin-bottom:8px}
+.success-wrap .order-no{display:inline-block;background:var(--ink);color:#fff;font-size:14px;font-weight:700;
+  padding:7px 16px;border-radius:99px;margin:6px 0 16px;letter-spacing:.01em}
+.success-wrap p{font-size:14.5px;color:var(--muted);font-weight:500;max-width:300px;margin:0 auto 8px;line-height:1.55}
+
+/* ---------- CONTENT SECTIONS (about/promo/contacts/orders) ---------- */
+.content-card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:22px;box-shadow:var(--shadow);margin-bottom:13px}
+.content-card .mission{font-size:15px;color:var(--ink);font-weight:500;line-height:1.6}
+.team-row{display:flex;gap:12px;align-items:flex-start;padding:14px 0;border-bottom:1px solid var(--line)}
+.team-row:last-child{border-bottom:none;padding-bottom:0}
+.team-ic{width:46px;height:46px;border-radius:14px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.team-row h4{font-size:14.5px;font-weight:700;letter-spacing:-.01em}
+.team-row p{font-size:12.5px;color:var(--muted);font-weight:500;margin-top:2px;line-height:1.4}
+.promo{position:relative;border-radius:var(--r);padding:20px;margin-bottom:13px;color:#fff;overflow:hidden;box-shadow:var(--shadow)}
+.promo::before{content:'';position:absolute;width:140px;height:140px;border-radius:50%;background:rgba(255,255,255,.13);top:-50px;right:-40px}
+.promo-1{background:linear-gradient(135deg,#FBB13C,var(--amber-d))}
+.promo-2{background:linear-gradient(135deg,#54C683,var(--green-d))}
+.promo-3{background:linear-gradient(135deg,#5C8FD6,#2C6FB5)}
+.promo .ptag{font-size:11px;font-weight:700;background:rgba(255,255,255,.22);padding:4px 11px;border-radius:99px;display:inline-block;margin-bottom:11px;position:relative;letter-spacing:.02em}
+.promo h3{font-size:19px;font-weight:800;letter-spacing:-.02em;position:relative;line-height:1.25}
+.promo p{font-size:13px;opacity:.92;font-weight:500;margin-top:5px;position:relative}
+.contact-row{display:flex;align-items:center;gap:14px;padding:16px 0;border-bottom:1px solid var(--line)}
+.contact-row:last-child{border-bottom:none}
+.contact-ic{width:46px;height:46px;border-radius:14px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.contact-row .ck{font-size:12px;color:var(--muted);font-weight:600}
+.contact-row .cv{font-size:15px;font-weight:700;letter-spacing:-.01em;margin-top:1px}
+.contact-row .ca{margin-left:auto;color:var(--muted)}
+.order-hist{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px;box-shadow:var(--shadow);margin-bottom:13px}
+.order-hist .oh-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.order-hist h4{font-size:16px;font-weight:800;letter-spacing:-.02em}
+.status-pill{font-size:11.5px;font-weight:700;padding:5px 12px;border-radius:99px;display:inline-flex;align-items:center;gap:5px}
+.status-pill.proc{background:#FDF1DD;color:var(--amber-d)}
+.status-pill .dot{width:6px;height:6px;border-radius:50%;background:currentColor;animation:blink 1.4s infinite}
+@keyframes blink{50%{opacity:.3}}
+.empty-state{text-align:center;padding:50px 20px}
+.empty-state .es-ic{width:80px;height:80px;border-radius:24px;background:var(--green-l);color:var(--green-d);
+  display:flex;align-items:center;justify-content:center;margin:0 auto 18px}
+.empty-state .es-ic .ic{width:38px;height:38px}
+.empty-state h3{font-size:18px;font-weight:700;margin-bottom:6px}
+.empty-state p{font-size:14px;color:var(--muted);font-weight:500;margin-bottom:20px}
+
+</style>
+</head>
+<body>
+<div id="loader">
+  <div class="ld-anim">
+    <dotlottie-player id="ldLottie" src="loader.json" autoplay speed="1.5"
+      style="width:300px;max-width:78vw;height:auto"></dotlottie-player>
+  </div>
+  <div class="ld-brand" id="ldBrand">Ratsion</div>
+  <div class="ld-tag" id="ldTag">здоровая и вкусная еда</div>
+</div>
+<div class="app" id="app"></div>
+<div id="offhours">
+  <div class="oh-ic"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><path d="M12 7v5l3 2"/></svg></div>
+  <div class="oh-body"><b>Сейчас нерабочее время</b><span>Мы работаем 09:00–18:00, кроме воскресенья. Заказы примем, менеджер ответит в рабочие часы.</span></div>
+  <div class="oh-x" id="ohClose">×</div>
+</div>
+<script>
+const tg = window.Telegram?.WebApp;
+try{ tg?.ready(); tg?.expand(); }catch(e){}
+
+/* ---------- config (fill these in) ----------
+   apiBase: публичный URL вашего бота на Render, напр. 'https://ratsion-bot.onrender.com'.
+            ЭТО ГЛАВНЫЙ КАНАЛ доставки заказа менеджеру. Без него заказы НЕ дойдут
+            надёжно (см. ниже про sendData). Без завершающего "/".
+   managerUsername: Telegram @username менеджера БЕЗ "@", напр. 'ratsion_manager'.
+            Используется как запасной вариант, если apiBase недоступен. */
+const CONFIG = { apiBase:'', managerUsername:'', phone:'+998999888808', phoneText:'+998 99 988 88 08' };
+
+/* ---------- icon set (inline SVG, premium thin-line) ---------- */
+const I = {
+  salad:'<path d="M7 21h10M12 21a9 9 0 0 0 9-9H3a9 9 0 0 0 9 9Z"/><path d="M11.38 12a2.4 2.4 0 0 1-.4-4.77 2.4 2.4 0 0 1 3.2-2.77 2.4 2.4 0 0 1 3.47 3.27A2.4 2.4 0 0 1 16 12"/><path d="m13 12-4-4M8 9h.01"/>',
+  bowl:'<path d="M3 11h18M5 11a7 7 0 0 0 14 0M12 11V4M12 4a2 2 0 1 0 0-.5"/><path d="M19 21H5"/>',
+  calc:'<rect x="4" y="2" width="16" height="20" rx="2.5"/><path d="M8 6h8M8 10h.01M12 10h.01M16 10h.01M8 14h.01M12 14h.01M16 14h4M8 18h.01M12 18h.01"/>',
+  gift:'<rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/><path d="M12 8S10.5 3 7.5 3 5 8 12 8Zm0 0s1.5-5 4.5-5S19 8 12 8Z"/>',
+  info:'<circle cx="12" cy="12" r="9.5"/><path d="M12 16v-4M12 8h.01"/>',
+  phone:'<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92Z"/>',
+  box:'<path d="M21 8 12 3 3 8v8l9 5 9-5V8Z"/><path d="m3 8 9 5 9-5M12 13v8"/>',
+  flame:'<path d="M12 2c1 4 5 5 5 9a5 5 0 0 1-10 0c0-1.5.5-2.5 1-3 .5 2 2 2.5 2 2.5C9 8 12 6 12 2Z"/>',
+  leaf:'<path d="M11 20A7 7 0 0 1 4 13c0-6 8-9 16-9 0 8-3 16-9 16ZM4 21c4-6 7-8 12-9"/>',
+  dumbbell:'<path d="M6.5 6.5 17.5 17.5M3 8v8M8 3v18M16 3v18M21 8v8M2 12h2M20 12h2"/>',
+  sprout:'<path d="M7 20h10M12 20V10M12 10a4 4 0 0 0-4-4H6a4 4 0 0 0 4 4Zm0 0a4 4 0 0 1 4-4h2a4 4 0 0 1-4 4Z"/>',
+  arrow:'<path d="M5 12h14M13 6l6 6-6 6"/>',
+  back:'<path d="M19 12H5M11 18l-6-6 6-6"/>',
+  man:'<circle cx="12" cy="6" r="3.5"/><path d="M5 21c0-4 3-7 7-7s7 3 7 7"/>',
+  woman:'<circle cx="12" cy="6" r="3.5"/><path d="M8 21l1.5-7M16 21l-1.5-7M9 14h6"/>',
+  chef:'<path d="M6 14h12v5a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2v-5Z"/><path d="M6 14a4 4 0 0 1-1-7.9A4 4 0 0 1 12 4a4 4 0 0 1 7 2.1A4 4 0 0 1 18 14"/>',
+  heart:'<path d="M19 5a5.5 5.5 0 0 0-7 .9A5.5 5.5 0 0 0 5 5a5.4 5.4 0 0 0 0 7.7L12 20l7-7.3A5.4 5.4 0 0 0 19 5Z"/>',
+  truck:'<path d="M1 3h13v13H1zM14 8h4l3 3v5h-7"/><circle cx="6" cy="18" r="2"/><circle cx="18" cy="18" r="2"/>',
+  check:'<path d="M5 13l4 4L19 7"/>',
+  refresh:'<path d="M21 12a9 9 0 1 1-3-6.7L21 8M21 3v5h-5"/>',
+  edit:'<path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/>',
+  insta:'<rect x="2.5" y="2.5" width="19" height="19" rx="5.5"/><circle cx="12" cy="12" r="4"/><path d="M17.5 6.5h.01"/>',
+  send:'<path d="M22 2 11 13M22 2l-7 20-4-9-9-4Z"/>',
+  clock:'<circle cx="12" cy="12" r="9.5"/><path d="M12 7v5l3 2"/>',
+  cart:'<circle cx="9" cy="21" r="1.5"/><circle cx="18" cy="21" r="1.5"/><path d="M2 3h3l2.4 12.4a2 2 0 0 0 2 1.6h8.4a2 2 0 0 0 2-1.6L23 6H6"/>',
+  cal:'<rect x="3" y="4.5" width="18" height="17" rx="2.5"/><path d="M3 9.5h18M8 2.5v4M16 2.5v4"/>',
+  target:'<circle cx="12" cy="12" r="9.5"/><circle cx="12" cy="12" r="5.5"/><circle cx="12" cy="12" r="1.5"/>',
+  scale:'<path d="M12 3a4 4 0 0 0-4 4h8a4 4 0 0 0-4-4Z"/><rect x="4" y="7" width="16" height="14" rx="3"/><path d="M12 11v3"/>',
+  ruler:'<rect x="2" y="8" width="20" height="8" rx="1.5"/><path d="M6 8v3M10 8v4M14 8v3M18 8v4"/>',
+  trend:'<path d="M3 17l6-6 4 4 7-7M17 8h4v4"/>',
+  trenddown:'<path d="M3 7l6 6 4-4 7 7M17 16h4v-4"/>',
+  equal:'<path d="M5 9h14M5 15h14"/>',
+  sofa:'<path d="M4 11V8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3M2 13a2 2 0 0 1 2-2 2 2 0 0 1 2 2v3h12v-3a2 2 0 0 1 4 0v5H2Z"/>',
+  walk:'<circle cx="13" cy="4" r="2"/><path d="M11 21l1-6-3-3 1-5 3 3 3 1M8 21l2-5"/>',
+  run:'<circle cx="14" cy="4" r="2"/><path d="M10 21l2-5-2-3 1-4 3 3 3 .5M7 12l2-1M14 13l-1 8"/>'
+};
+function ic(name,cls='ic'){return `<svg class="${cls}" viewBox="0 0 24 24">${I[name]||''}</svg>`}
+
+/* ---------- programs data (easily editable / from backend later) ---------- */
+/* ---------- program catalogue (real Ratsion data) ----------
+   Each category has calorie tiers; price is per day (прайс на 1 день).
+   tiers: {lo, hi, price}  — price in сум.
+   *** CATEGORIES MARKED needConfirm:true use placeholder numbers the client must confirm ***/
+const CATEGORIES = [
+  {
+    id:'lechebnaya', name:'Лечебная диета', sub:'Стол №5 и №9', icon:'heart', v:'pink',
+    tiers:[
+      {lo:800,hi:1000,price:145000},{lo:1000,hi:1200,price:165000},{lo:1200,hi:1400,price:185000},
+      {lo:1400,hi:1600,price:195000},{lo:1600,hi:1800,price:205000},{lo:1800,hi:2000,price:225000},
+      {lo:2000,hi:2200,price:240000},{lo:2200,hi:2500,price:255000}
+    ]
+  },
+  {
+    id:'individual', name:'Индивидуальный рацион', sub:'подбор под вашу цель', icon:'leaf', v:'green',
+    tiers:[
+      {lo:1000,hi:1500,price:250000,label:'Первая группа'},
+      {lo:1500,hi:2000,price:280000,label:'Вторая группа'},
+      {lo:2000,hi:2500,price:320000,label:'Третья группа'},
+      {lo:2500,hi:3000,price:370000,label:'Четвёртая группа'}
+    ]
+  },
+  {
+    id:'belkovaya', name:'Белковая группа', sub:'повышенный белок', icon:'dumbbell', v:'blue',
+    tiers:[
+      {lo:1000,hi:1200,price:250000,label:'Первая группа'},
+      {lo:1200,hi:1500,price:275000,label:'Вторая группа'},
+      {lo:1500,hi:1800,price:290000,label:'Третья группа'},
+      {lo:1800,hi:2000,price:300000,label:'Четвёртая группа'},
+      {lo:2000,hi:2500,price:330000,label:'Пятая группа'},
+      {lo:2500,hi:3000,price:380000,label:'Шестая группа'}
+    ]
+  },
+  {
+    id:'delovoy', name:'Деловой пакет', sub:'бизнес-рацион и кето', icon:'box', v:'amber',
+    tiers:[
+      {lo:800,hi:1000,price:105000,label:'Деловой'},
+      {lo:1000,hi:1600,price:250000,label:'Кето диета'}
+    ]
+  }
+];
+
+/* fmt price like "145 000 сум" */
+function sum(n){ return n.toLocaleString('ru-RU').replace(/,/g,' ')+' сум'; }
+/* pick the tier in a category that best fits a kcal value */
+function tierForKcal(cat,kcal){
+  for(const t of cat.tiers){ if(kcal>=t.lo && kcal<=t.hi) return t; }
+  // clamp to nearest edge tier
+  if(kcal < cat.tiers[0].lo) return cat.tiers[0];
+  return cat.tiers[cat.tiers.length-1];
+}
+
+/* ---------- app state ---------- */
+const S = { stack:['menu'], calc:{gender:null,age:25,height:170,weight:65,activity:null,goal:null,result:null,bmr:0,tdee:0,recCat:null,recTier:null}, order:{cat:null,tier:null,duration:null,date:null,address:'',name:'',phone:''}, hasOrders:false };
+const ACT = {min:{k:1.2,label:'Минимальный',sub:'сидячий образ жизни',icon:'sofa'},light:{k:1.375,label:'Лёгкий',sub:'1–3 трен/нед',icon:'walk'},mid:{k:1.55,label:'Средний',sub:'3–5 трен/нед',icon:'run'},high:{k:1.725,label:'Высокий',sub:'6–7 трен/нед',icon:'dumbbell'},vhigh:{k:1.9,label:'Очень высокий',sub:'спорт + физ. труд',icon:'flame'}};
+
+const app = document.getElementById('app');
+function haptic(t='light'){try{tg?.HapticFeedback?.impactOccurred(t)}catch(e){}}
+
+/* ---------- navigation ---------- */
+function go(screen,replace=false){
+  haptic('light');
+  if(replace){S.stack[S.stack.length-1]=screen}else{S.stack.push(screen)}
+  render();
+}
+function back(){ haptic('light'); if(S.stack.length>1){S.stack.pop();render()} }
+
+function render(){
+  const cur = S.stack[S.stack.length-1];
+  app.innerHTML = SCREENS[cur] ? SCREENS[cur]() : SCREENS.menu();
+  const el = app.firstElementChild;
+  requestAnimationFrame(()=>{ el?.classList.add('active'); });
+  attach(cur);
+  app.scrollTop=0;
+  const sc = app.querySelector('.screen'); if(sc) sc.scrollTop=0;
+}
+
+function topbar(title){return `<div class="topbar"><div class="back-btn" data-act="back">${ic('back')}</div><h2>${title}</h2></div>`}
+
+const SCREENS = {
+/* ===== MAIN MENU ===== */
+menu:()=>`<div class="screen" id="menu">
+  <div class="menu-logo-row fade-up d1">
+    <img class="menu-logo" src="logo.png" alt="Ratsion"
+         onerror="this.onerror=null;this.outerHTML='<span class=&quot;menu-logo-fallback&quot;>Ratsion</span>'">
+  </div>
+  <div class="menu-grid">
+    <div class="ptile fade-up d1" data-go="programs" style="--img:url('food-order.jpg')">
+      <div class="ptile-fallback v-green">${ic('bowl')}</div>
+      <div class="ptile-shade"></div>
+      <div class="ptile-txt"><h3>Заказать</h3><p>программы питания</p></div>
+    </div>
+    <div class="ptile fade-up d2" data-go="calc" style="--img:url('food-calories.jpg')">
+      <div class="ptile-fallback v-amber">${ic('calc')}</div>
+      <div class="ptile-shade"></div>
+      <div class="ptile-txt"><h3>Калории</h3><p>расчёт нормы</p></div>
+    </div>
+    <div class="ptile fade-up d3" data-go="promo" style="--img:url('food-promo.jpg')">
+      <div class="ptile-fallback v-pink">${ic('gift')}</div>
+      <div class="ptile-shade"></div>
+      <div class="ptile-txt"><h3>Акции</h3><p>спецпредложения</p></div>
+    </div>
+    <div class="ptile fade-up d4" data-go="about" style="--img:url('food-about.jpg')">
+      <div class="ptile-fallback v-violet">${ic('info')}</div>
+      <div class="ptile-shade"></div>
+      <div class="ptile-txt"><h3>О компании</h3><p>наша команда</p></div>
+    </div>
+    <div class="tile wide v-blue fade-up d5" data-go="contacts">
+      <img class="tile-logo-ic" src="contact-logo.png" alt=""
+           onerror="this.onerror=null;this.insertAdjacentHTML('afterend','<div class=&quot;tile-ic&quot;>${ic('phone').replace(/"/g,'&quot;')}</div>');this.remove()">
+      <div><h3>Контакты</h3><p>связаться с менеджером</p></div><div class="arrow">${ic('arrow')}</div></div>
+    <div class="tile wide v-green fade-up d6" data-go="orders"><div class="tile-ic">${ic('box')}</div><div><h3>Мои заказы</h3><p>история и статус</p></div><div class="arrow">${ic('arrow')}</div></div>
+  </div>
+</div>`,
+
+/* ===== ABOUT ===== */
+about:()=>`<div class="screen" id="about">
+  ${topbar('О компании')}
+  <div class="content-card fade-up d1">
+    <p class="mission">«Ratsion» — это команда профессионалов в области правильного питания. Мы стараемся для вас, чтобы вы были здоровыми, отдохнувшими, сытыми и довольными 💚</p>
+  </div>
+  <p class="sec-title fade-up d2" style="margin-top:18px">Наша команда</p>
+  <div class="content-card fade-up d3">
+    <div class="team-row"><div class="team-ic v-amber">${ic('chef')}</div><div><h4>Повара</h4><p>Профессиональное образование и опыт в ресторанах высокого уровня</p></div></div>
+    <div class="team-row"><div class="team-ic v-green">${ic('heart')}</div><div><h4>Консультанты и диетолог</h4><p>Подберут программу под ваши конкретные цели</p></div></div>
+    <div class="team-row"><div class="team-ic v-blue">${ic('truck')}</div><div><h4>Курьеры</h4><p>Доставят заказ в нужное время и место</p></div></div>
+  </div>
+  <div style="margin-top:18px" class="fade-up d4"><button class="cta cta-green" data-go="programs">${ic('bowl')} Заказать питание</button></div>
+</div>`,
+
+/* ===== PROMO (real Ratsion discounts) ===== */
+promo:()=>`<div class="screen" id="promo">
+  ${topbar('Акции')}
+  <div class="promo promo-2 fade-up d1"><span class="ptag">ЗАКАЗ НА 15 ДНЕЙ</span><h3>5% скидка</h3><p>При оформлении программы на 15 дней</p></div>
+  <div class="promo promo-1 fade-up d2"><span class="ptag">ЗАКАЗ НА 30 ДНЕЙ</span><h3>10% скидка</h3><p>При оформлении программы на 30 дней</p></div>
+  <p style="font-size:12px;color:var(--muted);text-align:center;margin:14px 6px 0;font-weight:500;line-height:1.5" class="fade-up d3">Скидки и акции на «Деловой рацион» не действуют. Оплата возврату не подлежит.</p>
+</div>`,
+
+/* ===== CONTACTS ===== */
+contacts:()=>`<div class="screen" id="contacts">
+  ${topbar('Контакты')}
+  <div class="content-card fade-up d1" style="padding:6px 22px">
+    <div class="contact-row" data-link="tel:+998999888808" style="cursor:pointer"><div class="contact-ic v-green">${ic('phone')}</div><div><div class="ck">Телефон</div><div class="cv">+998 99 988 88 08</div></div><div class="ca">${ic('arrow')}</div></div>
+    <div class="contact-row"><div class="contact-ic v-amber">${ic('clock')}</div><div><div class="ck">Время работы</div><div class="cv">09:00 – 18:00 · Вс — выходной</div></div></div>
+    <div class="contact-row" data-link="https://instagram.com/ratsion.uzb" style="cursor:pointer"><div class="contact-ic v-pink">${ic('insta')}</div><div><div class="ck">Instagram</div><div class="cv">@ratsion.uzb</div></div><div class="ca">${ic('arrow')}</div></div>
+  </div>
+  <div style="margin-top:16px" class="fade-up d3"><button class="cta cta-green" data-act="manager">${ic('send')} Написать менеджеру</button></div>
+</div>`,
+
+/* ===== CALCULATOR (multi-step, one screen) ===== */
+calc:()=>{
+  if(S.calc.result!==null) return SCREENS._calcResult();
+  return `<div class="screen" id="calc"><div id="calc-inner">${calcStep()}</div></div>`;
+},
+_calcResult:()=>{
+  const c=S.calc, cat=c.recCat, t=c.recTier;
+  return `<div class="screen" id="calc">
+    ${topbar('Ваш результат')}
+    <div class="result-hero fade-up d1">
+      <div class="lbl">Ваша суточная норма</div>
+      <div class="big">${c.result.toLocaleString('ru')}<small>ккал</small></div>
+    </div>
+    <div class="stat-row fade-up d2">
+      <div class="stat"><div class="sv">${c.bmr.toLocaleString('ru')}</div><div class="sl">BMR</div></div>
+      <div class="stat"><div class="sv">${c.tdee.toLocaleString('ru')}</div><div class="sl">TDEE</div></div>
+    </div>
+    <p class="sec-title fade-up d3">Рекомендуем для вас</p>
+    <div class="prog rec fade-up d3" data-cat="${cat.id}" data-tier="${t.lo}"><span class="rec-badge">Лучший выбор</span>
+      <div class="prog-top"><div class="prog-ic v-${cat.v}">${ic(cat.icon)}</div><div><h3>${cat.name}</h3><div class="kcal">${t.label?t.label+' · ':''}${t.lo}–${t.hi} ккал/день</div></div></div>
+      <div class="prog-meta"><div>Цена за день<b>${sum(t.price)}</b></div><div>Под вашу цель<b>${goalLabel(c.goal)}</b></div></div>
+    </div>
+    <p class="sec-title fade-up d4" style="margin-top:16px">Другие программы</p>
+    ${CATEGORIES.filter(x=>x.id!==cat.id).map((o,i)=>{const ot=tierForKcal(o,c.result);return `<div class="prog fade-up d4" data-cat="${o.id}" data-tier="${ot.lo}">
+      <div class="prog-top"><div class="prog-ic v-${o.v}">${ic(o.icon)}</div><div><h3>${o.name}</h3><div class="kcal">${o.sub} · от ${sum(o.tiers[0].price)}</div></div></div>
+    </div>`}).join('')}
+    <div style="margin-top:6px" class="fade-up d5">
+      <button class="cta cta-ghost" data-act="recalc">${ic('refresh')} Рассчитать заново</button>
+    </div>
+  </div>`;
+},
+
+orders:()=>{
+  const list=loadOrders();
+  if(!list.length) return `<div class="screen" id="orders">
+    ${topbar('Мои заказы')}
+    <div class="empty-state fade-up d1">
+      <div class="es-ic">${ic('box')}</div>
+      <h3>Заказов пока нет</h3>
+      <p>Самое время выбрать программу питания под ваши цели</p>
+      <button class="cta cta-green" data-go="programs">${ic('bowl')} Заказать питание</button>
+    </div>
+  </div>`;
+  return `<div class="screen" id="orders">
+    ${topbar('Мои заказы')}
+    ${list.map((od,i)=>`<div class="order-hist fade-up d${Math.min(i+1,6)}">
+      <div class="oh-top"><h4>Заказ ${od.no}</h4><span class="status-pill proc"><span class="dot"></span>${od.status||'В обработке'}</span></div>
+      <div class="prog-meta" style="border:none;padding:0">
+        <div>Программа<b>${od.category}</b></div><div>Срок<b>${od.duration}</b></div><div>Старт<b>${od.date}</b></div>
+      </div>
+      <div class="total-line grand" style="border-top:1px dashed #BFD9A8;margin-top:10px;padding-top:10px"><span>Итого</span><span>${sum(od.total)}</span></div>
+    </div>`).join('')}
+    <div style="display:flex;gap:11px;margin-top:4px" class="fade-up d6">
+      <button class="cta cta-green" style="flex:1" data-go="programs">${ic('refresh')} Новый заказ</button>
+    </div>
+  </div>`;
+},
+
+/* ===== PROGRAM LIST (categories) ===== */
+programs:()=>{
+  const recId = S.calc.recCat ? S.calc.recCat.id : null;
+  const ordered = recId ? [CATEGORIES.find(c=>c.id===recId),...CATEGORIES.filter(c=>c.id!==recId)] : CATEGORIES;
+  return `<div class="screen" id="programs">
+    ${topbar('Программы питания')}
+    ${recId?`<p class="sec-title fade-up d1" style="margin-top:4px">Рекомендовано по вашему расчёту</p>`:''}
+    ${ordered.map((cat,i)=>{
+      const lo=cat.tiers[0].price, hi=cat.tiers[cat.tiers.length-1].price;
+      const priceRange = lo===hi?sum(lo):`${sum(lo)} – ${sum(hi)}`;
+      return `<div class="prog ${recId&&cat.id===recId?'rec':''} fade-up d${Math.min(i+1,6)}" data-cat="${cat.id}">
+      ${recId&&cat.id===recId?'<span class="rec-badge">Для вас</span>':''}
+      <div class="prog-top"><div class="prog-ic v-${cat.v}">${ic(cat.icon)}</div><div><h3>${cat.name}</h3><div class="kcal">${cat.sub}</div></div></div>
+      <div class="prog-meta"><div>Калорийность<b>${cat.tiers[0].lo}–${cat.tiers[cat.tiers.length-1].hi} ккал</b></div><div>Цена за день<b>${priceRange}</b></div></div>
+    </div>`}).join('')}
+    <p style="font-size:12px;color:var(--muted);text-align:center;margin:12px 6px 0;font-weight:500" class="fade-up d6">Цена указана за 1 день. В стоимость входят доставка, контейнеры и приборы.</p>
+  </div>`;
+},
+
+/* ===== TIER SELECTION (pick calorie tier within a category) ===== */
+tiers:()=>{
+  const cat=S.order.cat;
+  if(!cat) return SCREENS.programs();
+  const recLo = (S.calc.recCat&&S.calc.recCat.id===cat.id&&S.calc.recTier)?S.calc.recTier.lo:null;
+  return `<div class="screen" id="tiers">
+    ${topbar(cat.name)}
+    ${cat.needConfirm?`<div class="pay-note fade-up d1" style="margin-bottom:14px">${ic('info')}<p>Цены этой категории уточняются — менеджер подтвердит при оформлении.</p></div>`:''}
+    <p class="sec-title fade-up d1">Выберите калорийность</p>
+    ${cat.tiers.map((t,i)=>`<div class="prog ${recLo===t.lo?'rec':''} fade-up d${Math.min(i+1,6)}" data-cat="${cat.id}" data-tier="${t.lo}">
+      ${recLo===t.lo?'<span class="rec-badge">Для вас</span>':''}
+      <div class="prog-top"><div class="prog-ic v-${cat.v}">${ic(cat.icon)}</div><div><h3>${t.label?t.label:t.lo+'–'+t.hi+' ккал'}</h3><div class="kcal">${t.lo}–${t.hi} ккал/день</div></div></div>
+      <div class="prog-meta"><div>Цена за день<b>${sum(t.price)}</b></div><div>Доставка<b>включена</b></div></div>
+    </div>`).join('')}
+  </div>`;
+},
+
+/* ===== ORDER FLOW (multi-step) ===== */
+order:()=>`<div class="screen" id="order"><div id="order-inner">${orderStep()}</div></div>`,
+
+/* ===== SUCCESS ===== */
+success:()=>{
+  const n = S.order.orderNo || '#—';
+  const delivered = S.order.delivered;
+  return `<div class="screen" id="success">
+    <div class="success-wrap">
+      <div class="check-ring fade-up d1">${ic('check')}</div>
+      <h1 class="fade-up d2">Заказ оформлен!</h1>
+      <div class="order-no fade-up d2">${n}</div>
+      ${delivered
+        ? `<p class="fade-up d3">Заказ отправлен менеджеру. Он свяжется с вами для подтверждения и деталей доставки.</p>`
+        : `<div class="pay-note fade-up d3" style="text-align:left;margin:8px 0 2px">${ic('info')}<p>Заказ сохранён в «Мои заказы». Чтобы мы точно его получили — отправьте детали менеджеру или позвоните, это пара секунд.</p></div>`}
+      <div style="margin-top:24px" class="fade-up d4">
+        ${!delivered?`<button class="cta cta-green" data-act="sendmanager">${ic('send')} Отправить менеджеру</button>`:''}
+        <a href="tel:${CONFIG.phone}" class="cta ${delivered?'cta-green':'cta-amber'}" style="text-decoration:none;${!delivered?'margin-top:8px':''}">${ic('phone')} ${CONFIG.phoneText}</a>
+        <button class="cta cta-ghost" data-act="home" style="margin-top:6px">На главную</button>
+      </div>
+    </div>
+  </div>`;
+}
+};
+
+function goalLabel(g){return {loss:'Снижение веса',maint:'Поддержание',gain:'Набор массы'}[g]||''}
+
+function calcStep(){
+  const c=S.calc;
+  let step='gender';
+  if(c.gender&&!c.bodyDone){ step='body'; }
+  else if(c.gender&&c.bodyDone&&!c.activity){ step='activity'; }
+  else if(c.gender&&c.bodyDone&&c.activity&&!c.goal){ step='goal'; }
+  const steps=['gender','body','activity','goal'];
+  const idx=steps.indexOf(step);
+  const pct=((idx+1)/steps.length)*100;
+  const head=`<div class="topbar"><div class="back-btn" data-act="calcback">${ic('back')}</div><h2>Расчёт калорий</h2></div>
+    <div class="progress-wrap"><div class="progress-track"><div class="progress-bar" style="width:${pct}%"></div></div>
+    <div class="step-label"><span>Шаг ${idx+1} из 4</span><span>${Math.round(pct)}%</span></div></div>`;
+
+  if(step==='gender') return head+`
+    <div class="q fade-up d1">Укажите ваш пол</div>
+    <div class="opt-grid two">
+      <div class="opt center ${c.gender==='m'?'sel':''} fade-up d2" data-gender="m"><div class="o-ic">${ic('man')}</div>Мужской</div>
+      <div class="opt center ${c.gender==='f'?'sel':''} fade-up d3" data-gender="f"><div class="o-ic">${ic('woman')}</div>Женский</div>
+    </div>`;
+
+  if(step==='body') return head+`
+    <div class="q fade-up d1">Параметры тела</div>
+    <div class="fade-up d2" style="margin-bottom:22px">
+      <div class="field-label">Возраст</div>
+      <div class="num-field"><input id="age" type="number" inputmode="numeric" value="${c.age}" min="14" max="80"><span class="unit">лет</span></div>
+    </div>
+    <div class="fade-up d3" style="margin-bottom:22px">
+      <div class="field-label">Рост · <span id="hVal" style="color:var(--green-d)">${c.height} см</span></div>
+      <input id="height" type="range" min="140" max="210" value="${c.height}" style="--p:${(c.height-140)/70*100}%">
+      <div class="range-ends"><span>140</span><span>210</span></div>
+    </div>
+    <div class="fade-up d4" style="margin-bottom:26px">
+      <div class="field-label">Вес · <span id="wVal" style="color:var(--green-d)">${c.weight} кг</span></div>
+      <input id="weight" type="range" min="40" max="150" value="${c.weight}" style="--p:${(c.weight-40)/110*100}%">
+      <div class="range-ends"><span>40</span><span>150</span></div>
+    </div>
+    <button class="cta cta-green fade-up d5" data-act="bodynext">Далее ${ic('arrow')}</button>`;
+
+  if(step==='activity') return head+`
+    <div class="q fade-up d1">Уровень активности</div>
+    <div class="opt-grid">
+      ${Object.entries(ACT).map(([k,a],i)=>`<div class="opt ${c.activity===k?'sel':''} fade-up d${i+1}" data-act-level="${k}">
+        <div class="o-ic">${ic(a.icon)}</div><div><div>${a.label}</div><div class="o-sub">${a.sub}</div></div></div>`).join('')}
+    </div>`;
+
+  if(step==='goal') return head+`
+    <div class="q fade-up d1">Какая у вас цель?</div>
+    <div class="opt-grid">
+      <div class="opt ${c.goal==='loss'?'sel':''} fade-up d2" data-goal="loss"><div class="o-ic">${ic('trenddown')}</div><div>Снижение веса<div class="o-sub">умеренный дефицит −15%</div></div></div>
+      <div class="opt ${c.goal==='maint'?'sel':''} fade-up d3" data-goal="maint"><div class="o-ic">${ic('equal')}</div><div>Поддержание веса<div class="o-sub">норма без изменений</div></div></div>
+      <div class="opt ${c.goal==='gain'?'sel':''} fade-up d4" data-goal="gain"><div class="o-ic">${ic('trend')}</div><div>Набор массы<div class="o-sub">умеренный профицит +12%</div></div></div>
+    </div>`;
+  return head;
+}
+
+function computeCalories(){
+  const c=S.calc;
+  let bmr = 10*c.weight + 6.25*c.height - 5*c.age + (c.gender==='m'?5:-161);
+  let tdee = bmr * ACT[c.activity].k;
+  let result = tdee;
+  if(c.goal==='loss') result = tdee*0.85;
+  if(c.goal==='gain') result = tdee*1.12;
+  const floor = c.gender==='f'?1200:1500;
+  result = Math.max(result, floor);
+  c.bmr=Math.round(bmr); c.tdee=Math.round(tdee); c.result=Math.round(result/10)*10;
+  // recommend the "Индивидуальный рацион" category as the default, and the tier matching the kcal
+  const cat = CATEGORIES.find(x=>x.id==='individual') || CATEGORIES[0];
+  c.recCat = cat;
+  c.recTier = tierForKcal(cat, c.result);
+}
+
+function orderStep(){
+  const o=S.order;
+  let step = 'duration';
+  if(o.duration&&!o.date) step='date';
+  else if(o.duration&&o.date&&(!o.address||!o.name||!o.phone)) step='details';
+  else if(o.duration&&o.date&&o.address&&o.name&&o.phone) step='confirm';
+
+  const head=`<div class="topbar"><div class="back-btn" data-act="orderback">${ic('back')}</div><h2>${o.cat?o.cat.name:'Оформление'}</h2></div>`;
+
+  if(step==='duration') return head+`
+    <div class="q fade-up d1">На какой срок?</div>
+    <div class="chip-row fade-up d2">
+      <div class="chip" data-dur="3 дня (пробный)" data-days="3">3 дня<small>пробный</small></div>
+      <div class="chip" data-dur="7 дней" data-days="7">7 дней<small>неделя</small></div>
+      <div class="chip" data-dur="15 дней" data-days="15">15 дней<small>−5% скидка</small></div>
+      <div class="chip" data-dur="30 дней" data-days="30">30 дней<small>−10% скидка</small></div>
+    </div>
+    <p style="font-size:12px;color:var(--muted);margin:4px 6px 0;font-weight:500" class="fade-up d3">Цена указана за 1 день. Итоговая сумма за весь срок — на следующем шаге.</p>`;
+
+  if(step==='date') return head+`
+    <div class="q fade-up d1">Дата начала доставки</div>
+    <div class="chip-row fade-up d2" style="margin-bottom:14px">
+      <div class="chip" data-date="tomorrow">Завтра</div>
+      <div class="chip" data-date="day2">Через 2 дня</div>
+    </div>
+    <div class="fade-up d3">
+      <div class="field-label">Или укажите свою дату</div>
+      <input class="t-input" id="customDate" placeholder="ДД.ММ.ГГГГ" inputmode="numeric">
+      <button class="cta cta-green" data-act="datenext" style="margin-top:12px">Далее ${ic('arrow')}</button>
+    </div>`;
+
+  if(step==='details') return head+`
+    <div class="q fade-up d1">Контакты и доставка</div>
+    <div class="fade-up d2" style="margin-bottom:16px"><div class="field-label">Адрес доставки</div>
+      <input class="t-input" id="address" placeholder="Город, район, улица, дом, кв." value="${o.address}"></div>
+    <div class="fade-up d3" style="margin-bottom:16px"><div class="field-label">Имя и фамилия</div>
+      <input class="t-input" id="name" placeholder="Как к вам обращаться?" value="${o.name}"></div>
+    <div class="fade-up d4" style="margin-bottom:22px"><div class="field-label">Телефон</div>
+      <input class="t-input" id="phone" type="tel" inputmode="tel" placeholder="+998 __ ___ __ __" value="${o.phone}"></div>
+    <button class="cta cta-green fade-up d5" data-act="detailsnext">Проверить заказ ${ic('arrow')}</button>`;
+
+  if(step==='confirm'){
+    const pr=orderPricing(o);
+    return head+`
+    <div class="q fade-up d1">Проверьте заказ</div>
+    <div class="summary fade-up d2">
+      <div class="sum-row"><span class="k">Программа</span><span class="vv">${o.cat.name}</span></div>
+      <div class="sum-row"><span class="k">Калорийность</span><span class="vv">${o.tier.lo}–${o.tier.hi} ккал/день</span></div>
+      <div class="sum-row"><span class="k">Цена за день</span><span class="vv">${sum(o.tier.price)}</span></div>
+      <div class="sum-row"><span class="k">Срок</span><span class="vv">${o.duration}</span></div>
+      <div class="sum-row"><span class="k">Начало</span><span class="vv">${o.date}</span></div>
+      <div class="sum-row"><span class="k">Адрес</span><span class="vv">${o.address}</span></div>
+      <div class="sum-row"><span class="k">Получатель</span><span class="vv">${o.name}</span></div>
+      <div class="sum-row"><span class="k">Телефон</span><span class="vv">${o.phone}</span></div>
+    </div>
+    <div class="total-box fade-up d3">
+      <div class="total-line"><span>${o.days} × ${sum(o.tier.price)}</span><span>${sum(pr.subtotal)}</span></div>
+      ${pr.discountPct>0?`<div class="total-line disc"><span>Скидка ${pr.discountPct}%</span><span>−${sum(pr.discountAmt)}</span></div>`:''}
+      <div class="total-line grand"><span>Итого за ${o.days} дн.</span><span>${sum(pr.total)}</span></div>
+    </div>
+    <div class="pay-note fade-up d3">${ic('info')}<p>Оплата наличными при доставке. Менеджер свяжется с вами для подтверждения. Доставка по Ташкенту.</p></div>
+    <button class="cta cta-amber fade-up d4" data-act="placeorder">${ic('check')} Подтвердить заказ</button>
+    <button class="cta cta-ghost fade-up d4" data-act="orderback">${ic('edit')} Изменить</button>`;
+  }
+  return head;
+}
+
+/* compute order pricing: subtotal, discount, total */
+function orderPricing(o){
+  const days=o.days||1;
+  const subtotal=o.tier.price*days;
+  let discountPct=0;
+  if(days>=30) discountPct=10; else if(days>=15) discountPct=5;
+  // discount does not apply to Деловой пакет
+  if(o.cat && o.cat.id==='delovoy') discountPct=0;
+  const discountAmt=Math.round(subtotal*discountPct/100);
+  const total=subtotal-discountAmt;
+  return {subtotal,discountPct,discountAmt,total};
+}
+
+function dateFrom(days){const d=new Date();d.setDate(d.getDate()+days);return String(d.getDate()).padStart(2,'0')+'.'+String(d.getMonth()+1).padStart(2,'0')+'.'+d.getFullYear();}
+
+function softRender(innerId,builder){
+  const inner=document.getElementById(innerId);
+  if(!inner){render();return;}
+  inner.style.opacity='0';inner.style.transform='translateY(10px)';inner.style.transition='opacity .22s,transform .22s';
+  setTimeout(()=>{ inner.innerHTML=builder(); inner.style.opacity='1';inner.style.transform='none';
+    attach(S.stack[S.stack.length-1]); },210);
+}
+
+/* ---------- order persistence (real "Мои заказы" history) ---------- */
+function loadOrders(){ try{ return JSON.parse(localStorage.getItem('ratsion_orders')||'[]'); }catch(e){ return []; } }
+function saveOrder(rec){ const list=loadOrders(); list.unshift(rec); try{ localStorage.setItem('ratsion_orders', JSON.stringify(list.slice(0,20))); }catch(e){} }
+function nextOrderNo(){ let n=+(localStorage.getItem('ratsion_orderseq')||'1041')+1; try{ localStorage.setItem('ratsion_orderseq',String(n)); }catch(e){} return '#'+n; }
+
+/* parse & validate ДД.ММ.ГГГГ — must be a real calendar date, today..+90 days */
+function parseRuDate(v){
+  const m=/^(\d{2})\.(\d{2})\.(\d{4})$/.exec(v); if(!m) return null;
+  const d=+m[1], mo=+m[2], y=+m[3];
+  const dt=new Date(y,mo-1,d);
+  if(dt.getFullYear()!==y||dt.getMonth()!==mo-1||dt.getDate()!==d) return null; // rejects 31.02 etc.
+  const today=new Date(); today.setHours(0,0,0,0);
+  if(dt<today) return null;                                                     // rejects past dates
+  const max=new Date(today); max.setDate(max.getDate()+90);
+  if(dt>max) return null;                                                       // rejects far-future
+  return dt;
+}
+/* live mask: types "25062026" -> "25.06.2026" */
+function maskRuDate(v){ const d=(v||'').replace(/\D/g,'').slice(0,8);
+  let out=d.slice(0,2); if(d.length>2) out+='.'+d.slice(2,4); if(d.length>4) out+='.'+d.slice(4,8); return out; }
+
+/* ---------- phone (Uzbekistan +998 + 9 digits, valid operator code) ---------- */
+const UZ_CODES=['20','33','50','55','61','62','65','66','67','69','70','71','72','73','74','75','76','77','78','79','88','90','91','93','94','95','97','98','99'];
+function phoneDigits(v){ let d=(v||'').replace(/\D/g,''); if(d.startsWith('998')) d=d.slice(3); return d; }
+function validUzPhone(v){ const d=phoneDigits(v); return d.length===9 && UZ_CODES.includes(d.slice(0,2)); }
+function normUzPhone(v){ return '+998'+phoneDigits(v).slice(0,9); }
+/* live mask: formats as "+998 90 123 45 67" while typing */
+function fmtUzPhone(v){ const d=phoneDigits(v).slice(0,9);
+  let out='+998'; if(d.length) out+=' '+d.slice(0,2); if(d.length>2) out+=' '+d.slice(2,5);
+  if(d.length>5) out+=' '+d.slice(5,7); if(d.length>7) out+=' '+d.slice(7,9); return out; }
+
+/* human-readable order for the fallback channel */
+function buildOrderText(o,pr){
+  return `🥗 Новый заказ ${o.orderNo}\n`+
+    `Программа: ${o.cat.name}\n`+
+    `Калорийность: ${o.tier.lo}–${o.tier.hi} ккал/день\n`+
+    `Срок: ${o.duration} (${o.days} дн.)\n`+
+    `Начало: ${o.date}\n`+
+    `Итого: ${sum(pr.total)}\n`+
+    `Имя: ${o.name}\n`+
+    `Телефон: ${o.phone}\n`+
+    `Адрес: ${o.address}`;
+}
+
+function attach(cur){
+  app.querySelectorAll('[data-go]').forEach(el=>el.onclick=()=>go(el.dataset.go));
+  app.querySelectorAll('[data-act="back"]').forEach(el=>el.onclick=back);
+  const homeBtn=app.querySelector('[data-act="home"]'); if(homeBtn) homeBtn.onclick=()=>{S.stack=['menu'];render();};
+  const mgr=app.querySelector('[data-act="manager"]'); if(mgr) mgr.onclick=async()=>{
+    haptic('light');
+    // primary: backend forwards the request to the manager and confirms
+    if(CONFIG.apiBase){
+      try{
+        const res=await fetch(CONFIG.apiBase.replace(/\/$/,'')+'/contact',{
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({ initData:(tg&&tg.initData)||'' })
+        });
+        if(res.ok){ const d=await res.json().catch(()=>null);
+          if(d&&d.ok){ alert('Готово! Менеджер свяжется с вами в ближайшее время.'); return; } }
+      }catch(e){ /* fall through to fallbacks */ }
+    }
+    // fallback: open the manager chat directly
+    if(CONFIG.managerUsername){ const url='https://t.me/'+CONFIG.managerUsername; try{ tg?.openTelegramLink ? tg.openTelegramLink(url) : window.open(url,'_blank'); }catch(e){ window.open(url,'_blank'); } return; }
+    // last resort: legacy sendData (only if the app was opened from a reply-keyboard button)
+    try{ if(tg&&typeof tg.sendData==='function'){ tg.sendData(JSON.stringify({type:'contact_manager'})); return; } }catch(e){}
+    alert('Свяжитесь с нами по телефону '+CONFIG.phoneText);
+  };
+
+  // contact links — open reliably inside Telegram
+  app.querySelectorAll('[data-link]').forEach(el=>el.onclick=()=>{
+    const url=el.dataset.link; haptic('light');
+    try{
+      if(url.startsWith('https://t.me')||url.startsWith('tg:')){ tg?.openTelegramLink ? tg.openTelegramLink(url) : window.open(url,'_blank'); }
+      else if(url.startsWith('tel:')){ window.open(url,'_self'); }
+      else { tg?.openLink ? tg.openLink(url) : window.open(url,'_blank'); }
+    }catch(e){ window.open(url,'_blank'); }
+  });
+
+  // category tap (no tier) -> go choose a tier; category+tier tap -> start order
+  app.querySelectorAll('[data-cat]').forEach(el=>el.onclick=()=>{
+    const cat=CATEGORIES.find(x=>x.id===el.dataset.cat);
+    if(!cat) return;
+    if(el.dataset.tier!==undefined && el.dataset.tier!==''){
+      const t=cat.tiers.find(x=>String(x.lo)===String(el.dataset.tier)) || cat.tiers[0];
+      S.order={cat:cat,tier:t,duration:null,date:null,address:'',name:'',phone:''};
+      go('order');
+    } else {
+      S.order={cat:cat,tier:null,duration:null,date:null,address:'',name:'',phone:''};
+      go('tiers');
+    }
+  });
+
+  app.querySelectorAll('[data-gender]').forEach(el=>el.onclick=()=>{ S.calc.gender=el.dataset.gender; haptic('light'); softRender('calc-inner',calcStep); });
+  app.querySelectorAll('[data-act-level]').forEach(el=>el.onclick=()=>{ S.calc.activity=el.dataset.actLevel; haptic('light'); softRender('calc-inner',calcStep); });
+  app.querySelectorAll('[data-goal]').forEach(el=>el.onclick=()=>{ S.calc.goal=el.dataset.goal; haptic('medium'); computeCalories(); render(); });
+
+  const bodyNext=app.querySelector('[data-act="bodynext"]');
+  if(bodyNext) bodyNext.onclick=()=>{
+    const age=+document.getElementById('age').value;
+    if(age<14||age>80||!age){ alert('Введите возраст от 14 до 80'); return; }
+    S.calc.age=age; S.calc.bodyDone=true; haptic('light'); softRender('calc-inner',calcStep);
+  };
+  const hEl=document.getElementById('height'), wEl=document.getElementById('weight');
+  if(hEl) hEl.oninput=()=>{ S.calc.height=+hEl.value; document.getElementById('hVal').textContent=hEl.value+' см'; hEl.style.setProperty('--p',(hEl.value-140)/70*100+'%'); };
+  if(wEl) wEl.oninput=()=>{ S.calc.weight=+wEl.value; document.getElementById('wVal').textContent=wEl.value+' кг'; wEl.style.setProperty('--p',(wEl.value-40)/110*100+'%'); };
+
+  const calcBack=app.querySelector('[data-act="calcback"]');
+  if(calcBack) calcBack.onclick=()=>{
+    const c=S.calc;
+    if(c.goal){c.goal=null;softRender('calc-inner',calcStep);}
+    else if(c.activity){c.activity=null;softRender('calc-inner',calcStep);}
+    else if(c.bodyDone){c.bodyDone=false;softRender('calc-inner',calcStep);}
+    else if(c.gender){c.gender=null;softRender('calc-inner',calcStep);}
+    else back();
+  };
+  const recalc=app.querySelector('[data-act="recalc"]');
+  if(recalc) recalc.onclick=()=>{ S.calc={gender:null,age:S.calc.age,height:S.calc.height,weight:S.calc.weight,activity:null,goal:null,result:null,bmr:0,tdee:0,recCat:null,recTier:null}; render(); };
+
+  app.querySelectorAll('[data-dur]').forEach(el=>el.onclick=()=>{ S.order.duration=el.dataset.dur; S.order.days=parseInt(el.dataset.days)||1; haptic('light'); softRender('order-inner',orderStep); });
+  app.querySelectorAll('[data-date]').forEach(el=>el.onclick=()=>{ S.order.date = el.dataset.date==='tomorrow'?dateFrom(1):dateFrom(2); haptic('light'); softRender('order-inner',orderStep); });
+  const cDate=document.getElementById('customDate');
+  if(cDate) cDate.oninput=()=>{ cDate.value=maskRuDate(cDate.value); };
+  const dateNext=app.querySelector('[data-act="datenext"]');
+  if(dateNext) dateNext.onclick=()=>{ const v=document.getElementById('customDate').value.trim(); if(!parseRuDate(v)){alert('Введите корректную дату в формате ДД.ММ.ГГГГ\n(от сегодня и не позднее, чем через 90 дней)');return;} S.order.date=v; softRender('order-inner',orderStep); };
+  // live input masks on the details step
+  const phoneEl=document.getElementById('phone');
+  if(phoneEl){
+    if(!phoneEl.value.trim()) phoneEl.value='+998 ';
+    phoneEl.oninput=()=>{ phoneEl.value=fmtUzPhone(phoneEl.value); };
+    phoneEl.onfocus=()=>{ if(!phoneEl.value.trim()) phoneEl.value='+998 '; };
+  }
+  const detNext=app.querySelector('[data-act="detailsnext"]');
+  if(detNext) detNext.onclick=()=>{
+    const a=document.getElementById('address').value.trim(), n=document.getElementById('name').value.trim(), p=document.getElementById('phone').value.trim();
+    if(a.length<6){alert('Укажите полный адрес доставки (район, улица, дом)');return;}
+    if(n.length<2){alert('Укажите имя');return;}
+    if(!validUzPhone(p)){alert('Введите корректный номер: +998 и 9 цифр\nнапример +998 90 123 45 67');return;}
+    S.order.address=a;S.order.name=n;S.order.phone=normUzPhone(p); haptic('light'); softRender('order-inner',orderStep);
+  };
+  const orderBack=app.querySelector('[data-act="orderback"]');
+  if(orderBack) orderBack.onclick=()=>{
+    const o=S.order;
+    if(o.address&&o.name&&o.phone&&o.date&&o.duration){ o.address='';o.name='';o.phone='';softRender('order-inner',orderStep); }
+    else if(o.date){o.date=null;softRender('order-inner',orderStep);}
+    else if(o.duration){o.duration=null;softRender('order-inner',orderStep);}
+    else back();
+  };
+  const place=app.querySelector('[data-act="placeorder"]');
+  if(place) place.onclick=async()=>{
+    const o=S.order; const pr=orderPricing(o);
+    const tgUser = (tg&&tg.initDataUnsafe&&tg.initDataUnsafe.user)?tg.initDataUnsafe.user:null;
+    const payload={
+      type:'new_order',
+      category:o.cat.name, kcal:o.tier.lo+'-'+o.tier.hi,
+      price_per_day:o.tier.price, days:o.days, duration:o.duration,
+      subtotal:pr.subtotal, discount_pct:pr.discountPct, discount_amt:pr.discountAmt, total:pr.total,
+      date:o.date, address:o.address, name:o.name, phone:o.phone,
+      tg_id: tgUser?tgUser.id:null, tg_username: tgUser?tgUser.username:null
+    };
+
+    // loading state (the call is async)
+    place.disabled=true; const _label=place.innerHTML; place.style.opacity='.7'; place.innerHTML='Отправляем…';
+
+    let delivered=false, orderNo=null;
+
+    // PRIMARY channel: backend API. Works regardless of how the app was opened,
+    // returns a REAL order number, and confirms only on actual delivery.
+    if(CONFIG.apiBase){
+      try{
+        const res=await fetch(CONFIG.apiBase.replace(/\/$/,'')+'/order',{
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({ initData:(tg&&tg.initData)||'', order:payload })
+        });
+        if(res.ok){ const data=await res.json().catch(()=>null);
+          if(data&&data.ok&&data.orderNo){ delivered=true; orderNo=data.orderNo; } }
+      }catch(e){ /* network/CORS error -> stays not-delivered, fallback UI shown */ }
+    } else {
+      // LEGACY degraded mode (no backend configured): try sendData().
+      // It only delivers when opened from a reply-keyboard button AND it closes
+      // the app, so we cannot confirm delivery — never mark as delivered here.
+      try{ if(tg&&typeof tg.sendData==='function'){ tg.sendData(JSON.stringify(payload)); } }catch(e){}
+    }
+
+    if(!orderNo) orderNo=nextOrderNo();      // local fallback number if API didn't assign one
+    o.orderNo=orderNo; o.delivered=delivered;
+
+    // record locally so "Мои заказы" is always real (and shows only this user's orders)
+    saveOrder({ no:orderNo, category:o.cat.name, kcal:o.tier.lo+'–'+o.tier.hi,
+      duration:o.duration, days:o.days, date:o.date, total:pr.total, ts:Date.now(),
+      status: delivered?'Принят':'Ожидает отправки' });
+    S.hasOrders=true;
+
+    // keep a readable copy for the manual fallback channel on the success screen
+    o.text=buildOrderText(o,pr);
+
+    place.disabled=false; place.style.opacity=''; place.innerHTML=_label;
+    haptic('heavy');
+    go('success');
+  };
+
+  // success-screen fallback: copy the order + open the manager chat
+  const sendMgr=app.querySelector('[data-act="sendmanager"]');
+  if(sendMgr) sendMgr.onclick=async()=>{
+    haptic('light');
+    let copied=false;
+    try{ await navigator.clipboard.writeText(S.order.text||''); copied=true; }catch(e){}
+    if(CONFIG.managerUsername){
+      const url='https://t.me/'+CONFIG.managerUsername;
+      try{ tg?.openTelegramLink ? tg.openTelegramLink(url) : window.open(url,'_blank'); }catch(e){ window.open(url,'_blank'); }
+      alert(copied?'Заказ скопирован — вставьте его в чат менеджеру (долгое нажатие → Вставить).':'Откройте чат менеджера и пришлите детали заказа.');
+    } else {
+      alert(copied?'Заказ скопирован в буфер обмена. Отправьте его менеджеру в Telegram или позвоните нам.':'Свяжитесь с менеджером по телефону, чтобы подтвердить заказ.');
+    }
+  };
+
+  try{
+    if(cur==='menu'){ tg?.BackButton?.hide(); }
+    else { tg?.BackButton?.show(); }
+  }catch(e){}
+}
+
+// register the hardware/Telegram back button ONCE (not per screen — that stacked handlers)
+try{ tg?.BackButton?.onClick(()=>back()); }catch(e){}
+
+render();
+
+/* ---------- off-hours notice (Tashkent UTC+5, 09:00–18:00, Sun off) ---------- */
+(function(){
+  const el=document.getElementById('offhours');
+  if(!el) return;
+  // Tashkent has no DST; UTC+5 year-round
+  const now=new Date();
+  const tash=new Date(now.getTime() + (now.getTimezoneOffset()*60000) + (5*3600000));
+  const day=tash.getDay();      // 0 = Sunday
+  const hr=tash.getHours();
+  const closed = (day===0) || (hr<9) || (hr>=18);
+  if(closed){
+    setTimeout(()=>el.classList.add('show'), 1200);          // appear after loader
+    setTimeout(()=>el.classList.remove('show'), 8000);       // auto-hide
+  }
+  const x=document.getElementById('ohClose');
+  if(x) x.onclick=()=>el.classList.remove('show');
+})();
+
+/* ---------- Lottie loading screen (event-driven timing) ---------- */
+(function(){
+  const loader=document.getElementById('loader');
+  const brand=document.getElementById('ldBrand');
+  const tag=document.getElementById('ldTag');
+  const player=document.getElementById('ldLottie');
+  if(!loader) return;
+
+  let finished=false;
+  function finish(){
+    if(finished) return; finished=true;
+    // 1) reveal Ratsion + tagline AFTER the handwriting is done
+    brand&&brand.classList.add('show');
+    setTimeout(()=>{ tag&&tag.classList.add('show'); }, 300);
+    // 2) hold a beat so the brand is readable, THEN dissolve into the menu
+    setTimeout(()=>{ loader.classList.add('hide'); setTimeout(()=>loader.remove(),750); }, 1400);
+  }
+
+  // primary: fire when the Lottie animation actually completes
+  if(player){
+    player.addEventListener('complete', finish);
+    // some builds emit 'loop'/'frame' instead; also catch the player erroring out
+    player.addEventListener('error', finish);
+  }
+  // safety net: if the event never fires (CDN blocked, etc.), finish after 6s max
+  setTimeout(finish, 6000);
+})();
+</script>
+</body>
+</html>

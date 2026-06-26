@@ -824,15 +824,21 @@ success:()=>{
       </div>
     </div>`;
   }
-  // delivery failed — be honest and let them retry (no manual texting)
+  // delivery failed — be honest, explain, and let them retry (no manual texting)
+  const fr = S.order.failReason;
+  const msg = fr==='network' ? 'Похоже, нет интернета. Проверьте подключение и попробуйте ещё раз.'
+            : fr==='timeout' ? 'Сервер долго не отвечал. Подождите немного и попробуйте снова.'
+            : 'Не удалось доставить заказ менеджеру. Попробуйте ещё раз через минуту.';
   return `<div class="screen" id="success">
     <div class="success-wrap">
       <div class="check-ring err fade-up d1">${ic('info')}</div>
-      <h1 class="fade-up d2">Не удалось отправить</h1>
-      <p class="fade-up d3">Похоже, нет связи с сервером. Данные заказа сохранены — проверьте интернет и попробуйте ещё раз.</p>
-      <div style="margin-top:24px" class="fade-up d4">
+      <h1 class="fade-up d2">Что-то пошло не так</h1>
+      <p class="fade-up d3">${msg}</p>
+      <div class="pay-note fade-up d3" style="text-align:left;margin:12px 0 2px">${ic('info')}<p>Возможные причины: нет интернета или слабый сигнал; сервер временно недоступен. Заказ <b>не отправлен</b> — попробуйте ещё раз или свяжитесь с нами по телефону.</p></div>
+      <div style="margin-top:20px" class="fade-up d4">
         <button class="cta cta-green" data-act="retryorder">${ic('refresh')} Повторить отправку</button>
-        <button class="cta cta-ghost" data-act="home" style="margin-top:8px">На главную</button>
+        <a href="tel:${CONFIG.phone}" class="cta cta-ghost" style="text-decoration:none;margin-top:8px">${ic('phone')} Позвонить нам</a>
+        <button class="cta cta-ghost" data-act="home" style="margin-top:4px">На главную</button>
       </div>
     </div>
   </div>`;
@@ -1056,7 +1062,7 @@ async function submitOrder(btn){
   let _lbl;
   if(btn){ btn.disabled=true; _lbl=btn.innerHTML; btn.style.opacity='.7'; btn.innerHTML='Отправляем…'; }
 
-  let delivered=false, orderNo=null;
+  let delivered=false, orderNo=null, failReason='server';
   if(CONFIG.apiBase){
     // generous timeout so a cold-starting server still has time, but the button
     // can't hang on "Отправляем…" forever if the network is dead
@@ -1068,8 +1074,10 @@ async function submitOrder(btn){
         signal:ctrl.signal
       });
       if(res.ok){ const data=await res.json().catch(()=>null);
-        if(data&&data.ok&&data.orderNo){ delivered=true; orderNo=data.orderNo; } }
-    }catch(e){ /* network/CORS/timeout -> not delivered, honest error screen */ }
+        if(data&&data.ok&&data.orderNo){ delivered=true; orderNo=data.orderNo; }
+        else { failReason='server'; } }
+      else { failReason='server'; }   // server reachable but couldn't deliver (e.g. менеджер не нажал «Старт» у бота)
+    }catch(e){ failReason = (e&&e.name==='AbortError') ? 'timeout' : 'network'; }
     finally{ clearTimeout(to); }
   } else {
     // legacy degraded mode (no backend configured): try sendData (can't confirm)
@@ -1077,7 +1085,7 @@ async function submitOrder(btn){
   }
 
   if(!orderNo) orderNo=nextOrderNo();      // local fallback number if API didn't assign one
-  o.orderNo=orderNo; o.delivered=delivered;
+  o.orderNo=orderNo; o.delivered=delivered; o.failReason = delivered?null:failReason;
 
   // record it locally only once it actually went through, so a failed attempt
   // doesn't leave a stuck "Ожидает отправки" order behind

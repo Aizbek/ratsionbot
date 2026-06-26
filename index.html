@@ -471,7 +471,7 @@ const CATEGORIES = [
     ]
   },
   {
-    id:'delovoy', name:'Деловой пакет', sub:'бизнес-рацион и кето', icon:'box', v:'amber',
+    id:'delovoy', name:'Деловой пакет', sub:'бизнес-рацион и кето', icon:'box', v:'orange',
     tiers:[
       {lo:800,hi:1000,price:105000,label:'Деловой'},
       {lo:1000,hi:1600,price:250000,label:'Кето диета'}
@@ -683,11 +683,14 @@ tiers:()=>{
   const cat=S.order.cat;
   if(!cat) return SCREENS.programs();
   const recLo = (S.calc.recCat&&S.calc.recCat.id===cat.id&&S.calc.recTier)?S.calc.recTier.lo:null;
+  // each group starts the colour cycle at a different point, so every group's
+  // calorie list has its own look while tiers within a group still differ
+  const gi = Math.max(0, CATEGORIES.findIndex(c=>c.id===cat.id));
   return `<div class="screen" id="tiers">
     ${topbar(cat.name)}
     ${cat.needConfirm?`<div class="pay-note fade-up d1" style="margin-bottom:14px">${ic('info')}<p>Цены этой категории уточняются — менеджер подтвердит при оформлении.</p></div>`:''}
     <p class="sec-title fade-up d1">Выберите калорийность</p>
-    ${cat.tiers.map((t,i)=>`<div class="prog v-${PALETTE[i%PALETTE.length]} ${recLo===t.lo?'rec':''} fade-up d${Math.min(i+1,6)}" data-cat="${cat.id}" data-tier="${t.lo}">
+    ${cat.tiers.map((t,i)=>`<div class="prog v-${PALETTE[(i+gi*2)%PALETTE.length]} ${recLo===t.lo?'rec':''} fade-up d${Math.min(i+1,6)}" data-cat="${cat.id}" data-tier="${t.lo}">
       ${recLo===t.lo?'<span class="rec-badge">Для вас</span>':''}
       <div class="prog-top"><div class="prog-ic">${ic(cat.icon)}</div><div><h3>${t.label?t.label:t.lo+'–'+t.hi+' ккал'}</h3><div class="kcal">${t.lo}–${t.hi} ккал/день</div></div></div>
       <div class="prog-meta"><div>Цена за день<b>${sum(t.price)}</b></div><div>Доставка<b>включена</b></div></div>

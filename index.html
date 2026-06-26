@@ -89,31 +89,59 @@ body{
   background:linear-gradient(180deg,rgba(246,247,244,0),var(--bg) 38%)}
 
 /* ---------- MENU ---------- */
-.menu-logo-row{display:flex;flex-direction:column;align-items:center;padding:34px 2px 26px}
-.menu-logo{height:84px;width:auto;display:block;filter:drop-shadow(0 6px 16px rgba(176,141,58,.20))}
-.menu-logo-fallback{font-family:Georgia,serif;font-style:italic;font-size:44px;font-weight:500;
+.m-hero{margin:0 -18px;padding:20px 20px 18px;text-align:center;background:#fff;
+  box-shadow:0 6px 20px -14px rgba(31,42,36,.25)}
+.m-hero-logo{width:42%;max-width:165px;height:auto;display:block;margin:0 auto}
+.menu-logo-fallback{font-family:Georgia,serif;font-style:italic;font-size:40px;font-weight:500;
   background:linear-gradient(95deg,#E7C66B,#B08D3A);-webkit-background-clip:text;background-clip:text;color:transparent}
-.menu-head{padding:8px 4px 18px}
-.menu-head .hi{font-size:13px;color:var(--muted);font-weight:600;letter-spacing:.02em}
-.menu-head h1{font-size:26px;font-weight:800;letter-spacing:-.03em;margin-top:2px}
-.menu-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.m-body{padding-top:18px}
+
+/* featured order tile */
+.m-feature{position:relative;display:flex;align-items:center;gap:16px;padding:20px;border-radius:var(--r);overflow:hidden;cursor:pointer;
+  background:linear-gradient(120deg,#4CC079,var(--green-d));color:#fff;box-shadow:0 18px 36px -16px rgba(63,176,105,.6);
+  margin-bottom:13px;transition:transform .25s,box-shadow .25s}
+.m-feature:hover{transform:translateY(-4px);box-shadow:0 26px 50px -18px rgba(63,176,105,.7)}
+.m-feature:active{transform:scale(.98)}
+.m-feature::before{content:'';position:absolute;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,.12);top:-60px;right:-30px}
+.m-feature .f-ic{width:58px;height:58px;border-radius:17px;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative}
+.m-feature .f-ic .ic{width:30px;height:30px}
+.m-feature .f-txt{position:relative;flex:1}
+.m-feature h3{font-size:20px;font-weight:800;letter-spacing:-.02em}
+.m-feature p{font-size:13px;opacity:.9;font-weight:500;margin-top:2px}
+.m-feature .f-arrow{position:relative;opacity:.85}
+
+/* 2x2 grid */
+.m-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-bottom:13px}
 .tile{position:relative;background:var(--card);border-radius:var(--r);border:1px solid var(--line);
-  padding:18px 16px 16px;cursor:pointer;overflow:hidden;box-shadow:var(--shadow);
-  transition:transform .28s cubic-bezier(.34,1.56,.64,1),box-shadow .28s;min-height:128px;
-  display:flex;flex-direction:column;justify-content:space-between}
+  padding:18px 16px;cursor:pointer;overflow:hidden;box-shadow:var(--shadow);min-height:118px;isolation:isolate;
+  display:flex;flex-direction:column;justify-content:space-between;
+  transition:transform .28s cubic-bezier(.34,1.56,.64,1),box-shadow .28s}
 .tile:active{transform:scale(.96)}
 .tile:hover{transform:translateY(-5px);box-shadow:var(--shadow-lg)}
-.tile-ic{width:48px;height:48px;border-radius:15px;display:flex;align-items:center;justify-content:center;margin-bottom:14px}
+/* frosted-glass photo background: blurred light image + white wash so dark text stays readable */
+.tile.photo::before{content:'';position:absolute;inset:-24px;z-index:-2;
+  background-image:var(--img);background-size:cover;background-position:center;
+  filter:blur(7px) saturate(1.2);opacity:.95}
+.tile.photo::after{content:'';position:absolute;inset:0;z-index:-1;
+  background:linear-gradient(180deg,rgba(255,255,255,.10) 0%,rgba(255,255,255,.30) 45%,rgba(255,255,255,.74) 78%,rgba(255,255,255,.9) 100%)}
+.tile-ic{width:48px;height:48px;border-radius:15px;display:flex;align-items:center;justify-content:center;margin-bottom:14px;
+  box-shadow:0 6px 16px -8px rgba(31,42,36,.4)}
 .tile-ic .ic{width:25px;height:25px}
-.tile h3{font-size:16px;font-weight:700;letter-spacing:-.02em}
-.tile p{font-size:12px;color:var(--muted);font-weight:500;margin-top:3px;line-height:1.3}
-.tile .glow{position:absolute;top:-40px;right:-40px;width:110px;height:110px;border-radius:50%;opacity:.5;filter:blur(6px)}
-.tile.wide{grid-column:1/-1;min-height:auto;flex-direction:row;align-items:center;gap:14px;padding:16px}
-.tile.wide .tile-ic{margin:0}
-.tile.wide .arrow{margin-left:auto;color:var(--muted)}
+.tile h3{font-size:16px;font-weight:700;letter-spacing:-.02em;text-shadow:0 1px 6px rgba(255,255,255,.8)}
+.tile p{font-size:12px;color:#6b746e;font-weight:600;margin-top:3px;line-height:1.3;text-shadow:0 1px 6px rgba(255,255,255,.8)}
+
+/* wide list row */
+.m-row{display:flex;align-items:center;gap:14px;background:var(--card);border:1px solid var(--line);border-radius:var(--r);
+  padding:16px 18px;cursor:pointer;box-shadow:var(--shadow);transition:transform .25s,box-shadow .25s}
+.m-row:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg)}
+.m-row:active{transform:scale(.98)}
+.m-row .r-ic{width:44px;height:44px;border-radius:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.m-row h3{font-size:15px;font-weight:700;letter-spacing:-.01em}
+.m-row p{font-size:12px;color:var(--muted);font-weight:500;margin-top:1px}
+.m-row .r-arrow{margin-left:auto;color:var(--muted)}
 
 /* color variants */
-.v-green .tile-ic,.v-green.feat-ic{background:var(--green-l);color:var(--green-d)}
+.v-green .tile-ic,.v-green .r-ic,.v-green.feat-ic{background:var(--green-l);color:var(--green-d)}
 .v-green .glow{background:var(--green)}
 .v-amber .tile-ic,.v-amber.feat-ic{background:#FDF1DD;color:var(--amber-d)}
 .v-amber .glow{background:var(--amber)}
@@ -481,36 +509,39 @@ function topbar(title){return `<div class="topbar"><div class="back-btn" data-ac
 const SCREENS = {
 /* ===== MAIN MENU ===== */
 menu:()=>`<div class="screen" id="menu">
-  <div class="menu-logo-row fade-up d1">
-    <img class="menu-logo" src="logo.png" alt="Ratsion"
+  <div class="m-hero fade-up d1">
+    <img class="m-hero-logo" src="logo.png" alt="Ratsion"
          onerror="this.onerror=null;this.outerHTML='<span class=&quot;menu-logo-fallback&quot;>Ratsion</span>'">
   </div>
-  <div class="menu-grid">
-    <div class="ptile fade-up d1" data-go="programs" style="--img:url('food-order.jpg')">
-      <div class="ptile-fallback v-green">${ic('bowl')}</div>
-      <div class="ptile-shade"></div>
-      <div class="ptile-txt"><h3>Заказать</h3><p>программы питания</p></div>
+  <div class="m-body">
+    <div class="m-feature fade-up d2" data-go="programs">
+      <div class="f-ic">${ic('bowl')}</div>
+      <div class="f-txt"><h3>Заказать</h3><p>программы правильного питания</p></div>
+      <div class="f-arrow">${ic('arrow')}</div>
     </div>
-    <div class="ptile fade-up d2" data-go="calc" style="--img:url('food-calories.jpg')">
-      <div class="ptile-fallback v-amber">${ic('calc')}</div>
-      <div class="ptile-shade"></div>
-      <div class="ptile-txt"><h3>Калории</h3><p>расчёт нормы</p></div>
+    <div class="m-grid">
+      <div class="tile photo v-amber fade-up d3" data-go="calc" style="--img:url('rtsn4-44.jpg')">
+        <div class="tile-ic">${ic('calc')}</div>
+        <div><h3>Калории</h3><p>расчёт суточной нормы</p></div>
+      </div>
+      <div class="tile photo v-pink fade-up d3" data-go="promo" style="--img:url('rtsn4-67.jpg')">
+        <div class="tile-ic">${ic('gift')}</div>
+        <div><h3>Акции</h3><p>спецпредложения</p></div>
+      </div>
+      <div class="tile photo v-blue fade-up d4" data-go="about" style="--img:url('rtsn4-125.jpg')">
+        <div class="tile-ic">${ic('info')}</div>
+        <div><h3>О компании</h3><p>наша команда</p></div>
+      </div>
+      <div class="tile photo v-green fade-up d4" data-go="contacts" style="--img:url('rtsn4-155.jpg')">
+        <div class="tile-ic" style="background:var(--green-l);color:var(--green-d)">${ic('phone')}</div>
+        <div><h3>Контакты</h3><p>связаться с нами</p></div>
+      </div>
     </div>
-    <div class="ptile fade-up d3" data-go="promo" style="--img:url('food-promo.jpg')">
-      <div class="ptile-fallback v-pink">${ic('gift')}</div>
-      <div class="ptile-shade"></div>
-      <div class="ptile-txt"><h3>Акции</h3><p>спецпредложения</p></div>
+    <div class="m-row v-green fade-up d5" data-go="orders">
+      <div class="r-ic">${ic('box')}</div>
+      <div><h3>Мои заказы</h3><p>история и статус</p></div>
+      <div class="r-arrow">${ic('arrow')}</div>
     </div>
-    <div class="ptile fade-up d4" data-go="about" style="--img:url('food-about.jpg')">
-      <div class="ptile-fallback v-violet">${ic('info')}</div>
-      <div class="ptile-shade"></div>
-      <div class="ptile-txt"><h3>О компании</h3><p>наша команда</p></div>
-    </div>
-    <div class="tile wide v-blue fade-up d5" data-go="contacts">
-      <img class="tile-logo-ic" src="contact-logo.png" alt=""
-           onerror="this.onerror=null;this.insertAdjacentHTML('afterend','<div class=&quot;tile-ic&quot;>${ic('phone').replace(/"/g,'&quot;')}</div>');this.remove()">
-      <div><h3>Контакты</h3><p>связаться с менеджером</p></div><div class="arrow">${ic('arrow')}</div></div>
-    <div class="tile wide v-green fade-up d6" data-go="orders"><div class="tile-ic">${ic('box')}</div><div><h3>Мои заказы</h3><p>история и статус</p></div><div class="arrow">${ic('arrow')}</div></div>
   </div>
 </div>`,
 

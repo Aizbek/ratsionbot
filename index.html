@@ -754,11 +754,13 @@ orders:()=>{
     ${list.map((od,i)=>{
       const st=od.status||'В обработке';
       const cls = st==='Доставляется'?'ship' : st==='Доставлен'?'done' : 'proc';
+      // orders in motion or already delivered can't be removed from history
+      const canDelete = st!=='Доставляется' && st!=='Доставлен';
       return `<div class="order-hist fade-up d${Math.min(i+1,6)}">
       <div class="oh-top"><h4>Заказ ${od.no}</h4>
         <div style="display:flex;align-items:center">
           <span class="status-pill ${cls}"><span class="dot"></span>${st}</span>
-          <div class="oh-del" data-del="${od.no}" title="Удалить">×</div>
+          ${canDelete?`<div class="oh-del" data-del="${od.no}" title="Удалить">×</div>`:''}
         </div>
       </div>
       <div class="prog-meta" style="border:none;padding:0">

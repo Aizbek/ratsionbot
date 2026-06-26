@@ -1304,7 +1304,7 @@ render();
     brand&&brand.classList.add('show');
     setTimeout(()=>{ tag&&tag.classList.add('show'); }, 300);
     // 2) hold a beat so the brand is readable, THEN dissolve into the menu
-    setTimeout(()=>{ loader.classList.add('hide'); setTimeout(()=>loader.remove(),750); }, 1400);
+    setTimeout(()=>{ loader.classList.add('hide'); setTimeout(()=>loader.remove(),600); }, 700);
   }
 
   // primary: fire when the Lottie animation actually completes
@@ -1313,8 +1313,8 @@ render();
     // some builds emit 'loop'/'frame' instead; also catch the player erroring out
     player.addEventListener('error', finish);
   }
-  // safety net: if the event never fires (CDN blocked, etc.), finish after 6s max
-  setTimeout(finish, 6000);
+  // safety net: if the event never fires (CDN blocked, etc.), finish after 3s max
+  setTimeout(finish, 3000);
 })();
 </script>
 </body>

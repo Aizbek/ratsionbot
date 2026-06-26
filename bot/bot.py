@@ -58,6 +58,9 @@ from telegram import (
     InlineKeyboardMarkup,
     ReplyKeyboardMarkup,
     KeyboardButton,
+    BotCommand,
+    BotCommandScopeDefault,
+    BotCommandScopeChat,
 )
 from telegram.ext import (
     Application,
@@ -491,6 +494,31 @@ async def list_orders(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 # ----------------------------- bootstrap -----------------------------
 
+async def setup_commands(bot):
+    """Set the '/' command menu. Manager commands are scoped to the manager's
+    chat only, so regular customers never even see them."""
+    # everyone sees just this
+    await bot.set_my_commands(
+        [BotCommand("start", "Открыть приложение Ratsion")],
+        scope=BotCommandScopeDefault(),
+    )
+    # the manager additionally sees the delivery commands
+    if MANAGER_CHAT_ID:
+        try:
+            await bot.set_my_commands(
+                [
+                    BotCommand("start", "Открыть приложение Ratsion"),
+                    BotCommand("orders", "Последние заказы и их статусы"),
+                    BotCommand("delivering", "В доставке: /delivering <номер>"),
+                    BotCommand("delivered", "Доставлен: /delivered <номер>"),
+                    BotCommand("myid", "Показать chat_id"),
+                ],
+                scope=BotCommandScopeChat(chat_id=MANAGER_CHAT_ID),
+            )
+        except Exception as e:
+            log.warning("Could not set manager commands: %s", e)
+
+
 async def main():
     application = Application.builder().token(BOT_TOKEN).build()
     application.add_handler(CommandHandler("start", start))
@@ -515,6 +543,7 @@ async def main():
     # start the polling bot (for /start, /myid, legacy sendData)
     await application.initialize()
     await application.start()
+    await setup_commands(application.bot)
     await application.updater.start_polling(allowed_updates=Update.ALL_TYPES)
 
     # start the HTTP API (for the Mini App order channel)

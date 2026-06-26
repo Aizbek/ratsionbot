@@ -155,9 +155,19 @@ body{
 /* program-list icons get their colour too */
 .v-green .prog-ic{background:var(--green-l);color:var(--green-d)}
 .v-amber .prog-ic{background:#FDF1DD;color:var(--amber-d)}
-.v-blue .prog-ic{background:#E6F0FB;color:#2C6FB5}
+.v-blue .prog-ic{background:#E1EFFC;color:#2C6FB5}
 .v-pink .prog-ic{background:#FCEAF0;color:#C24C73}
 .v-violet .prog-ic{background:#EFEBFB;color:#6A52C2}
+.v-teal .prog-ic{background:#DCF5EF;color:#0E9C84}
+.v-orange .prog-ic{background:#FFE9D6;color:#E07A1A}
+/* colorful light tints for the program / calorie cards (bright, never dark) */
+.prog.v-green{background:#F2FBF5}
+.prog.v-amber{background:#FFF9EF}
+.prog.v-blue{background:#F1F7FE}
+.prog.v-pink{background:#FEF4F8}
+.prog.v-violet{background:#F8F5FD}
+.prog.v-teal{background:#EEFBF7}
+.prog.v-orange{background:#FFF6EE}
 
 /* photo cards (real food images fill the whole tile) */
 .ptile{position:relative;border-radius:var(--r);overflow:hidden;cursor:pointer;min-height:152px;
@@ -466,8 +476,20 @@ const CATEGORIES = [
       {lo:800,hi:1000,price:105000,label:'Деловой'},
       {lo:1000,hi:1600,price:250000,label:'Кето диета'}
     ]
+  },
+  {
+    id:'kaloraj', name:'Прайс по калоражным критериям', sub:'цена за день · доставка включена', icon:'flame', v:'teal',
+    tiers:[
+      {lo:800,hi:1000,price:145000},{lo:1000,hi:1200,price:165000},{lo:1200,hi:1400,price:185000},
+      {lo:1400,hi:1600,price:195000},{lo:1600,hi:1800,price:205000},{lo:1800,hi:2000,price:225000},
+      {lo:2000,hi:2200,price:240000},{lo:2200,hi:2500,price:255000},{lo:2500,hi:2800,price:265000},
+      {lo:2800,hi:3000,price:285000},{lo:3000,hi:3300,price:300000},{lo:3300,hi:3600,price:310000}
+    ]
   }
 ];
+
+/* bright colour cycle for calorie tiers — keeps every program card colourful */
+const PALETTE = ['green','amber','blue','pink','violet','teal','orange'];
 
 /* fmt price like "145 000 сум" */
 function sum(n){ return n.toLocaleString('ru-RU').replace(/,/g,' ')+' сум'; }
@@ -597,13 +619,13 @@ _calcResult:()=>{
       <div class="stat"><div class="sv">${c.tdee.toLocaleString('ru')}</div><div class="sl">TDEE</div></div>
     </div>
     <p class="sec-title fade-up d3">Рекомендуем для вас</p>
-    <div class="prog rec fade-up d3" data-cat="${cat.id}" data-tier="${t.lo}"><span class="rec-badge">Лучший выбор</span>
-      <div class="prog-top"><div class="prog-ic v-${cat.v}">${ic(cat.icon)}</div><div><h3>${cat.name}</h3><div class="kcal">${t.label?t.label+' · ':''}${t.lo}–${t.hi} ккал/день</div></div></div>
+    <div class="prog v-${cat.v} rec fade-up d3" data-cat="${cat.id}" data-tier="${t.lo}"><span class="rec-badge">Лучший выбор</span>
+      <div class="prog-top"><div class="prog-ic">${ic(cat.icon)}</div><div><h3>${cat.name}</h3><div class="kcal">${t.label?t.label+' · ':''}${t.lo}–${t.hi} ккал/день</div></div></div>
       <div class="prog-meta"><div>Цена за день<b>${sum(t.price)}</b></div><div>Под вашу цель<b>${goalLabel(c.goal)}</b></div></div>
     </div>
     <p class="sec-title fade-up d4" style="margin-top:16px">Другие программы</p>
-    ${CATEGORIES.filter(x=>x.id!==cat.id).map((o,i)=>{const ot=tierForKcal(o,c.result);return `<div class="prog fade-up d4" data-cat="${o.id}" data-tier="${ot.lo}">
-      <div class="prog-top"><div class="prog-ic v-${o.v}">${ic(o.icon)}</div><div><h3>${o.name}</h3><div class="kcal">${o.sub} · от ${sum(o.tiers[0].price)}</div></div></div>
+    ${CATEGORIES.filter(x=>x.id!==cat.id).map((o,i)=>{const ot=tierForKcal(o,c.result);return `<div class="prog v-${o.v} fade-up d4" data-cat="${o.id}" data-tier="${ot.lo}">
+      <div class="prog-top"><div class="prog-ic">${ic(o.icon)}</div><div><h3>${o.name}</h3><div class="kcal">${o.sub} · от ${sum(o.tiers[0].price)}</div></div></div>
     </div>`}).join('')}
     <div style="margin-top:6px" class="fade-up d5">
       <button class="cta cta-ghost" data-act="recalc">${ic('refresh')} Рассчитать заново</button>
@@ -647,9 +669,9 @@ programs:()=>{
     ${ordered.map((cat,i)=>{
       const lo=cat.tiers[0].price, hi=cat.tiers[cat.tiers.length-1].price;
       const priceRange = lo===hi?sum(lo):`${sum(lo)} – ${sum(hi)}`;
-      return `<div class="prog ${recId&&cat.id===recId?'rec':''} fade-up d${Math.min(i+1,6)}" data-cat="${cat.id}">
+      return `<div class="prog v-${cat.v} ${recId&&cat.id===recId?'rec':''} fade-up d${Math.min(i+1,6)}" data-cat="${cat.id}">
       ${recId&&cat.id===recId?'<span class="rec-badge">Для вас</span>':''}
-      <div class="prog-top"><div class="prog-ic v-${cat.v}">${ic(cat.icon)}</div><div><h3>${cat.name}</h3><div class="kcal">${cat.sub}</div></div></div>
+      <div class="prog-top"><div class="prog-ic">${ic(cat.icon)}</div><div><h3>${cat.name}</h3><div class="kcal">${cat.sub}</div></div></div>
       <div class="prog-meta"><div>Калорийность<b>${cat.tiers[0].lo}–${cat.tiers[cat.tiers.length-1].hi} ккал</b></div><div>Цена за день<b>${priceRange}</b></div></div>
     </div>`}).join('')}
     <p style="font-size:12px;color:var(--muted);text-align:center;margin:12px 6px 0;font-weight:500" class="fade-up d6">Цена указана за 1 день. В стоимость входят доставка, контейнеры и приборы.</p>
@@ -665,9 +687,9 @@ tiers:()=>{
     ${topbar(cat.name)}
     ${cat.needConfirm?`<div class="pay-note fade-up d1" style="margin-bottom:14px">${ic('info')}<p>Цены этой категории уточняются — менеджер подтвердит при оформлении.</p></div>`:''}
     <p class="sec-title fade-up d1">Выберите калорийность</p>
-    ${cat.tiers.map((t,i)=>`<div class="prog ${recLo===t.lo?'rec':''} fade-up d${Math.min(i+1,6)}" data-cat="${cat.id}" data-tier="${t.lo}">
+    ${cat.tiers.map((t,i)=>`<div class="prog v-${PALETTE[i%PALETTE.length]} ${recLo===t.lo?'rec':''} fade-up d${Math.min(i+1,6)}" data-cat="${cat.id}" data-tier="${t.lo}">
       ${recLo===t.lo?'<span class="rec-badge">Для вас</span>':''}
-      <div class="prog-top"><div class="prog-ic v-${cat.v}">${ic(cat.icon)}</div><div><h3>${t.label?t.label:t.lo+'–'+t.hi+' ккал'}</h3><div class="kcal">${t.lo}–${t.hi} ккал/день</div></div></div>
+      <div class="prog-top"><div class="prog-ic">${ic(cat.icon)}</div><div><h3>${t.label?t.label:t.lo+'–'+t.hi+' ккал'}</h3><div class="kcal">${t.lo}–${t.hi} ккал/день</div></div></div>
       <div class="prog-meta"><div>Цена за день<b>${sum(t.price)}</b></div><div>Доставка<b>включена</b></div></div>
     </div>`).join('')}
   </div>`;

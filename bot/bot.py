@@ -5,6 +5,11 @@ What it does:
   /start  -> greets the user and shows a button that opens the Ratsion Mini App
   /myid   -> tells you the current chat id (use it to fill MANAGER_CHAT_ID)
 
+  Manager-only commands (ignored for everyone except MANAGER_CHAT_ID):
+  /delivering <order#>  -> mark an order as "Доставляется" + notify the customer
+  /delivered  <order#>  -> mark an order as "Доставлен"   + notify the customer
+  /orders               -> list recent orders and their statuses
+
   The Mini App sends an order to this bot through TWO possible channels:
 
     1. HTTP API  (PRIMARY, reliable)
@@ -25,6 +30,7 @@ Setup (environment variables on Render -> Settings -> Environment):
   PORT             - injected by Render automatically       (default 8080)
   ALLOW_ORIGIN     - the Mini App origin for CORS, or "*"   (default "*")
   ORDER_SEQ_FILE   - file that stores the order counter     (default order_seq.txt)
+  ORDERS_FILE      - file that stores orders + statuses      (default orders.json)
 
 IMPORTANT (Render): deploy this as a **Web Service** (not a Background Worker),
 because it now binds an HTTP port. The Mini App must point CONFIG.apiBase at the
@@ -68,6 +74,7 @@ MANAGER_CHAT_ID = int(os.environ.get("MANAGER_CHAT_ID", "0"))
 PORT = int(os.environ.get("PORT", "8080"))
 ALLOW_ORIGIN = os.environ.get("ALLOW_ORIGIN", "*")
 SEQ_FILE = os.environ.get("ORDER_SEQ_FILE", "order_seq.txt")
+ORDERS_FILE = os.environ.get("ORDERS_FILE", "orders.json")
 SEQ_START = 1041  # first order will be SEQ_START + 1
 # ===============================================================
 
@@ -80,6 +87,57 @@ logging.basicConfig(
 log = logging.getLogger("ratsion")
 
 _seq_lock = asyncio.Lock()
+_orders_lock = asyncio.Lock()
+
+
+# ----------------------------- orders store -----------------------------
+# Maps order_no -> {uid, status, category, date, days, total}. Lets the manager
+# update delivery status and lets the Mini App read each customer's statuses.
+# NOTE: on Render's FREE tier the disk is ephemeral (resets on redeploy/sleep),
+# so this can be lost. The customer is still notified by chat message either way.
+# For rock-solid persistence use a Render persistent disk or a small database.
+
+def _read_orders():
+    try:
+        with open(ORDERS_FILE, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except (OSError, ValueError):
+        return {}
+
+
+def _write_orders(data):
+    try:
+        with open(ORDERS_FILE, "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False)
+    except OSError as e:
+        log.warning("Could not persist orders: %s", e)
+
+
+async def store_order(order_no, uid, info):
+    async with _orders_lock:
+        data = _read_orders()
+        data[order_no] = {"uid": uid, "status": "Принят", **info}
+        _write_orders(data)
+
+
+async def set_order_status(order_no, status):
+    async with _orders_lock:
+        data = _read_orders()
+        rec = data.get(order_no)
+        if not rec:
+            return None
+        rec["status"] = status
+        data[order_no] = rec
+        _write_orders(data)
+        return rec
+
+
+def orders_for_uid(uid):
+    return [
+        {"no": no, "status": rec.get("status", "Принят")}
+        for no, rec in _read_orders().items()
+        if rec.get("uid") == uid
+    ]
 
 
 def fmt_sum(n):
@@ -291,6 +349,10 @@ async def handle_order(request):
     init_data = body.get("initData", "")
     order = body.get("order", {}) or {}
 
+    # Reject empty / probe requests so they can't mint phantom order numbers.
+    if not (order.get("category") and order.get("total") and order.get("phone")):
+        return _cors(web.json_response({"ok": False, "error": "empty_order"}, status=400))
+
     # If the app sent initData, it MUST be valid (anti-spoof). If it's empty
     # (e.g. tested in a plain browser) we still accept, just without a verified user.
     auth = verify_init_data(init_data)
@@ -308,6 +370,14 @@ async def handle_order(request):
     except Exception as e:
         log.error("Could not send order to manager (API channel): %s", e)
         return _cors(web.json_response({"ok": False, "error": "send_failed"}, status=502))
+
+    # remember the order so the manager can update its status later
+    await store_order(order_no, (user or {}).get("id"), {
+        "category": order.get("category"),
+        "date": order.get("date"),
+        "days": order.get("days"),
+        "total": order.get("total"),
+    })
 
     # best-effort confirmation back to the customer (needs them to have started the bot)
     if user and user.get("id"):
@@ -354,12 +424,80 @@ async def handle_contact(request):
     return _cors(web.json_response({"ok": True}))
 
 
+async def handle_my_orders(request):
+    """The Mini App asks for this user's orders + live delivery statuses."""
+    try:
+        body = await request.json()
+    except Exception:
+        body = {}
+    auth = verify_init_data(body.get("initData", ""))
+    uid = ((auth or {}).get("user") or {}).get("id") if auth else None
+    if not uid:
+        return _cors(web.json_response({"ok": True, "orders": []}))
+    return _cors(web.json_response({"ok": True, "orders": orders_for_uid(uid)}))
+
+
+# ----------------------------- manager-only commands -----------------------------
+
+def _is_manager(update: Update) -> bool:
+    """True only for the configured manager chat. Guards delivery commands."""
+    return bool(MANAGER_CHAT_ID) and update.effective_chat and update.effective_chat.id == MANAGER_CHAT_ID
+
+
+async def _set_status_cmd(update, context, status, verb):
+    # Silently ignore for everyone except the manager — a random user typing
+    # /delivered <number> must NOT be able to change anyone's order.
+    if not _is_manager(update):
+        return
+    if not context.args:
+        await update.message.reply_text(f"Использование: /{verb} <номер заказа>\nНапример: /{verb} R-260626-1042")
+        return
+    order_no = context.args[0].strip()
+    rec = await set_order_status(order_no, status)
+    if not rec:
+        await update.message.reply_text(f"Заказ {order_no} не найден.")
+        return
+    uid = rec.get("uid")
+    if uid:
+        try:
+            if status == "Доставляется":
+                await context.bot.send_message(uid, f"🚗 Ваш заказ {order_no} передан в доставку. Курьер уже в пути!")
+            else:
+                await context.bot.send_message(uid, f"✅ Ваш заказ {order_no} доставлен. Приятного аппетита, и спасибо, что выбрали Ratsion 💚")
+        except Exception as e:
+            log.info("Could not notify customer %s: %s", uid, e)
+    await update.message.reply_text(f"Готово ✅ Заказ {order_no}: статус «{status}».")
+
+
+async def delivering(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await _set_status_cmd(update, context, "Доставляется", "delivering")
+
+
+async def delivered(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await _set_status_cmd(update, context, "Доставлен", "delivered")
+
+
+async def list_orders(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Manager-only: quick list of recent orders and their statuses."""
+    if not _is_manager(update):
+        return
+    data = _read_orders()
+    if not data:
+        await update.message.reply_text("Заказов пока нет.")
+        return
+    lines = [f"{no} — {rec.get('status', 'Принят')} — {fmt_sum(rec.get('total'))}" for no, rec in list(data.items())[-25:]]
+    await update.message.reply_text("Последние заказы:\n" + "\n".join(lines))
+
+
 # ----------------------------- bootstrap -----------------------------
 
 async def main():
     application = Application.builder().token(BOT_TOKEN).build()
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("myid", myid))
+    application.add_handler(CommandHandler("delivering", delivering))
+    application.add_handler(CommandHandler("delivered", delivered))
+    application.add_handler(CommandHandler("orders", list_orders))
     application.add_handler(MessageHandler(filters.StatusUpdate.WEB_APP_DATA, on_webapp_data))
 
     web_app = web.Application()
@@ -370,6 +508,8 @@ async def main():
         web.options("/order", handle_preflight),
         web.post("/contact", handle_contact),
         web.options("/contact", handle_preflight),
+        web.post("/my-orders", handle_my_orders),
+        web.options("/my-orders", handle_preflight),
     ])
 
     # start the polling bot (for /start, /myid, legacy sendData)

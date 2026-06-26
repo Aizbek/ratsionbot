@@ -358,8 +358,17 @@ input[type=range]::-webkit-slider-thumb:active{transform:scale(1.18)}
 .order-hist h4{font-size:16px;font-weight:800;letter-spacing:-.02em}
 .status-pill{font-size:11.5px;font-weight:700;padding:5px 12px;border-radius:99px;display:inline-flex;align-items:center;gap:5px}
 .status-pill.proc{background:#FDF1DD;color:var(--amber-d)}
+.status-pill.ship{background:#E1EFFC;color:#2C6FB5}
+.status-pill.done{background:var(--green-l);color:var(--green-d)}
 .status-pill .dot{width:6px;height:6px;border-radius:50%;background:currentColor;animation:blink 1.4s infinite}
+.status-pill.done .dot{animation:none}
 @keyframes blink{50%{opacity:.3}}
+.ship-banner{display:flex;align-items:center;gap:10px;background:#E1EFFC;border:1px solid #BcdAF5;border-radius:var(--r-sm);
+  padding:11px 14px;margin-top:12px;color:#2C6FB5;font-size:13.5px;font-weight:700}
+.ship-banner .ic{width:20px;height:20px;flex-shrink:0}
+.oh-del{margin-left:10px;width:30px;height:30px;border-radius:9px;border:1px solid var(--line);background:var(--card);
+  color:var(--muted);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;font-size:16px;line-height:1}
+.oh-del:active{transform:scale(.9)}
 .empty-state{text-align:center;padding:50px 20px}
 .empty-state .es-ic{width:80px;height:80px;border-radius:24px;background:var(--green-l);color:var(--green-d);
   display:flex;align-items:center;justify-content:center;margin:0 auto 18px}
@@ -676,7 +685,6 @@ catering:()=>`<div class="screen" id="catering">
     </ul>
   </div>
 
-  <div style="margin-top:18px" class="fade-up d5"><button class="cta cta-green" data-act="manager">${ic('send')} Обсудить с менеджером</button></div>
 </div>`,
 
 /* ===== PROMO (real Ratsion discounts) ===== */
@@ -743,13 +751,22 @@ orders:()=>{
   </div>`;
   return `<div class="screen" id="orders">
     ${topbar('Мои заказы')}
-    ${list.map((od,i)=>`<div class="order-hist fade-up d${Math.min(i+1,6)}">
-      <div class="oh-top"><h4>Заказ ${od.no}</h4><span class="status-pill proc"><span class="dot"></span>${od.status||'В обработке'}</span></div>
+    ${list.map((od,i)=>{
+      const st=od.status||'В обработке';
+      const cls = st==='Доставляется'?'ship' : st==='Доставлен'?'done' : 'proc';
+      return `<div class="order-hist fade-up d${Math.min(i+1,6)}">
+      <div class="oh-top"><h4>Заказ ${od.no}</h4>
+        <div style="display:flex;align-items:center">
+          <span class="status-pill ${cls}"><span class="dot"></span>${st}</span>
+          <div class="oh-del" data-del="${od.no}" title="Удалить">×</div>
+        </div>
+      </div>
       <div class="prog-meta" style="border:none;padding:0">
         <div>Программа<b>${od.category}</b></div><div>Срок<b>${od.duration}</b></div><div>Старт<b>${od.date}</b></div>
       </div>
       <div class="total-line grand" style="border-top:1px dashed #BFD9A8;margin-top:10px;padding-top:10px"><span>Итого</span><span>${sum(od.total)}</span></div>
-    </div>`).join('')}
+      ${st==='Доставляется'?`<div class="ship-banner">${ic('truck')} Ваш заказ доставляется</div>`:''}
+    </div>`}).join('')}
     <div style="display:flex;gap:11px;margin-top:4px" class="fade-up d6">
       <button class="cta cta-green" style="flex:1" data-go="programs">${ic('refresh')} Новый заказ</button>
     </div>
@@ -984,9 +1001,42 @@ function softRender(innerId,builder){
 }
 
 /* ---------- order persistence (real "Мои заказы" history) ---------- */
-function loadOrders(){ try{ return JSON.parse(localStorage.getItem('ratsion_orders')||'[]'); }catch(e){ return []; } }
-function saveOrder(rec){ const list=loadOrders(); list.unshift(rec); try{ localStorage.setItem('ratsion_orders', JSON.stringify(list.slice(0,20))); }catch(e){} }
+function rawOrders(){ try{ return JSON.parse(localStorage.getItem('ratsion_orders')||'[]'); }catch(e){ return []; } }
+function writeOrders(list){ try{ localStorage.setItem('ratsion_orders', JSON.stringify(list.slice(0,20))); }catch(e){} }
+/* parse stored "ДД.ММ.ГГГГ" -> Date (or null) */
+function parseStoredDate(v){ const m=/^(\d{2})\.(\d{2})\.(\d{4})$/.exec(v||''); if(!m) return null; const d=new Date(+m[3],+m[2]-1,+m[1]); return isNaN(d)?null:d; }
+/* load orders, auto-dropping any whose delivery period (start + срок) has fully passed,
+   and anything already marked доставлен more than a day ago */
+function loadOrders(){
+  const today=new Date(); today.setHours(0,0,0,0);
+  const kept=rawOrders().filter(od=>{
+    const start=parseStoredDate(od.date);
+    if(start){ const end=new Date(start); end.setDate(end.getDate()+(od.days||1)); if(end<today) return false; } // period passed → drop
+    return true;
+  });
+  if(kept.length!==rawOrders().length) writeOrders(kept);
+  return kept;
+}
+function saveOrder(rec){ const list=rawOrders(); list.unshift(rec); writeOrders(list); }
+function deleteOrder(no){ writeOrders(rawOrders().filter(o=>o.no!==no)); haptic('light'); render(); }
 function nextOrderNo(){ let n=+(localStorage.getItem('ratsion_orderseq')||'1041')+1; try{ localStorage.setItem('ratsion_orderseq',String(n)); }catch(e){} return '#'+n; }
+/* pull live delivery statuses from the bot for this user's orders, then refresh the screen */
+async function syncOrderStatuses(){
+  if(!CONFIG.apiBase) return;
+  let data=null;
+  try{
+    const res=await fetch(CONFIG.apiBase.replace(/\/$/,'')+'/my-orders',{
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({ initData:(tg&&tg.initData)||'' })
+    });
+    if(res.ok) data=await res.json().catch(()=>null);
+  }catch(e){ return; }
+  if(!data||!data.ok||!Array.isArray(data.orders)) return;
+  const byNo={}; data.orders.forEach(o=>{ byNo[o.no]=o.status; });
+  let changed=false;
+  const list=rawOrders().map(od=>{ const st=byNo[od.no]; if(st&&st!==od.status){ od.status=st; changed=true; } return od; });
+  if(changed){ writeOrders(list); if(S.stack[S.stack.length-1]==='orders') render(); }
+}
 
 /* parse & validate ДД.ММ.ГГГГ — must be a real calendar date, today..+90 days */
 function parseRuDate(v){
@@ -1197,6 +1247,11 @@ function attach(cur){
       alert(copied?'Заказ скопирован в буфер обмена. Отправьте его менеджеру в Telegram или позвоните нам.':'Свяжитесь с менеджером по телефону, чтобы подтвердить заказ.');
     }
   };
+
+  // delete an order from "Мои заказы"
+  app.querySelectorAll('[data-del]').forEach(el=>el.onclick=(e)=>{ e.stopPropagation(); deleteOrder(el.dataset.del); });
+  // on the orders screen, pull live delivery statuses from the bot
+  if(cur==='orders') syncOrderStatuses();
 
   try{
     if(cur==='menu'){ tg?.BackButton?.hide(); }

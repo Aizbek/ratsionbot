@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Ratsion · правильное питание</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.mjs" type="module"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -207,14 +208,19 @@ body{
 #offhours .oh-body span{font-size:12px;color:#9A7B2E;font-weight:500;line-height:1.4}
 #offhours .oh-x{margin-left:auto;color:#C2A55A;font-size:18px;cursor:pointer;flex-shrink:0;line-height:1}
 
-/* ---------- LIGHTWEIGHT LOADING SCREEN (pure CSS logo reveal) ---------- */
-#loader{position:fixed;inset:0;z-index:999;display:flex;align-items:center;justify-content:center;
+/* ---------- PREMIUM LOADING SCREEN (Lottie handwriting + brand) ---------- */
+#loader{position:fixed;inset:0;z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;
   background:radial-gradient(125% 90% at 50% 38%,#FFFDF8 0%,#FAF4E6 55%,#F1E6CC 100%);
-  transition:opacity .5s ease,visibility .5s}
+  transition:opacity .7s ease,visibility .7s}
 #loader.hide{opacity:0;visibility:hidden;pointer-events:none}
-.ld-logo{width:200px;max-width:62vw;height:auto;opacity:0;transform:scale(.92);
-  animation:ldIn .6s cubic-bezier(.22,.61,.36,1) forwards}
-@keyframes ldIn{to{opacity:1;transform:none}}
+.ld-anim{display:flex;align-items:center;justify-content:center}
+.ld-brand{margin-top:6px;font-family:Georgia,'Times New Roman',serif;font-weight:700;font-size:40px;letter-spacing:.01em;
+  background:linear-gradient(95deg,#E7C66B,#B08D3A 50%,#D4AF52);-webkit-background-clip:text;background-clip:text;color:transparent;
+  opacity:0;transform:translateY(10px);transition:opacity .9s ease,transform .9s ease}
+.ld-brand.show{opacity:1;transform:none}
+.ld-tag{margin-top:14px;font-size:11px;font-weight:700;letter-spacing:.36em;text-transform:uppercase;color:rgba(176,141,58,.75);
+  opacity:0;transform:translateY(8px);transition:opacity .9s ease .15s,transform .9s ease .15s}
+.ld-tag.show{opacity:1;transform:none}
 
 /* ---------- CALCULATOR ---------- */
 .progress-wrap{padding:6px 2px 18px}
@@ -391,7 +397,14 @@ input[type=range]::-webkit-slider-thumb:active{transform:scale(1.18)}
 </style>
 </head>
 <body>
-<div id="loader"><img class="ld-logo" src="logo.png" alt="Ratsion"></div>
+<div id="loader">
+  <div class="ld-anim">
+    <dotlottie-player id="ldLottie" src="loader.json" autoplay speed="1.5"
+      style="width:300px;max-width:78vw;height:auto"></dotlottie-player>
+  </div>
+  <div class="ld-brand" id="ldBrand">Ratsion</div>
+  <div class="ld-tag" id="ldTag">здоровая и вкусная еда</div>
+</div>
 <div class="app" id="app"></div>
 <div id="offhours">
   <div class="oh-ic"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><path d="M12 7v5l3 2"/></svg></div>
@@ -1283,11 +1296,31 @@ render();
   if(x) x.onclick=()=>el.classList.remove('show');
 })();
 
-/* ---------- loading screen: brief logo reveal, then dissolve into the menu ---------- */
+/* ---------- Lottie loading screen (event-driven timing) ---------- */
 (function(){
   const loader=document.getElementById('loader');
+  const brand=document.getElementById('ldBrand');
+  const tag=document.getElementById('ldTag');
+  const player=document.getElementById('ldLottie');
   if(!loader) return;
-  setTimeout(()=>{ loader.classList.add('hide'); setTimeout(()=>loader.remove(),500); }, 1100);
+
+  let finished=false;
+  function finish(){
+    if(finished) return; finished=true;
+    // reveal Ratsion + tagline AFTER the handwriting is done
+    brand&&brand.classList.add('show');
+    setTimeout(()=>{ tag&&tag.classList.add('show'); }, 300);
+    // hold a beat so the brand is readable, THEN dissolve into the menu
+    setTimeout(()=>{ loader.classList.add('hide'); setTimeout(()=>loader.remove(),600); }, 900);
+  }
+
+  // primary: fire when the Lottie animation actually completes
+  if(player){
+    player.addEventListener('complete', finish);
+    player.addEventListener('error', finish);
+  }
+  // safety net: if the event never fires (CDN blocked, etc.), finish after 5s max
+  setTimeout(finish, 5000);
 })();
 </script>
 </body>

@@ -149,7 +149,7 @@ body{
 .v-blue .glow{background:#3C82D6}
 .v-pink .tile-ic,.v-pink.feat-ic{background:#FCEAF0;color:#C24C73}
 .v-pink .glow{background:#D85A85}
-.v-violet .tile-ic,.v-violet.feat-ic{background:#EFEBFB;color:#6A52C2}
+.v-violet .tile-ic,.v-violet .r-ic,.v-violet.feat-ic{background:#EFEBFB;color:#6A52C2}
 .v-violet .glow{background:#7E63D8}
 
 /* program-list icons get their colour too */
@@ -367,6 +367,21 @@ input[type=range]::-webkit-slider-thumb:active{transform:scale(1.18)}
 .empty-state h3{font-size:18px;font-weight:700;margin-bottom:6px}
 .empty-state p{font-size:14px;color:var(--muted);font-weight:500;margin-bottom:20px}
 
+/* ---------- about: reasons & service lists ---------- */
+.reason{display:flex;gap:13px;align-items:flex-start;padding:13px 0;border-bottom:1px solid var(--line)}
+.reason:last-child{border-bottom:none}
+.reason-num{width:30px;height:30px;border-radius:9px;background:var(--green-l);color:var(--green-d);flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px}
+.reason p{font-size:13.5px;color:var(--ink);font-weight:500;line-height:1.5}
+.offer-chips{display:flex;flex-wrap:wrap;gap:8px}
+.offer-chips span{background:var(--green-l);color:var(--green-d);font-size:12.5px;font-weight:700;
+  padding:8px 13px;border-radius:99px;letter-spacing:-.01em}
+.svc-list{list-style:none}
+.svc-list li{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--line);
+  font-size:14px;font-weight:600;color:var(--ink);line-height:1.4}
+.svc-list li:last-child{border-bottom:none}
+.svc-list li .ic{width:18px;height:18px;flex-shrink:0;margin-top:1px;color:var(--c,#2E8E52)}
+
 </style>
 </head>
 <body>
@@ -559,7 +574,12 @@ menu:()=>`<div class="screen" id="menu">
         <div><h3>Контакты</h3><p>связаться с нами</p></div>
       </div>
     </div>
-    <div class="m-row v-green fade-up d5" data-go="orders">
+    <div class="m-row v-violet fade-up d5" data-go="catering" style="margin-bottom:12px">
+      <div class="r-ic">${ic('chef')}</div>
+      <div><h3>Кейтеринг и услуги</h3><p>корпоративное и социальное питание</p></div>
+      <div class="r-arrow">${ic('arrow')}</div>
+    </div>
+    <div class="m-row v-green fade-up d6" data-go="orders">
       <div class="r-ic">${ic('box')}</div>
       <div><h3>Мои заказы</h3><p>история и статус</p></div>
       <div class="r-arrow">${ic('arrow')}</div>
@@ -571,15 +591,92 @@ menu:()=>`<div class="screen" id="menu">
 about:()=>`<div class="screen" id="about">
   ${topbar('О компании')}
   <div class="content-card fade-up d1">
-    <p class="mission">«Ratsion» — это команда профессионалов в области правильного питания. Мы стараемся для вас, чтобы вы были здоровыми, отдохнувшими, сытыми и довольными 💚</p>
+    <p class="mission">Компания «Ratsion» начала свою деятельность в 2019 году. Благодаря ответственному и профессиональному подходу мы в короткий срок заняли лидирующую позицию в области здорового питания Республики Узбекистан.<br><br>Основное направление нашей деятельности — разработка, приготовление и доставка рационов здорового и вкусного питания на каждый день.</p>
   </div>
-  <p class="sec-title fade-up d2" style="margin-top:18px">Наша команда</p>
+
+  <p class="sec-title fade-up d2" style="margin-top:18px">Наша цель</p>
+  <div class="content-card fade-up d2">
+    <p class="mission">Мы хотим изменить стереотипы большинства людей в области правильного питания и вывести здоровый образ жизни на новый уровень. Мы убеждены, что здоровая пища должна быть не только полезной, но и по-настоящему вкусной 💚</p>
+  </div>
+
+  <p class="sec-title fade-up d3" style="margin-top:18px">Почему именно «Ratsion»?</p>
   <div class="content-card fade-up d3">
-    <div class="team-row"><div class="team-ic v-amber">${ic('chef')}</div><div><h4>Повара</h4><p>Профессиональное образование и опыт в ресторанах высокого уровня</p></div></div>
-    <div class="team-row"><div class="team-ic v-green">${ic('heart')}</div><div><h4>Консультанты и диетолог</h4><p>Подберут программу под ваши конкретные цели</p></div></div>
+    <div class="reason"><div class="reason-num">1</div><p>Вы избавлены от подсчёта калорий, изучения состава блюд и взвешивания продуктов — наш диетолог и повара сделают это за вас.</p></div>
+    <div class="reason"><div class="reason-num">2</div><p>Мы учитываем ваши предпочтения в еде, возможные аллергические реакции, состояние здоровья и образ жизни.</p></div>
+    <div class="reason"><div class="reason-num">3</div><p>Ежедневно удивляем и балуем вас новым меню. Более 3000 полезных рецептов — вам никогда не надоест правильное питание.</p></div>
+    <div class="reason"><div class="reason-num">4</div><p>Ежедневный закуп свежих продуктов и соблюдение санитарных норм на всех этапах гарантируют гастрономическое удовольствие.</p></div>
+  </div>
+
+  <p class="sec-title fade-up d4" style="margin-top:18px">Наша команда</p>
+  <div class="content-card fade-up d4">
+    <p class="mission" style="margin-bottom:6px">«Ratsion» — это команда из 50 профессионалов в области правильного питания.</p>
+    <div class="team-row"><div class="team-ic v-amber">${ic('chef')}</div><div><h4>Повара</h4><p>Профессиональное образование и большой опыт работы в ресторанах высокого уровня</p></div></div>
+    <div class="team-row"><div class="team-ic v-green">${ic('heart')}</div><div><h4>Консультанты и диетолог</h4><p>Помогут правильно подобрать программу под ваши цели</p></div></div>
     <div class="team-row"><div class="team-ic v-blue">${ic('truck')}</div><div><h4>Курьеры</h4><p>Доставят заказ в нужное время и место</p></div></div>
   </div>
-  <div style="margin-top:18px" class="fade-up d4"><button class="cta cta-green" data-go="programs">${ic('bowl')} Заказать питание</button></div>
+
+  <p class="sec-title fade-up d5" style="margin-top:18px">Что мы предлагаем</p>
+  <div class="content-card fade-up d5">
+    <div class="offer-chips">
+      <span>Снижение / набор веса</span><span>При заболеваниях</span><span>Спортивное</span>
+      <span>Для беременных и кормящих</span><span>Вегетарианское</span><span>Индивидуальное</span>
+      <span>Корпоративное</span><span>Детское</span>
+    </div>
+  </div>
+
+  <div style="margin-top:18px;display:flex;gap:11px" class="fade-up d6">
+    <button class="cta cta-green" style="flex:1" data-go="programs">${ic('bowl')} Заказать питание</button>
+  </div>
+  <div style="margin-top:10px" class="fade-up d6">
+    <button class="cta cta-ghost" data-go="catering">${ic('chef')} Кейтеринг и услуги для бизнеса</button>
+  </div>
+</div>`,
+
+/* ===== CATERING / B2B SERVICES ===== */
+catering:()=>`<div class="screen" id="catering">
+  ${topbar('Кейтеринг и услуги')}
+  <div class="content-card fade-up d1">
+    <h4 style="font-size:16px;font-weight:800;margin-bottom:8px;color:var(--ink)">Корпоративное питание</h4>
+    <p class="mission">Помимо основного направления у нас есть отдельная кухня для корпоративного питания, производственные мощности которой позволяют ежедневно обслуживать более 1000 человек. «Ratsion» организует корпоративное питание в различных форматах.</p>
+  </div>
+
+  <p class="sec-title fade-up d2" style="margin-top:18px">Коммерческое питание</p>
+  <div class="content-card fade-up d2">
+    <ul class="svc-list" style="--c:#2C6FB5">
+      <li>${ic('check')} Доставка обедов</li>
+      <li>${ic('check')} Корпоративное питание</li>
+      <li>${ic('check')} Кейтеринг</li>
+      <li>${ic('check')} Организация столовой на предприятии</li>
+      <li>${ic('check')} Доставка питания на строительные объекты</li>
+      <li>${ic('check')} Выпечка на заказ</li>
+    </ul>
+  </div>
+
+  <p class="sec-title fade-up d3" style="margin-top:18px">Социальное питание</p>
+  <div class="content-card fade-up d3">
+    <ul class="svc-list" style="--c:#0E9C84">
+      <li>${ic('check')} Питание в учебных заведениях</li>
+      <li>${ic('check')} Питание в детских учреждениях</li>
+      <li>${ic('check')} Питание в лечебных учреждениях</li>
+      <li>${ic('check')} Питание в государственных учреждениях</li>
+      <li>${ic('check')} Санаторно-курортное питание</li>
+      <li>${ic('check')} Лечебное и диетическое питание</li>
+    </ul>
+  </div>
+
+  <p class="sec-title fade-up d4" style="margin-top:18px">Банкеты и фуршеты</p>
+  <div class="content-card fade-up d4">
+    <ul class="svc-list" style="--c:#E0921A">
+      <li>${ic('check')} Салаты и закуски фуршетные</li>
+      <li>${ic('check')} Канапе, тарталетки, валованы</li>
+      <li>${ic('check')} Горячие блюда фуршетные</li>
+      <li>${ic('check')} Гарниры фуршетные</li>
+      <li>${ic('check')} Выпечка фуршетная</li>
+      <li>${ic('check')} Проведение мероприятий</li>
+    </ul>
+  </div>
+
+  <div style="margin-top:18px" class="fade-up d5"><button class="cta cta-green" data-act="manager">${ic('send')} Обсудить с менеджером</button></div>
 </div>`,
 
 /* ===== PROMO (real Ratsion discounts) ===== */

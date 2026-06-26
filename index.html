@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Ratsion · правильное питание</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-<script src="https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.mjs" type="module"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -208,19 +207,14 @@ body{
 #offhours .oh-body span{font-size:12px;color:#9A7B2E;font-weight:500;line-height:1.4}
 #offhours .oh-x{margin-left:auto;color:#C2A55A;font-size:18px;cursor:pointer;flex-shrink:0;line-height:1}
 
-/* ---------- PREMIUM LOADING SCREEN (Lottie handwriting + brand) ---------- */
-#loader{position:fixed;inset:0;z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;
+/* ---------- LIGHTWEIGHT LOADING SCREEN (pure CSS logo reveal) ---------- */
+#loader{position:fixed;inset:0;z-index:999;display:flex;align-items:center;justify-content:center;
   background:radial-gradient(125% 90% at 50% 38%,#FFFDF8 0%,#FAF4E6 55%,#F1E6CC 100%);
-  transition:opacity .7s ease,visibility .7s}
+  transition:opacity .5s ease,visibility .5s}
 #loader.hide{opacity:0;visibility:hidden;pointer-events:none}
-.ld-anim{display:flex;align-items:center;justify-content:center}
-.ld-brand{margin-top:6px;font-family:Georgia,'Times New Roman',serif;font-weight:700;font-size:40px;letter-spacing:.01em;
-  background:linear-gradient(95deg,#E7C66B,#B08D3A 50%,#D4AF52);-webkit-background-clip:text;background-clip:text;color:transparent;
-  opacity:0;transform:translateY(10px);transition:opacity .9s ease,transform .9s ease}
-.ld-brand.show{opacity:1;transform:none}
-.ld-tag{margin-top:14px;font-size:11px;font-weight:700;letter-spacing:.36em;text-transform:uppercase;color:rgba(176,141,58,.75);
-  opacity:0;transform:translateY(8px);transition:opacity .9s ease .15s,transform .9s ease .15s}
-.ld-tag.show{opacity:1;transform:none}
+.ld-logo{width:200px;max-width:62vw;height:auto;opacity:0;transform:scale(.92);
+  animation:ldIn .6s cubic-bezier(.22,.61,.36,1) forwards}
+@keyframes ldIn{to{opacity:1;transform:none}}
 
 /* ---------- CALCULATOR ---------- */
 .progress-wrap{padding:6px 2px 18px}
@@ -326,6 +320,9 @@ input[type=range]::-webkit-slider-thumb:active{transform:scale(1.18)}
 .check-ring::after{content:'';position:absolute;inset:-8px;border-radius:50%;border:2px solid var(--green);opacity:.3;animation:ring 1.6s ease-out infinite}
 @keyframes ring{0%{transform:scale(.9);opacity:.5}100%{transform:scale(1.25);opacity:0}}
 .check-ring .ic{width:50px;height:50px;color:var(--green-d);stroke-width:2.5}
+.check-ring.err{background:#FDECEC}
+.check-ring.err::after{border-color:#D9544D}
+.check-ring.err .ic{color:#C0392B}
 .success-wrap h1{font-size:25px;font-weight:800;letter-spacing:-.03em;margin-bottom:8px}
 .success-wrap .order-no{display:inline-block;background:var(--ink);color:#fff;font-size:14px;font-weight:700;
   padding:7px 16px;border-radius:99px;margin:6px 0 16px;letter-spacing:.01em}
@@ -394,14 +391,7 @@ input[type=range]::-webkit-slider-thumb:active{transform:scale(1.18)}
 </style>
 </head>
 <body>
-<div id="loader">
-  <div class="ld-anim">
-    <dotlottie-player id="ldLottie" src="loader.json" autoplay speed="1.5"
-      style="width:300px;max-width:78vw;height:auto"></dotlottie-player>
-  </div>
-  <div class="ld-brand" id="ldBrand">Ratsion</div>
-  <div class="ld-tag" id="ldTag">здоровая и вкусная еда</div>
-</div>
+<div id="loader"><img class="ld-logo" src="logo.png" alt="Ratsion"></div>
 <div class="app" id="app"></div>
 <div id="offhours">
   <div class="oh-ic"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><path d="M12 7v5l3 2"/></svg></div>
@@ -821,18 +811,28 @@ order:()=>`<div class="screen" id="order"><div id="order-inner">${orderStep()}</
 success:()=>{
   const n = S.order.orderNo || '#—';
   const delivered = S.order.delivered;
+  if(delivered){
+    return `<div class="screen" id="success">
+      <div class="success-wrap">
+        <div class="check-ring fade-up d1">${ic('check')}</div>
+        <h1 class="fade-up d2">Заказ оформлен!</h1>
+        <div class="order-no fade-up d2">${n}</div>
+        <p class="fade-up d3">Заказ отправлен менеджеру. Он свяжется с вами в ближайшее время для подтверждения и деталей доставки.</p>
+        <div style="margin-top:24px" class="fade-up d4">
+          <button class="cta cta-ghost" data-act="home">На главную</button>
+        </div>
+      </div>
+    </div>`;
+  }
+  // delivery failed — be honest and let them retry (no manual texting)
   return `<div class="screen" id="success">
     <div class="success-wrap">
-      <div class="check-ring fade-up d1">${ic('check')}</div>
-      <h1 class="fade-up d2">Заказ оформлен!</h1>
-      <div class="order-no fade-up d2">${n}</div>
-      ${delivered
-        ? `<p class="fade-up d3">Заказ отправлен менеджеру. Он свяжется с вами для подтверждения и деталей доставки.</p>`
-        : `<div class="pay-note fade-up d3" style="text-align:left;margin:8px 0 2px">${ic('info')}<p>Заказ сохранён в «Мои заказы». Чтобы мы точно его получили — отправьте детали менеджеру или позвоните, это пара секунд.</p></div>`}
+      <div class="check-ring err fade-up d1">${ic('info')}</div>
+      <h1 class="fade-up d2">Не удалось отправить</h1>
+      <p class="fade-up d3">Похоже, нет связи с сервером. Данные заказа сохранены — проверьте интернет и попробуйте ещё раз.</p>
       <div style="margin-top:24px" class="fade-up d4">
-        ${!delivered?`<button class="cta cta-green" data-act="sendmanager">${ic('send')} Отправить менеджеру</button>`:''}
-        <a href="tel:${CONFIG.phone}" class="cta ${delivered?'cta-green':'cta-amber'}" style="text-decoration:none;${!delivered?'margin-top:8px':''}">${ic('phone')} ${CONFIG.phoneText}</a>
-        <button class="cta cta-ghost" data-act="home" style="margin-top:6px">На главную</button>
+        <button class="cta cta-green" data-act="retryorder">${ic('refresh')} Повторить отправку</button>
+        <button class="cta cta-ghost" data-act="home" style="margin-top:8px">На главную</button>
       </div>
     </div>
   </div>`;
@@ -1040,6 +1040,58 @@ async function syncOrderStatuses(){
   if(changed){ writeOrders(list); if(S.stack[S.stack.length-1]==='orders') render(); }
 }
 
+/* submit the current order to the bot, record it, and show the result screen.
+   Used by both "Подтвердить заказ" and the "Повторить отправку" retry. */
+async function submitOrder(btn){
+  const o=S.order; const pr=orderPricing(o);
+  const tgUser=(tg&&tg.initDataUnsafe&&tg.initDataUnsafe.user)?tg.initDataUnsafe.user:null;
+  const payload={
+    type:'new_order',
+    category:o.cat.name, kcal:o.tier.lo+'-'+o.tier.hi,
+    price_per_day:o.tier.price, days:o.days, duration:o.duration,
+    subtotal:pr.subtotal, discount_pct:pr.discountPct, discount_amt:pr.discountAmt, total:pr.total,
+    date:o.date, address:o.address, name:o.name, phone:o.phone,
+    tg_id: tgUser?tgUser.id:null, tg_username: tgUser?tgUser.username:null
+  };
+  let _lbl;
+  if(btn){ btn.disabled=true; _lbl=btn.innerHTML; btn.style.opacity='.7'; btn.innerHTML='Отправляем…'; }
+
+  let delivered=false, orderNo=null;
+  if(CONFIG.apiBase){
+    // generous timeout so a cold-starting server still has time, but the button
+    // can't hang on "Отправляем…" forever if the network is dead
+    const ctrl=new AbortController(); const to=setTimeout(()=>ctrl.abort(),90000);
+    try{
+      const res=await fetch(CONFIG.apiBase.replace(/\/$/,'')+'/order',{
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({ initData:(tg&&tg.initData)||'', order:payload }),
+        signal:ctrl.signal
+      });
+      if(res.ok){ const data=await res.json().catch(()=>null);
+        if(data&&data.ok&&data.orderNo){ delivered=true; orderNo=data.orderNo; } }
+    }catch(e){ /* network/CORS/timeout -> not delivered, honest error screen */ }
+    finally{ clearTimeout(to); }
+  } else {
+    // legacy degraded mode (no backend configured): try sendData (can't confirm)
+    try{ if(tg&&typeof tg.sendData==='function'){ tg.sendData(JSON.stringify(payload)); } }catch(e){}
+  }
+
+  if(!orderNo) orderNo=nextOrderNo();      // local fallback number if API didn't assign one
+  o.orderNo=orderNo; o.delivered=delivered;
+
+  // record it locally only once it actually went through, so a failed attempt
+  // doesn't leave a stuck "Ожидает отправки" order behind
+  if(delivered){
+    saveOrder({ no:orderNo, category:o.cat.name, kcal:o.tier.lo+'–'+o.tier.hi,
+      duration:o.duration, days:o.days, date:o.date, total:pr.total, ts:Date.now(), status:'Принят' });
+    S.hasOrders=true;
+  }
+
+  if(btn){ btn.disabled=false; btn.style.opacity=''; btn.innerHTML=_lbl; }
+  haptic('heavy');
+  go('success');
+}
+
 /* parse & validate ДД.ММ.ГГГГ — must be a real calendar date, today..+90 days */
 function parseRuDate(v){
   const m=/^(\d{2})\.(\d{2})\.(\d{4})$/.exec(v); if(!m) return null;
@@ -1183,77 +1235,11 @@ function attach(cur){
     else back();
   };
   const place=app.querySelector('[data-act="placeorder"]');
-  if(place) place.onclick=async()=>{
-    const o=S.order; const pr=orderPricing(o);
-    const tgUser = (tg&&tg.initDataUnsafe&&tg.initDataUnsafe.user)?tg.initDataUnsafe.user:null;
-    const payload={
-      type:'new_order',
-      category:o.cat.name, kcal:o.tier.lo+'-'+o.tier.hi,
-      price_per_day:o.tier.price, days:o.days, duration:o.duration,
-      subtotal:pr.subtotal, discount_pct:pr.discountPct, discount_amt:pr.discountAmt, total:pr.total,
-      date:o.date, address:o.address, name:o.name, phone:o.phone,
-      tg_id: tgUser?tgUser.id:null, tg_username: tgUser?tgUser.username:null
-    };
+  if(place) place.onclick=()=>submitOrder(place);
 
-    // loading state (the call is async)
-    place.disabled=true; const _label=place.innerHTML; place.style.opacity='.7'; place.innerHTML='Отправляем…';
-
-    let delivered=false, orderNo=null;
-
-    // PRIMARY channel: backend API. Works regardless of how the app was opened,
-    // returns a REAL order number, and confirms only on actual delivery.
-    if(CONFIG.apiBase){
-      // generous timeout so a cold-starting server still has time, but the
-      // button can't hang on "Отправляем…" forever if the network is dead
-      const ctrl=new AbortController(); const to=setTimeout(()=>ctrl.abort(),90000);
-      try{
-        const res=await fetch(CONFIG.apiBase.replace(/\/$/,'')+'/order',{
-          method:'POST', headers:{'Content-Type':'application/json'},
-          body:JSON.stringify({ initData:(tg&&tg.initData)||'', order:payload }),
-          signal:ctrl.signal
-        });
-        if(res.ok){ const data=await res.json().catch(()=>null);
-          if(data&&data.ok&&data.orderNo){ delivered=true; orderNo=data.orderNo; } }
-      }catch(e){ /* network/CORS/timeout -> stays not-delivered, fallback UI shown */ }
-      finally{ clearTimeout(to); }
-    } else {
-      // LEGACY degraded mode (no backend configured): try sendData().
-      // It only delivers when opened from a reply-keyboard button AND it closes
-      // the app, so we cannot confirm delivery — never mark as delivered here.
-      try{ if(tg&&typeof tg.sendData==='function'){ tg.sendData(JSON.stringify(payload)); } }catch(e){}
-    }
-
-    if(!orderNo) orderNo=nextOrderNo();      // local fallback number if API didn't assign one
-    o.orderNo=orderNo; o.delivered=delivered;
-
-    // record locally so "Мои заказы" is always real (and shows only this user's orders)
-    saveOrder({ no:orderNo, category:o.cat.name, kcal:o.tier.lo+'–'+o.tier.hi,
-      duration:o.duration, days:o.days, date:o.date, total:pr.total, ts:Date.now(),
-      status: delivered?'Принят':'Ожидает отправки' });
-    S.hasOrders=true;
-
-    // keep a readable copy for the manual fallback channel on the success screen
-    o.text=buildOrderText(o,pr);
-
-    place.disabled=false; place.style.opacity=''; place.innerHTML=_label;
-    haptic('heavy');
-    go('success');
-  };
-
-  // success-screen fallback: copy the order + open the manager chat
-  const sendMgr=app.querySelector('[data-act="sendmanager"]');
-  if(sendMgr) sendMgr.onclick=async()=>{
-    haptic('light');
-    let copied=false;
-    try{ await navigator.clipboard.writeText(S.order.text||''); copied=true; }catch(e){}
-    if(CONFIG.managerUsername){
-      const url='https://t.me/'+CONFIG.managerUsername;
-      try{ tg?.openTelegramLink ? tg.openTelegramLink(url) : window.open(url,'_blank'); }catch(e){ window.open(url,'_blank'); }
-      alert(copied?'Заказ скопирован — вставьте его в чат менеджеру (долгое нажатие → Вставить).':'Откройте чат менеджера и пришлите детали заказа.');
-    } else {
-      alert(copied?'Заказ скопирован в буфер обмена. Отправьте его менеджеру в Telegram или позвоните нам.':'Свяжитесь с менеджером по телефону, чтобы подтвердить заказ.');
-    }
-  };
+  // success screen: retry sending after a failed attempt
+  const retry=app.querySelector('[data-act="retryorder"]');
+  if(retry) retry.onclick=()=>submitOrder(retry);
 
   // delete an order from "Мои заказы"
   app.querySelectorAll('[data-del]').forEach(el=>el.onclick=(e)=>{ e.stopPropagation(); deleteOrder(el.dataset.del); });
@@ -1289,32 +1275,11 @@ render();
   if(x) x.onclick=()=>el.classList.remove('show');
 })();
 
-/* ---------- Lottie loading screen (event-driven timing) ---------- */
+/* ---------- loading screen: brief logo reveal, then dissolve into the menu ---------- */
 (function(){
   const loader=document.getElementById('loader');
-  const brand=document.getElementById('ldBrand');
-  const tag=document.getElementById('ldTag');
-  const player=document.getElementById('ldLottie');
   if(!loader) return;
-
-  let finished=false;
-  function finish(){
-    if(finished) return; finished=true;
-    // 1) reveal Ratsion + tagline AFTER the handwriting is done
-    brand&&brand.classList.add('show');
-    setTimeout(()=>{ tag&&tag.classList.add('show'); }, 300);
-    // 2) hold a beat so the brand is readable, THEN dissolve into the menu
-    setTimeout(()=>{ loader.classList.add('hide'); setTimeout(()=>loader.remove(),600); }, 700);
-  }
-
-  // primary: fire when the Lottie animation actually completes
-  if(player){
-    player.addEventListener('complete', finish);
-    // some builds emit 'loop'/'frame' instead; also catch the player erroring out
-    player.addEventListener('error', finish);
-  }
-  // safety net: if the event never fires (CDN blocked, etc.), finish after 3s max
-  setTimeout(finish, 3000);
+  setTimeout(()=>{ loader.classList.add('hide'); setTimeout(()=>loader.remove(),500); }, 1100);
 })();
 </script>
 </body>

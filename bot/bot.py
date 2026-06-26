@@ -372,7 +372,7 @@ async def handle_order(request):
         await bot.send_message(MANAGER_CHAT_ID, build_card(order, order_no, user))
     except Exception as e:
         log.error("Could not send order to manager (API channel): %s", e)
-        return _cors(web.json_response({"ok": False, "error": "send_failed"}, status=502))
+        return _cors(web.json_response({"ok": False, "error": "send_failed", "detail": str(e)}, status=502))
 
     # remember the order so the manager can update its status later
     await store_order(order_no, (user or {}).get("id"), {

@@ -1203,14 +1203,19 @@ function attach(cur){
     // PRIMARY channel: backend API. Works regardless of how the app was opened,
     // returns a REAL order number, and confirms only on actual delivery.
     if(CONFIG.apiBase){
+      // generous timeout so a cold-starting server still has time, but the
+      // button can't hang on "Отправляем…" forever if the network is dead
+      const ctrl=new AbortController(); const to=setTimeout(()=>ctrl.abort(),90000);
       try{
         const res=await fetch(CONFIG.apiBase.replace(/\/$/,'')+'/order',{
           method:'POST', headers:{'Content-Type':'application/json'},
-          body:JSON.stringify({ initData:(tg&&tg.initData)||'', order:payload })
+          body:JSON.stringify({ initData:(tg&&tg.initData)||'', order:payload }),
+          signal:ctrl.signal
         });
         if(res.ok){ const data=await res.json().catch(()=>null);
           if(data&&data.ok&&data.orderNo){ delivered=true; orderNo=data.orderNo; } }
-      }catch(e){ /* network/CORS error -> stays not-delivered, fallback UI shown */ }
+      }catch(e){ /* network/CORS/timeout -> stays not-delivered, fallback UI shown */ }
+      finally{ clearTimeout(to); }
     } else {
       // LEGACY degraded mode (no backend configured): try sendData().
       // It only delivers when opened from a reply-keyboard button AND it closes

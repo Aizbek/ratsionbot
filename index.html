@@ -928,8 +928,9 @@ function computeCalories(){
   const floor = c.gender==='f'?1200:1500;
   result = Math.max(result, floor);
   c.bmr=Math.round(bmr); c.tdee=Math.round(tdee); c.result=Math.round(result/10)*10;
-  // recommend the "Индивидуальный рацион" category as the default, and the tier matching the kcal
-  const cat = CATEGORIES.find(x=>x.id==='individual') || CATEGORIES[0];
+  // recommend the "Прайс по калоражным критериям" (kaloraj) category by default,
+  // and the tier matching the kcal — it covers the widest calorie range
+  const cat = CATEGORIES.find(x=>x.id==='kaloraj') || CATEGORIES[0];
   c.recCat = cat;
   c.recTier = tierForKcal(cat, c.result);
 }

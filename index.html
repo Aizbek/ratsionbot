@@ -473,6 +473,15 @@ function ic(name,cls='ic'){return `<svg class="${cls}" viewBox="0 0 24 24">${I[n
    *** CATEGORIES MARKED needConfirm:true use placeholder numbers the client must confirm ***/
 const CATEGORIES = [
   {
+    id:'kaloraj', name:'Прайс по калоражным критериям', sub:'цена за день · доставка включена', icon:'flame', v:'teal',
+    tiers:[
+      {lo:800,hi:1000,price:145000},{lo:1000,hi:1200,price:165000},{lo:1200,hi:1400,price:185000},
+      {lo:1400,hi:1600,price:195000},{lo:1600,hi:1800,price:205000},{lo:1800,hi:2000,price:225000},
+      {lo:2000,hi:2200,price:240000},{lo:2200,hi:2500,price:255000},{lo:2500,hi:2800,price:265000},
+      {lo:2800,hi:3000,price:285000},{lo:3000,hi:3300,price:300000},{lo:3300,hi:3600,price:310000}
+    ]
+  },
+  {
     id:'lechebnaya', name:'Лечебная диета', sub:'Стол №5 и №9', icon:'heart', v:'pink',
     tiers:[
       {lo:800,hi:1000,price:145000},{lo:1000,hi:1200,price:165000},{lo:1200,hi:1400,price:185000},
@@ -505,15 +514,6 @@ const CATEGORIES = [
     tiers:[
       {lo:800,hi:1000,price:105000,label:'Деловой'},
       {lo:1000,hi:1600,price:250000,label:'Кето диета'}
-    ]
-  },
-  {
-    id:'kaloraj', name:'Прайс по калоражным критериям', sub:'цена за день · доставка включена', icon:'flame', v:'teal',
-    tiers:[
-      {lo:800,hi:1000,price:145000},{lo:1000,hi:1200,price:165000},{lo:1200,hi:1400,price:185000},
-      {lo:1400,hi:1600,price:195000},{lo:1600,hi:1800,price:205000},{lo:1800,hi:2000,price:225000},
-      {lo:2000,hi:2200,price:240000},{lo:2200,hi:2500,price:255000},{lo:2500,hi:2800,price:265000},
-      {lo:2800,hi:3000,price:285000},{lo:3000,hi:3300,price:300000},{lo:3300,hi:3600,price:310000}
     ]
   }
 ];

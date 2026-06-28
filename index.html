@@ -450,6 +450,7 @@ const I = {
   refresh:'<path d="M21 12a9 9 0 1 1-3-6.7L21 8M21 3v5h-5"/>',
   edit:'<path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/>',
   insta:'<rect x="2.5" y="2.5" width="19" height="19" rx="5.5"/><circle cx="12" cy="12" r="4"/><path d="M17.5 6.5h.01"/>',
+  link:'<path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1.5 1.5"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1.5-1.5"/>',
   send:'<path d="M22 2 11 13M22 2l-7 20-4-9-9-4Z"/>',
   clock:'<circle cx="12" cy="12" r="9.5"/><path d="M12 7v5l3 2"/>',
   cart:'<circle cx="9" cy="21" r="1.5"/><circle cx="18" cy="21" r="1.5"/><path d="M2 3h3l2.4 12.4a2 2 0 0 0 2 1.6h8.4a2 2 0 0 0 2-1.6L23 6H6"/>',
@@ -708,6 +709,7 @@ contacts:()=>`<div class="screen" id="contacts">
     <div class="contact-row" data-link="tel:+998999888808" style="cursor:pointer"><div class="contact-ic v-green">${ic('phone')}</div><div><div class="ck">Телефон</div><div class="cv">+998 99 988 88 08</div></div><div class="ca">${ic('arrow')}</div></div>
     <div class="contact-row"><div class="contact-ic v-amber">${ic('clock')}</div><div><div class="ck">Время работы</div><div class="cv">09:00 – 18:00 · Вс — выходной</div></div></div>
     <div class="contact-row" data-link="https://instagram.com/ratsion.uzb" style="cursor:pointer"><div class="contact-ic v-pink">${ic('insta')}</div><div><div class="ck">Instagram</div><div class="cv">@ratsion.uzb</div></div><div class="ca">${ic('arrow')}</div></div>
+    <div class="contact-row" data-link="https://taplink.cc/ratsion.uz" style="cursor:pointer"><div class="contact-ic v-blue">${ic('link')}</div><div><div class="ck">Taplink</div><div class="cv">Ratsion.uz</div></div><div class="ca">${ic('arrow')}</div></div>
   </div>
   <div style="margin-top:16px" class="fade-up d3"><button class="cta cta-green" data-act="manager">${ic('send')} Написать менеджеру</button></div>
 </div>`,

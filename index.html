@@ -283,6 +283,7 @@ input[type=range]::-webkit-slider-thumb:active{transform:scale(1.18)}
 .prog.rec{border:1.5px solid var(--green)}
 .prog .rec-badge{position:absolute;top:14px;right:14px;background:var(--green-l);color:var(--green-d);
   font-size:11px;font-weight:700;padding:5px 11px;border-radius:99px;letter-spacing:.01em}
+.prog.rec .prog-top{padding-right:100px}
 .prog-top{display:flex;align-items:center;gap:14px;margin-bottom:14px}
 .prog-ic{width:54px;height:54px;border-radius:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .prog-ic .ic{width:28px;height:28px}
@@ -997,7 +998,7 @@ function orderStep(){
       ${pr.discountPct>0?`<div class="total-line disc"><span>Скидка ${pr.discountPct}%</span><span>−${sum(pr.discountAmt)}</span></div>`:''}
       <div class="total-line grand"><span>Итого за ${o.days} дн.</span><span>${sum(pr.total)}</span></div>
     </div>
-    <div class="pay-note fade-up d3">${ic('info')}<p>Оплата наличными при доставке. Менеджер свяжется с вами для подтверждения. Доставка по Ташкенту.</p></div>
+    <div class="pay-note fade-up d3">${ic('info')}<p>Оплата и остальные детали заказа обсуждаются с менеджером — он свяжется с вами в течение минуты. Доставка по Ташкенту.</p></div>
     <button class="cta cta-amber fade-up d4" data-act="placeorder">${ic('check')} Подтвердить заказ</button>
     <button class="cta cta-ghost fade-up d4" data-act="orderback">${ic('edit')} Изменить</button>`;
   }

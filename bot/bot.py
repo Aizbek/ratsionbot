@@ -45,6 +45,7 @@ import os
 import json
 import hmac
 import hashlib
+import html
 import asyncio
 import logging
 from urllib.parse import parse_qsl
@@ -299,9 +300,13 @@ async def on_webapp_data(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if d.get("type") == "contact_manager":
         uname = f"@{user.username}" if user and user.username else f"id {user.id}"
         if MANAGER_CHAT_ID:
+            display = html.escape(user.full_name or uname)
             await context.bot.send_message(
                 MANAGER_CHAT_ID,
-                f"📞 Клиент {uname} ({user.full_name}) хочет связаться с менеджером.",
+                f'📞 Клиент <a href="tg://user?id={user.id}">{display}</a> '
+                f"({uname}) хочет связаться с менеджером.\n"
+                f"👉 Нажмите на имя, чтобы открыть чат.",
+                parse_mode="HTML",
             )
         await update.effective_message.reply_text(
             "Спасибо! Менеджер свяжется с вами в ближайшее время."
@@ -411,14 +416,25 @@ async def handle_contact(request):
         return _cors(web.json_response({"ok": False, "error": "no_manager"}, status=500))
 
     if user:
-        uname = f"@{user['username']}" if user.get("username") else f"id {user.get('id')}"
+        uid = user.get("id")
+        uname = f"@{user['username']}" if user.get("username") else f"id {uid}"
         name = (user.get("first_name", "") + " " + user.get("last_name", "")).strip()
     else:
+        uid = None
         uname, name = "неизвестный клиент", ""
+
+    if uid:
+        display = html.escape(name or uname)
+        who = f'<a href="tg://user?id={uid}">{display}</a> ({html.escape(uname)})'
+        tail = "\n👉 Нажмите на имя, чтобы открыть чат."
+    else:
+        who = html.escape(uname)
+        tail = ""
     try:
         await bot.send_message(
             MANAGER_CHAT_ID,
-            f"📞 Клиент {uname} {('(' + name + ') ') if name else ''}хочет связаться с менеджером.",
+            f"📞 Клиент {who} хочет связаться с менеджером.{tail}",
+            parse_mode="HTML",
         )
     except Exception as e:
         log.error("Could not forward contact request: %s", e)

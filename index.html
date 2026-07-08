@@ -998,7 +998,7 @@ function orderStep(){
       ${pr.discountPct>0?`<div class="total-line disc"><span>Скидка ${pr.discountPct}%</span><span>−${sum(pr.discountAmt)}</span></div>`:''}
       <div class="total-line grand"><span>Итого за ${o.days} дн.</span><span>${sum(pr.total)}</span></div>
     </div>
-    <div class="pay-note fade-up d3">${ic('info')}<p>Оплата и остальные детали заказа обсуждаются с менеджером — он свяжется с вами в течение минуты. Доставка по Ташкенту.</p></div>
+    <div class="pay-note fade-up d3">${ic('info')}<p>Оплата и остальные детали заказа обсуждаются с менеджером — он свяжется с вами в ближайшее время. Доставка по Ташкенту.</p></div>
     <button class="cta cta-amber fade-up d4" data-act="placeorder">${ic('check')} Подтвердить заказ</button>
     <button class="cta cta-ghost fade-up d4" data-act="orderback">${ic('edit')} Изменить</button>`;
   }

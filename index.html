@@ -343,6 +343,11 @@ input[type=range]::-webkit-slider-thumb:active{transform:scale(1.18)}
 .tp-fade-b{bottom:0;background:linear-gradient(0deg,var(--card) 8%,rgba(255,255,255,0))}
 .tp-readout{text-align:center;font-size:13px;color:var(--muted);font-weight:600;margin-bottom:16px}
 .tp-readout b{color:var(--green-d);font-size:15px;font-variant-numeric:tabular-nums}
+.tp-hint{display:flex;align-items:center;justify-content:center;gap:7px;text-align:center;
+  font-size:12.5px;color:var(--muted);font-weight:600;margin:-2px 0 12px;transition:opacity .45s}
+.tp-hint.off{opacity:0}
+.tp-hint .ic{width:16px;height:16px;flex-shrink:0;animation:hintBob 1.6s ease-in-out infinite}
+@keyframes hintBob{0%,100%{transform:translateY(-2px)}50%{transform:translateY(2px)}}
 
 /* success */
 .success-wrap{text-align:center;padding-top:40px}
@@ -484,6 +489,7 @@ const I = {
   trend:'<path d="M3 17l6-6 4 4 7-7M17 8h4v4"/>',
   trenddown:'<path d="M3 7l6 6 4-4 7 7M17 16h4v-4"/>',
   equal:'<path d="M5 9h14M5 15h14"/>',
+  updown:'<path d="M12 3v18M8 7l4-4 4 4M8 17l4 4 4-4"/>',
   cash:'<rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M5.5 9.5h.01M18.5 14.5h.01"/>',
   cardpay:'<rect x="2" y="5" width="20" height="14" rx="2.5"/><path d="M2 10h20M6 15h4"/>',
   sofa:'<path d="M4 11V8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3M2 13a2 2 0 0 1 2-2 2 2 0 0 1 2 2v3h12v-3a2 2 0 0 1 4 0v5H2Z"/>',
@@ -1009,6 +1015,7 @@ function orderStep(){
       <div class="tp-col" id="tpM"></div>
       <div class="tp-fade-t"></div><div class="tp-fade-b"></div>
     </div>
+    <p class="tp-hint fade-up d3" id="tpHint">${ic('updown')} Листайте колёсики вверх-вниз, чтобы выбрать время</p>
     <p class="tp-readout fade-up d3">Привезём к <b id="tpOut">${String(selH).padStart(2,'0')}:${String(selM).padStart(2,'0')}</b> · доставка с 07:00 до 21:00</p>
     <button class="cta cta-green fade-up d3" data-act="timenext">Далее ${ic('arrow')}</button>`;
   }
@@ -1338,6 +1345,25 @@ function attach(cur){
       show();
     });
     show();
+
+    // the hint has done its job once the user touches a wheel
+    const hint=document.getElementById('tpHint');
+    const hideHint=()=>{ if(hint) hint.classList.add('off'); };
+    [tpH,tpM].forEach(el=>{
+      el.addEventListener('pointerdown',hideHint,{once:true});
+      el.addEventListener('wheel',hideHint,{once:true});
+    });
+
+    // discoverability nudge (once per session): the hour wheel dips two notches
+    // and rolls back, so users see it's a scrollable dial. Any touch cancels it.
+    if(!S.tpNudged){
+      S.tpNudged=true;
+      const homeTop=HOURS.indexOf(o.timeH)*44;
+      const t1=setTimeout(()=>{ tpH.scrollTo({top:homeTop+88,behavior:'smooth'}); },500);
+      const t2=setTimeout(()=>{ tpH.scrollTo({top:homeTop,behavior:'smooth'}); },1150);
+      const cancelNudge=()=>{ clearTimeout(t1); clearTimeout(t2); };
+      [tpH,tpM].forEach(el=>el.addEventListener('pointerdown',cancelNudge,{once:true}));
+    }
   }
   const timeNext=app.querySelector('[data-act="timenext"]');
   if(timeNext) timeNext.onclick=()=>{

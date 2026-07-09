@@ -209,13 +209,36 @@ def verify_init_data(init_data):
 
 
 def build_card(d, order_no, user=None):
-    """Format the order card sent to the manager (plain text, never breaks)."""
+    """Format the order card sent to the manager (plain text, never breaks).
+
+    Field order per client request (June 2026): start date, duration, customer
+    name + @username, program, price per day, total for the period, address,
+    phone, payment method, delivery time.
+    """
+    # prefer the verified Telegram identity, fall back to what the app sent
+    uname = None
+    if user and user.get("username"):
+        uname = "@" + user["username"]
+    elif d.get("tg_username"):
+        uname = "@" + d["tg_username"]
+    uid = (user or {}).get("id") or d.get("tg_id")
+
     lines = [
         f"🥗 НОВЫЙ ЗАКАЗ  {order_no}",
         "━━━━━━━━━━━━━━",
+        f"Дата начала: {d.get('date', '—')}",
+        f"Срок: {d.get('duration', '—')}",
+        "━━━━━━━━━━━━━━",
+        f"Имя: {d.get('name', '—')}",
+    ]
+    if uname:
+        lines.append(f"Telegram: {uname}")
+    elif uid:
+        lines.append(f"Telegram ID: {uid}")
+    lines += [
+        "━━━━━━━━━━━━━━",
         f"Программа: {d.get('category', '—')}",
         f"Калорийность: {d.get('kcal', '—')} ккал/день",
-        f"Срок: {d.get('duration', '—')}",
         f"Цена за день: {fmt_sum(d.get('price_per_day'))}",
         f"{d.get('days', '?')} × {fmt_sum(d.get('price_per_day'))} = {fmt_sum(d.get('subtotal'))}",
     ]
@@ -224,25 +247,10 @@ def build_card(d, order_no, user=None):
     lines += [
         f"ИТОГО: {fmt_sum(d.get('total'))}",
         "━━━━━━━━━━━━━━",
-        f"Доставка с: {d.get('date', '—')}",
         f"Адрес: {d.get('address', '—')}",
-        f"Имя: {d.get('name', '—')}",
         f"Телефон: {d.get('phone', '—')}",
-    ]
-
-    # prefer the verified Telegram identity, fall back to what the app sent
-    uname = None
-    if user and user.get("username"):
-        uname = "@" + user["username"]
-    elif d.get("tg_username"):
-        uname = "@" + d["tg_username"]
-    uid = (user or {}).get("id") or d.get("tg_id")
-    if uname:
-        lines.append(f"Telegram: {uname}")
-    elif uid:
-        lines.append(f"Telegram ID: {uid}")
-
-    lines += [
+        f"Оплата: {d.get('payment', '—')}",
+        f"Время доставки: {d.get('delivery_time', '—')}",
         "━━━━━━━━━━━━━━",
         "Свяжитесь с клиентом для подтверждения заказа.",
     ]

@@ -322,6 +322,28 @@ input[type=range]::-webkit-slider-thumb:active{transform:scale(1.18)}
 .pay-note .ic{color:var(--amber-d);flex-shrink:0;margin-top:1px}
 .pay-note p{font-size:12.5px;color:#8A6A22;font-weight:600;line-height:1.45}
 
+/* ---------- delivery time wheel picker (watch-style) ---------- */
+.tp-wrap{position:relative;display:flex;justify-content:center;gap:6px;background:var(--card);
+  border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);
+  padding:8px 20px;margin-bottom:14px;overflow:hidden}
+.tp-col{height:220px;width:92px;overflow-y:scroll;scroll-snap-type:y mandatory;
+  overscroll-behavior:contain;position:relative;z-index:2;
+  -ms-overflow-style:none;scrollbar-width:none}
+.tp-col::-webkit-scrollbar{display:none}
+.tp-item{height:44px;display:flex;align-items:center;justify-content:center;scroll-snap-align:center;
+  font-size:27px;font-weight:800;letter-spacing:-.02em;color:var(--muted);opacity:.32;transform:scale(.78);
+  cursor:pointer;transition:opacity .18s,transform .18s,color .18s;font-variant-numeric:tabular-nums}
+.tp-item.on{opacity:1;transform:scale(1.1);color:var(--green-d)}
+.tp-item.pad{pointer-events:none}
+.tp-colon{align-self:center;font-size:26px;font-weight:800;color:var(--green-d);z-index:2;padding-bottom:3px}
+.tp-hl{position:absolute;left:16px;right:16px;top:50%;height:46px;transform:translateY(-50%);
+  border-radius:13px;background:var(--green-l);border:1.5px solid #CBE7D6;z-index:1;pointer-events:none}
+.tp-fade-t,.tp-fade-b{position:absolute;left:0;right:0;height:72px;z-index:3;pointer-events:none}
+.tp-fade-t{top:0;background:linear-gradient(180deg,var(--card) 8%,rgba(255,255,255,0))}
+.tp-fade-b{bottom:0;background:linear-gradient(0deg,var(--card) 8%,rgba(255,255,255,0))}
+.tp-readout{text-align:center;font-size:13px;color:var(--muted);font-weight:600;margin-bottom:16px}
+.tp-readout b{color:var(--green-d);font-size:15px;font-variant-numeric:tabular-nums}
+
 /* success */
 .success-wrap{text-align:center;padding-top:40px}
 .check-ring{width:104px;height:104px;border-radius:50%;background:var(--green-l);display:flex;align-items:center;justify-content:center;
@@ -462,6 +484,8 @@ const I = {
   trend:'<path d="M3 17l6-6 4 4 7-7M17 8h4v4"/>',
   trenddown:'<path d="M3 7l6 6 4-4 7 7M17 16h4v-4"/>',
   equal:'<path d="M5 9h14M5 15h14"/>',
+  cash:'<rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M5.5 9.5h.01M18.5 14.5h.01"/>',
+  cardpay:'<rect x="2" y="5" width="20" height="14" rx="2.5"/><path d="M2 10h20M6 15h4"/>',
   sofa:'<path d="M4 11V8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3M2 13a2 2 0 0 1 2-2 2 2 0 0 1 2 2v3h12v-3a2 2 0 0 1 4 0v5H2Z"/>',
   walk:'<circle cx="13" cy="4" r="2"/><path d="M11 21l1-6-3-3 1-5 3 3 3 1M8 21l2-5"/>',
   run:'<circle cx="14" cy="4" r="2"/><path d="M10 21l2-5-2-3 1-4 3 3 3 .5M7 12l2-1M14 13l-1 8"/>'
@@ -534,7 +558,7 @@ function tierForKcal(cat,kcal){
 }
 
 /* ---------- app state ---------- */
-const S = { stack:['menu'], calc:{gender:null,age:25,height:170,weight:65,activity:null,goal:null,result:null,bmr:0,tdee:0,recCat:null,recTier:null}, order:{cat:null,tier:null,duration:null,date:null,address:'',name:'',phone:''}, hasOrders:false };
+const S = { stack:['menu'], calc:{gender:null,age:25,height:170,weight:65,activity:null,goal:null,result:null,bmr:0,tdee:0,recCat:null,recTier:null}, order:{cat:null,tier:null,duration:null,date:null,time:null,timeH:null,timeM:null,detailsDone:false,pay:null,address:'',name:'',phone:''}, hasOrders:false };
 const ACT = {min:{k:1.2,label:'Минимальный',sub:'сидячий образ жизни',icon:'sofa'},light:{k:1.375,label:'Лёгкий',sub:'1–3 трен/нед',icon:'walk'},mid:{k:1.55,label:'Средний',sub:'3–5 трен/нед',icon:'run'},high:{k:1.725,label:'Высокий',sub:'6–7 трен/нед',icon:'dumbbell'},vhigh:{k:1.9,label:'Очень высокий',sub:'спорт + физ. труд',icon:'flame'}};
 
 const app = document.getElementById('app');
@@ -773,7 +797,7 @@ orders:()=>{
         </div>
       </div>
       <div class="prog-meta" style="border:none;padding:0">
-        <div>Программа<b>${od.category}</b></div><div>Срок<b>${od.duration}</b></div><div>Старт<b>${od.date}</b></div>
+        <div>Программа<b>${od.category}</b></div><div>Срок<b>${od.duration}</b></div><div>Старт<b>${od.date}${od.time?' · '+od.time:''}</b></div>
       </div>
       <div class="total-line grand" style="border-top:1px dashed #BFD9A8;margin-top:10px;padding-top:10px"><span>Итого</span><span>${sum(od.total)}</span></div>
       ${st==='Доставляется'?`<div class="ship-banner">${ic('truck')} Ваш заказ доставляется</div>`:''}
@@ -831,12 +855,15 @@ success:()=>{
   const n = S.order.orderNo || '#—';
   const delivered = S.order.delivered;
   if(delivered){
+    const payMsg = S.order.pay==='online'
+      ? 'Менеджер свяжется с вами в ближайшее время и отправит реквизиты для онлайн-оплаты.'
+      : 'Оплата наличными курьеру при доставке. Менеджер свяжется с вами в ближайшее время для подтверждения.';
     return `<div class="screen" id="success">
       <div class="success-wrap">
         <div class="check-ring fade-up d1">${ic('check')}</div>
         <h1 class="fade-up d2">Заказ оформлен!</h1>
         <div class="order-no fade-up d2">${n}</div>
-        <p class="fade-up d3">Ваш заказ принят. По вопросу оплаты — наличными или картой — наш менеджер свяжется с вами по горячей линии в ближайшее время.</p>
+        <p class="fade-up d3">Ваш заказ принят${S.order.time?' — доставка к '+S.order.time:''}. ${payMsg}</p>
         <div style="margin-top:24px" class="fade-up d4">
           <button class="cta cta-ghost" data-act="home">На главную</button>
         </div>
@@ -942,8 +969,10 @@ function orderStep(){
   const o=S.order;
   let step = 'duration';
   if(o.duration&&!o.date) step='date';
-  else if(o.duration&&o.date&&(!o.address||!o.name||!o.phone)) step='details';
-  else if(o.duration&&o.date&&o.address&&o.name&&o.phone) step='confirm';
+  else if(o.duration&&o.date&&!o.time) step='time';
+  else if(o.duration&&o.date&&o.time&&!o.detailsDone) step='details';
+  else if(o.duration&&o.date&&o.time&&o.detailsDone&&!o.pay) step='pay';
+  else if(o.duration&&o.date&&o.time&&o.detailsDone&&o.pay) step='confirm';
 
   const head=`<div class="topbar"><div class="back-btn" data-act="orderback">${ic('back')}</div><h2>${o.cat?o.cat.name:'Оформление'}</h2></div>`;
 
@@ -969,6 +998,21 @@ function orderStep(){
       <button class="cta cta-green" data-act="datenext" style="margin-top:12px">Далее ${ic('arrow')}</button>
     </div>`;
 
+  if(step==='time'){
+    const selH=(o.timeH!=null)?o.timeH:12, selM=(o.timeM!=null)?o.timeM:0;
+    return head+`
+    <div class="q fade-up d1">Во сколько доставить?</div>
+    <div class="tp-wrap fade-up d2">
+      <div class="tp-hl"></div>
+      <div class="tp-col" id="tpH"></div>
+      <div class="tp-colon">:</div>
+      <div class="tp-col" id="tpM"></div>
+      <div class="tp-fade-t"></div><div class="tp-fade-b"></div>
+    </div>
+    <p class="tp-readout fade-up d3">Привезём к <b id="tpOut">${String(selH).padStart(2,'0')}:${String(selM).padStart(2,'0')}</b> · доставка с 07:00 до 21:00</p>
+    <button class="cta cta-green fade-up d3" data-act="timenext">Далее ${ic('arrow')}</button>`;
+  }
+
   if(step==='details') return head+`
     <div class="q fade-up d1">Контакты и доставка</div>
     <div class="fade-up d2" style="margin-bottom:16px"><div class="field-label">Адрес доставки</div>
@@ -978,6 +1022,15 @@ function orderStep(){
     <div class="fade-up d4" style="margin-bottom:22px"><div class="field-label">Телефон</div>
       <input class="t-input" id="phone" type="tel" inputmode="tel" placeholder="+998 __ ___ __ __" value="${o.phone}"></div>
     <button class="cta cta-green fade-up d5" data-act="detailsnext">Проверить заказ ${ic('arrow')}</button>`;
+
+  if(step==='pay') return head+`
+    <div class="q fade-up d1">Как будете оплачивать?</div>
+    <div class="opt-grid">
+      <div class="opt ${o.pay==='cash'?'sel':''} fade-up d2" data-pay="cash">
+        <div class="o-ic">${ic('cash')}</div><div>Наличными<div class="o-sub">курьеру при доставке</div></div></div>
+      <div class="opt ${o.pay==='online'?'sel':''} fade-up d3" data-pay="online">
+        <div class="o-ic">${ic('cardpay')}</div><div>Онлайн-оплата<div class="o-sub">картой · менеджер отправит реквизиты</div></div></div>
+    </div>`;
 
   if(step==='confirm'){
     const pr=orderPricing(o);
@@ -989,21 +1042,25 @@ function orderStep(){
       <div class="sum-row"><span class="k">Цена за день</span><span class="vv">${sum(o.tier.price)}</span></div>
       <div class="sum-row"><span class="k">Срок</span><span class="vv">${o.duration}</span></div>
       <div class="sum-row"><span class="k">Начало</span><span class="vv">${o.date}</span></div>
+      <div class="sum-row"><span class="k">Время доставки</span><span class="vv">${o.time}</span></div>
       <div class="sum-row"><span class="k">Адрес</span><span class="vv">${o.address}</span></div>
       <div class="sum-row"><span class="k">Получатель</span><span class="vv">${o.name}</span></div>
       <div class="sum-row"><span class="k">Телефон</span><span class="vv">${o.phone}</span></div>
+      <div class="sum-row"><span class="k">Оплата</span><span class="vv">${payLabel(o.pay)}</span></div>
     </div>
     <div class="total-box fade-up d3">
       <div class="total-line"><span>${o.days} × ${sum(o.tier.price)}</span><span>${sum(pr.subtotal)}</span></div>
       ${pr.discountPct>0?`<div class="total-line disc"><span>Скидка ${pr.discountPct}%</span><span>−${sum(pr.discountAmt)}</span></div>`:''}
       <div class="total-line grand"><span>Итого за ${o.days} дн.</span><span>${sum(pr.total)}</span></div>
     </div>
-    <div class="pay-note fade-up d3">${ic('info')}<p>Оплата и остальные детали заказа обсуждаются с менеджером — он свяжется с вами в ближайшее время. Доставка по Ташкенту.</p></div>
+    <div class="pay-note fade-up d3">${ic('info')}<p>Менеджер свяжется с вами в ближайшее время для подтверждения заказа. Доставка по Ташкенту.</p></div>
     <button class="cta cta-amber fade-up d4" data-act="placeorder">${ic('check')} Подтвердить заказ</button>
     <button class="cta cta-ghost fade-up d4" data-act="orderback">${ic('edit')} Изменить</button>`;
   }
   return head;
 }
+
+function payLabel(p){return p==='online'?'Онлайн-оплата':p==='cash'?'Наличными при доставке':'—'}
 
 /* compute order pricing: subtotal, discount, total */
 function orderPricing(o){
@@ -1019,6 +1076,26 @@ function orderPricing(o){
 }
 
 function dateFrom(days){const d=new Date();d.setDate(d.getDate()+days);return String(d.getDate()).padStart(2,'0')+'.'+String(d.getMonth()+1).padStart(2,'0')+'.'+d.getFullYear();}
+
+/* watch-style scroll wheel: values snap to the highlighted middle row.
+   Returns {set(v)} so wheels can correct each other (the 21:30 case). */
+function buildWheel(el,values,selected,onChange){
+  const IH=44; // must match .tp-item height
+  el.innerHTML='<div class="tp-item pad"></div><div class="tp-item pad"></div>'+
+    values.map(v=>`<div class="tp-item">${String(v).padStart(2,'0')}</div>`).join('')+
+    '<div class="tp-item pad"></div><div class="tp-item pad"></div>';
+  const items=[...el.querySelectorAll('.tp-item')].slice(2,2+values.length);
+  let cur=Math.max(0,values.indexOf(selected));
+  const mark=i=>items.forEach((it,j)=>it.classList.toggle('on',j===i));
+  mark(cur);
+  el.scrollTop=cur*IH;
+  el.onscroll=()=>{
+    const i=Math.max(0,Math.min(values.length-1,Math.round(el.scrollTop/IH)));
+    if(i!==cur){ cur=i; mark(i); haptic('light'); onChange(values[i]); }
+  };
+  items.forEach((it,j)=>it.onclick=()=>el.scrollTo({top:j*IH,behavior:'smooth'}));
+  return { set:v=>{ const i=values.indexOf(v); if(i>=0){ cur=i; mark(i); el.scrollTo({top:i*IH,behavior:'smooth'}); } } };
+}
 
 function softRender(innerId,builder){
   const inner=document.getElementById(innerId);
@@ -1076,7 +1153,8 @@ async function submitOrder(btn){
     category:o.cat.name, kcal:o.tier.lo+'-'+o.tier.hi,
     price_per_day:o.tier.price, days:o.days, duration:o.duration,
     subtotal:pr.subtotal, discount_pct:pr.discountPct, discount_amt:pr.discountAmt, total:pr.total,
-    date:o.date, address:o.address, name:o.name, phone:o.phone,
+    date:o.date, delivery_time:o.time, payment:payLabel(o.pay),
+    address:o.address, name:o.name, phone:o.phone,
     tg_id: tgUser?tgUser.id:null, tg_username: tgUser?tgUser.username:null
   };
   let _lbl;
@@ -1111,7 +1189,7 @@ async function submitOrder(btn){
   // doesn't leave a stuck "Ожидает отправки" order behind
   if(delivered){
     saveOrder({ no:orderNo, category:o.cat.name, kcal:o.tier.lo+'–'+o.tier.hi,
-      duration:o.duration, days:o.days, date:o.date, total:pr.total, ts:Date.now(), status:'Принят' });
+      duration:o.duration, days:o.days, date:o.date, time:o.time, pay:o.pay, total:pr.total, ts:Date.now(), status:'Принят' });
     S.hasOrders=true;
   }
 
@@ -1146,17 +1224,20 @@ function fmtUzPhone(v){ const d=phoneDigits(v).slice(0,9);
   let out='+998'; if(d.length) out+=' '+d.slice(0,2); if(d.length>2) out+=' '+d.slice(2,5);
   if(d.length>5) out+=' '+d.slice(5,7); if(d.length>7) out+=' '+d.slice(7,9); return out; }
 
-/* human-readable order for the fallback channel */
+/* human-readable order for the fallback channel (mirrors the manager card order) */
 function buildOrderText(o,pr){
   return `🥗 Новый заказ ${o.orderNo}\n`+
+    `Дата начала: ${o.date}\n`+
+    `Срок: ${o.duration} (${o.days} дн.)\n`+
+    `Имя: ${o.name}\n`+
     `Программа: ${o.cat.name}\n`+
     `Калорийность: ${o.tier.lo}–${o.tier.hi} ккал/день\n`+
-    `Срок: ${o.duration} (${o.days} дн.)\n`+
-    `Начало: ${o.date}\n`+
+    `Цена за день: ${sum(o.tier.price)}\n`+
     `Итого: ${sum(pr.total)}\n`+
-    `Имя: ${o.name}\n`+
+    `Адрес: ${o.address}\n`+
     `Телефон: ${o.phone}\n`+
-    `Адрес: ${o.address}`;
+    `Оплата: ${payLabel(o.pay)}\n`+
+    `Время доставки: ${o.time||'—'}`;
 }
 
 function attach(cur){
@@ -1199,10 +1280,10 @@ function attach(cur){
     if(!cat) return;
     if(el.dataset.tier!==undefined && el.dataset.tier!==''){
       const t=cat.tiers.find(x=>String(x.lo)===String(el.dataset.tier)) || cat.tiers[0];
-      S.order={cat:cat,tier:t,duration:null,date:null,address:'',name:'',phone:''};
+      S.order={cat:cat,tier:t,duration:null,date:null,time:null,timeH:null,timeM:null,detailsDone:false,pay:null,address:'',name:'',phone:''};
       go('order');
     } else {
-      S.order={cat:cat,tier:null,duration:null,date:null,address:'',name:'',phone:''};
+      S.order={cat:cat,tier:null,duration:null,date:null,time:null,timeH:null,timeM:null,detailsDone:false,pay:null,address:'',name:'',phone:''};
       go('tiers');
     }
   });
@@ -1235,6 +1316,39 @@ function attach(cur){
 
   app.querySelectorAll('[data-dur]').forEach(el=>el.onclick=()=>{ S.order.duration=el.dataset.dur; S.order.days=parseInt(el.dataset.days)||1; haptic('light'); softRender('order-inner',orderStep); });
   app.querySelectorAll('[data-date]').forEach(el=>el.onclick=()=>{ S.order.date = el.dataset.date==='tomorrow'?dateFrom(1):dateFrom(2); haptic('light'); softRender('order-inner',orderStep); });
+
+  // delivery-time wheel picker (07:00–21:00)
+  const tpH=document.getElementById('tpH'), tpM=document.getElementById('tpM');
+  if(tpH&&tpM){
+    const o=S.order;
+    if(o.timeH==null) o.timeH=12;
+    if(o.timeM==null) o.timeM=0;
+    const HOURS=[]; for(let h=7;h<=21;h++) HOURS.push(h);
+    const MINS=[0,30];
+    const out=document.getElementById('tpOut');
+    const show=()=>{ if(out) out.textContent=String(o.timeH).padStart(2,'0')+':'+String(o.timeM).padStart(2,'0'); };
+    const mW=buildWheel(tpM,MINS,o.timeM,v=>{
+      // 21:00 is the latest slot — bounce 21:30 back
+      if(o.timeH===21&&v!==0){ mW.set(0); return; }
+      o.timeM=v; show();
+    });
+    const hW=buildWheel(tpH,HOURS,o.timeH,v=>{
+      o.timeH=v;
+      if(v===21&&o.timeM!==0){ o.timeM=0; mW.set(0); }
+      show();
+    });
+    show();
+  }
+  const timeNext=app.querySelector('[data-act="timenext"]');
+  if(timeNext) timeNext.onclick=()=>{
+    const o=S.order;
+    if(o.timeH===21) o.timeM=0;
+    o.time=String(o.timeH).padStart(2,'0')+':'+String(o.timeM).padStart(2,'0');
+    haptic('light'); softRender('order-inner',orderStep);
+  };
+
+  // payment method choice
+  app.querySelectorAll('[data-pay]').forEach(el=>el.onclick=()=>{ S.order.pay=el.dataset.pay; haptic('medium'); softRender('order-inner',orderStep); });
   const cDate=document.getElementById('customDate');
   if(cDate) cDate.oninput=()=>{ cDate.value=maskRuDate(cDate.value); };
   const dateNext=app.querySelector('[data-act="datenext"]');
@@ -1252,12 +1366,14 @@ function attach(cur){
     if(a.length<6){alert('Укажите полный адрес доставки (район, улица, дом)');return;}
     if(n.length<2){alert('Укажите имя');return;}
     if(!validUzPhone(p)){alert('Введите корректный номер: +998 и 9 цифр\nнапример +998 90 123 45 67');return;}
-    S.order.address=a;S.order.name=n;S.order.phone=normUzPhone(p); haptic('light'); softRender('order-inner',orderStep);
+    S.order.address=a;S.order.name=n;S.order.phone=normUzPhone(p);S.order.detailsDone=true; haptic('light'); softRender('order-inner',orderStep);
   };
   const orderBack=app.querySelector('[data-act="orderback"]');
   if(orderBack) orderBack.onclick=()=>{
     const o=S.order;
-    if(o.address&&o.name&&o.phone&&o.date&&o.duration){ o.address='';o.name='';o.phone='';softRender('order-inner',orderStep); }
+    if(o.pay){o.pay=null;softRender('order-inner',orderStep);}                 // confirm -> payment
+    else if(o.detailsDone){o.detailsDone=false;softRender('order-inner',orderStep);} // payment -> details (keeps typed values)
+    else if(o.time){o.time=null;softRender('order-inner',orderStep);}          // details -> time
     else if(o.date){o.date=null;softRender('order-inner',orderStep);}
     else if(o.duration){o.duration=null;softRender('order-inner',orderStep);}
     else back();

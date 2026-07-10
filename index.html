@@ -869,7 +869,7 @@ success:()=>{
         <div class="check-ring fade-up d1">${ic('check')}</div>
         <h1 class="fade-up d2">Заказ оформлен!</h1>
         <div class="order-no fade-up d2">${n}</div>
-        <p class="fade-up d3">Ваш заказ принят${S.order.time?' — доставка к '+S.order.time:''}. ${payMsg}</p>
+        <p class="fade-up d3">Ваш заказ принят. ${payMsg}</p>
         <div style="margin-top:24px" class="fade-up d4">
           <button class="cta cta-ghost" data-act="home">На главную</button>
         </div>
@@ -1005,7 +1005,6 @@ function orderStep(){
     </div>`;
 
   if(step==='time'){
-    const selH=(o.timeH!=null)?o.timeH:12, selM=(o.timeM!=null)?o.timeM:0;
     return head+`
     <div class="q fade-up d1">Во сколько доставить?</div>
     <div class="tp-wrap fade-up d2">
@@ -1016,7 +1015,7 @@ function orderStep(){
       <div class="tp-fade-t"></div><div class="tp-fade-b"></div>
     </div>
     <p class="tp-hint fade-up d3" id="tpHint">${ic('updown')} Листайте колёсики вверх-вниз, чтобы выбрать время</p>
-    <p class="tp-readout fade-up d3">Привезём к <b id="tpOut">${String(selH).padStart(2,'0')}:${String(selM).padStart(2,'0')}</b> · доставка с 07:00 до 21:00</p>
+    <p class="tp-readout fade-up d3">Доставка работает с 07:00 до 09:00</p>
     <button class="cta cta-green fade-up d3" data-act="timenext">Далее ${ic('arrow')}</button>`;
   }
 
@@ -1324,27 +1323,23 @@ function attach(cur){
   app.querySelectorAll('[data-dur]').forEach(el=>el.onclick=()=>{ S.order.duration=el.dataset.dur; S.order.days=parseInt(el.dataset.days)||1; haptic('light'); softRender('order-inner',orderStep); });
   app.querySelectorAll('[data-date]').forEach(el=>el.onclick=()=>{ S.order.date = el.dataset.date==='tomorrow'?dateFrom(1):dateFrom(2); haptic('light'); softRender('order-inner',orderStep); });
 
-  // delivery-time wheel picker (07:00–21:00)
+  // delivery-time wheel picker (07:00–09:00 delivery window)
   const tpH=document.getElementById('tpH'), tpM=document.getElementById('tpM');
   if(tpH&&tpM){
     const o=S.order;
-    if(o.timeH==null) o.timeH=12;
+    if(o.timeH==null) o.timeH=8;
     if(o.timeM==null) o.timeM=0;
-    const HOURS=[]; for(let h=7;h<=21;h++) HOURS.push(h);
+    const HOURS=[7,8,9], MAX_H=9;
     const MINS=[0,30];
-    const out=document.getElementById('tpOut');
-    const show=()=>{ if(out) out.textContent=String(o.timeH).padStart(2,'0')+':'+String(o.timeM).padStart(2,'0'); };
     const mW=buildWheel(tpM,MINS,o.timeM,v=>{
-      // 21:00 is the latest slot — bounce 21:30 back
-      if(o.timeH===21&&v!==0){ mW.set(0); return; }
-      o.timeM=v; show();
+      // 09:00 is the latest slot — bounce 09:30 back
+      if(o.timeH===MAX_H&&v!==0){ mW.set(0); return; }
+      o.timeM=v;
     });
     const hW=buildWheel(tpH,HOURS,o.timeH,v=>{
       o.timeH=v;
-      if(v===21&&o.timeM!==0){ o.timeM=0; mW.set(0); }
-      show();
+      if(v===MAX_H&&o.timeM!==0){ o.timeM=0; mW.set(0); }
     });
-    show();
 
     // the hint has done its job once the user touches a wheel
     const hint=document.getElementById('tpHint');
@@ -1354,12 +1349,12 @@ function attach(cur){
       el.addEventListener('wheel',hideHint,{once:true});
     });
 
-    // discoverability nudge (once per session): the hour wheel dips two notches
+    // discoverability nudge (once per session): the hour wheel dips a notch
     // and rolls back, so users see it's a scrollable dial. Any touch cancels it.
     if(!S.tpNudged){
       S.tpNudged=true;
       const homeTop=HOURS.indexOf(o.timeH)*44;
-      const t1=setTimeout(()=>{ tpH.scrollTo({top:homeTop+88,behavior:'smooth'}); },500);
+      const t1=setTimeout(()=>{ tpH.scrollTo({top:homeTop+44,behavior:'smooth'}); },500);
       const t2=setTimeout(()=>{ tpH.scrollTo({top:homeTop,behavior:'smooth'}); },1150);
       const cancelNudge=()=>{ clearTimeout(t1); clearTimeout(t2); };
       [tpH,tpM].forEach(el=>el.addEventListener('pointerdown',cancelNudge,{once:true}));
@@ -1368,7 +1363,7 @@ function attach(cur){
   const timeNext=app.querySelector('[data-act="timenext"]');
   if(timeNext) timeNext.onclick=()=>{
     const o=S.order;
-    if(o.timeH===21) o.timeM=0;
+    if(o.timeH===9) o.timeM=0;   // window ends at 09:00 sharp
     o.time=String(o.timeH).padStart(2,'0')+':'+String(o.timeM).padStart(2,'0');
     haptic('light'); softRender('order-inner',orderStep);
   };

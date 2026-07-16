@@ -1423,8 +1423,8 @@ function attach(cur){
     if(a.length<6){popup('Укажите полный адрес доставки (район, улица, дом)');return;}
     if(n.length<2){popup('Укажите имя');return;}
     if(!validUzPhone(p)){popup('Введите корректный номер: +998 и 9 цифр\nнапример +998 90 123 45 67');return;}
-    if(!(h>=100&&h<=230)){popup('Укажите корректный рост в см (от 100 до 230)');return;}
-    if(!(w>=30&&w<=250)){popup('Укажите корректный вес в кг (от 30 до 250)');return;}
+    if(!(h>=100&&h<=300)){popup('Укажите корректный рост в см (от 100 до 300)');return;}
+    if(!(w>=30&&w<=300)){popup('Укажите корректный вес в кг (от 30 до 300)');return;}
     S.order.address=a;S.order.name=n;S.order.phone=normUzPhone(p);S.order.height=h;S.order.weight=w;S.order.detailsDone=true; haptic('light'); softRender('order-inner',orderStep);
   };
   const orderBack=app.querySelector('[data-act="orderback"]');

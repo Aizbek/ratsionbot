@@ -564,11 +564,14 @@ function tierForKcal(cat,kcal){
 }
 
 /* ---------- app state ---------- */
-const S = { stack:['menu'], calc:{gender:null,age:25,height:170,weight:65,activity:null,goal:null,result:null,bmr:0,tdee:0,recCat:null,recTier:null}, order:{cat:null,tier:null,duration:null,date:null,time:null,timeH:null,timeM:null,detailsDone:false,pay:null,address:'',name:'',phone:''}, hasOrders:false };
+const S = { stack:['menu'], calc:{gender:null,age:25,height:170,weight:65,activity:null,goal:null,result:null,bmr:0,tdee:0,recCat:null,recTier:null}, order:{cat:null,tier:null,duration:null,date:null,time:null,timeH:null,timeM:null,detailsDone:false,pay:null,address:'',name:'',phone:'',height:'',weight:''}, hasOrders:false };
 const ACT = {min:{k:1.2,label:'Минимальный',sub:'сидячий образ жизни',icon:'sofa'},light:{k:1.375,label:'Лёгкий',sub:'1–3 трен/нед',icon:'walk'},mid:{k:1.55,label:'Средний',sub:'3–5 трен/нед',icon:'run'},high:{k:1.725,label:'Высокий',sub:'6–7 трен/нед',icon:'dumbbell'},vhigh:{k:1.9,label:'Очень высокий',sub:'спорт + физ. труд',icon:'flame'}};
 
 const app = document.getElementById('app');
 function haptic(t='light'){try{tg?.HapticFeedback?.impactOccurred(t)}catch(e){}}
+/* Telegram's native popup shows only our text (no site domain in the title,
+   unlike the browser's alert()). Falls back to alert() outside Telegram. */
+function popup(msg){ try{ if(tg&&typeof tg.showAlert==='function'){ tg.showAlert(msg); return; } }catch(e){} alert(msg); }
 
 /* ---------- navigation ---------- */
 function go(screen,replace=false){
@@ -1037,9 +1040,13 @@ function orderStep(){
       <input class="t-input" id="address" placeholder="Город, район, улица, дом, кв." value="${o.address}"></div>
     <div class="fade-up d3" style="margin-bottom:16px"><div class="field-label">Имя и фамилия</div>
       <input class="t-input" id="name" placeholder="Как к вам обращаться?" value="${o.name}"></div>
-    <div class="fade-up d4" style="margin-bottom:22px"><div class="field-label">Телефон</div>
+    <div class="fade-up d4" style="margin-bottom:16px"><div class="field-label">Телефон</div>
       <input class="t-input" id="phone" type="tel" inputmode="tel" placeholder="+998 __ ___ __ __" value="${o.phone}"></div>
-    <button class="cta cta-green fade-up d5" data-act="detailsnext">Проверить заказ ${ic('arrow')}</button>`;
+    <div class="fade-up d5" style="margin-bottom:16px"><div class="field-label">Рост, см</div>
+      <input class="t-input" id="height" type="number" inputmode="numeric" placeholder="Напр. 175" value="${o.height}"></div>
+    <div class="fade-up d5" style="margin-bottom:22px"><div class="field-label">Вес, кг</div>
+      <input class="t-input" id="weight" type="number" inputmode="numeric" placeholder="Напр. 70" value="${o.weight}"></div>
+    <button class="cta cta-green fade-up d6" data-act="detailsnext">Проверить заказ ${ic('arrow')}</button>`;
 
   if(step==='pay') return head+`
     <div class="q fade-up d1">Как будете оплачивать?</div>
@@ -1064,6 +1071,8 @@ function orderStep(){
       <div class="sum-row"><span class="k">Адрес</span><span class="vv">${o.address}</span></div>
       <div class="sum-row"><span class="k">Получатель</span><span class="vv">${o.name}</span></div>
       <div class="sum-row"><span class="k">Телефон</span><span class="vv">${o.phone}</span></div>
+      <div class="sum-row"><span class="k">Рост</span><span class="vv">${o.height} см</span></div>
+      <div class="sum-row"><span class="k">Вес</span><span class="vv">${o.weight} кг</span></div>
       <div class="sum-row"><span class="k">Оплата</span><span class="vv">${payLabel(o.pay)}</span></div>
     </div>
     <div class="total-box fade-up d3">
@@ -1172,7 +1181,7 @@ async function submitOrder(btn){
     price_per_day:o.tier.price, days:o.days, duration:o.duration,
     subtotal:pr.subtotal, discount_pct:pr.discountPct, discount_amt:pr.discountAmt, total:pr.total,
     date:o.date, delivery_time:o.time, payment:payLabel(o.pay),
-    address:o.address, name:o.name, phone:o.phone,
+    address:o.address, name:o.name, phone:o.phone, height:o.height, weight:o.weight,
     tg_id: tgUser?tgUser.id:null, tg_username: tgUser?tgUser.username:null
   };
   let _lbl;
@@ -1275,7 +1284,7 @@ function attach(cur){
   const mgrSubmit=app.querySelector('[data-act="contactsubmit"]');
   if(mgrSubmit) mgrSubmit.onclick=async()=>{
     const raw=(document.getElementById('mgrPhone')||{}).value||'';
-    if(!validUzPhone(raw.trim())){ alert('Введите корректный номер: +998 и 9 цифр\nнапример +998 90 123 45 67'); return; }
+    if(!validUzPhone(raw.trim())){ popup('Введите корректный номер: +998 и 9 цифр\nнапример +998 90 123 45 67'); return; }
     const phone=normUzPhone(raw.trim());
     haptic('light');
     // primary: backend forwards the request (with the phone) to the manager and confirms
@@ -1286,14 +1295,14 @@ function attach(cur){
           body:JSON.stringify({ initData:(tg&&tg.initData)||'', phone:phone })
         });
         if(res.ok){ const d=await res.json().catch(()=>null);
-          if(d&&d.ok){ alert('Готово! Менеджер свяжется с вами в ближайшее время.'); back(); return; } }
+          if(d&&d.ok){ popup('Готово! Менеджер свяжется с вами в ближайшее время.'); back(); return; } }
       }catch(e){ /* fall through to fallbacks */ }
     }
     // fallback: open the manager chat directly
     if(CONFIG.managerUsername){ const url='https://t.me/'+CONFIG.managerUsername; try{ tg?.openTelegramLink ? tg.openTelegramLink(url) : window.open(url,'_blank'); }catch(e){ window.open(url,'_blank'); } return; }
     // last resort: legacy sendData (only if the app was opened from a reply-keyboard button)
     try{ if(tg&&typeof tg.sendData==='function'){ tg.sendData(JSON.stringify({type:'contact_manager', phone:phone})); back(); return; } }catch(e){}
-    alert('Свяжитесь с нами по телефону '+CONFIG.phoneText);
+    popup('Свяжитесь с нами по телефону '+CONFIG.phoneText);
   };
 
   // contact links — open reliably inside Telegram
@@ -1312,10 +1321,10 @@ function attach(cur){
     if(!cat) return;
     if(el.dataset.tier!==undefined && el.dataset.tier!==''){
       const t=cat.tiers.find(x=>String(x.lo)===String(el.dataset.tier)) || cat.tiers[0];
-      S.order={cat:cat,tier:t,duration:null,date:null,time:null,timeH:null,timeM:null,detailsDone:false,pay:null,address:'',name:'',phone:''};
+      S.order={cat:cat,tier:t,duration:null,date:null,time:null,timeH:null,timeM:null,detailsDone:false,pay:null,address:'',name:'',phone:'',height:'',weight:''};
       go('order');
     } else {
-      S.order={cat:cat,tier:null,duration:null,date:null,time:null,timeH:null,timeM:null,detailsDone:false,pay:null,address:'',name:'',phone:''};
+      S.order={cat:cat,tier:null,duration:null,date:null,time:null,timeH:null,timeM:null,detailsDone:false,pay:null,address:'',name:'',phone:'',height:'',weight:''};
       go('tiers');
     }
   });
@@ -1327,7 +1336,7 @@ function attach(cur){
   const bodyNext=app.querySelector('[data-act="bodynext"]');
   if(bodyNext) bodyNext.onclick=()=>{
     const age=+document.getElementById('age').value;
-    if(age<14||age>80||!age){ alert('Введите возраст от 14 до 80'); return; }
+    if(age<14||age>80||!age){ popup('Введите возраст от 14 до 80'); return; }
     S.calc.age=age; S.calc.bodyDone=true; haptic('light'); softRender('calc-inner',calcStep);
   };
   const hEl=document.getElementById('height'), wEl=document.getElementById('weight');
@@ -1399,7 +1408,7 @@ function attach(cur){
   const cDate=document.getElementById('customDate');
   if(cDate) cDate.oninput=()=>{ cDate.value=maskRuDate(cDate.value); };
   const dateNext=app.querySelector('[data-act="datenext"]');
-  if(dateNext) dateNext.onclick=()=>{ const v=document.getElementById('customDate').value.trim(); if(!parseRuDate(v)){alert('Введите корректную дату в формате ДД.ММ.ГГГГ\n(от сегодня и не позднее, чем через 90 дней)');return;} S.order.date=v; softRender('order-inner',orderStep); };
+  if(dateNext) dateNext.onclick=()=>{ const v=document.getElementById('customDate').value.trim(); if(!parseRuDate(v)){popup('Введите корректную дату в формате ДД.ММ.ГГГГ\n(от сегодня и не позднее, чем через 90 дней)');return;} S.order.date=v; softRender('order-inner',orderStep); };
   // live input masks on the details step
   const phoneEl=document.getElementById('phone');
   if(phoneEl){
@@ -1410,10 +1419,13 @@ function attach(cur){
   const detNext=app.querySelector('[data-act="detailsnext"]');
   if(detNext) detNext.onclick=()=>{
     const a=document.getElementById('address').value.trim(), n=document.getElementById('name').value.trim(), p=document.getElementById('phone').value.trim();
-    if(a.length<6){alert('Укажите полный адрес доставки (район, улица, дом)');return;}
-    if(n.length<2){alert('Укажите имя');return;}
-    if(!validUzPhone(p)){alert('Введите корректный номер: +998 и 9 цифр\nнапример +998 90 123 45 67');return;}
-    S.order.address=a;S.order.name=n;S.order.phone=normUzPhone(p);S.order.detailsDone=true; haptic('light'); softRender('order-inner',orderStep);
+    const h=parseInt(document.getElementById('height').value,10), w=parseInt(document.getElementById('weight').value,10);
+    if(a.length<6){popup('Укажите полный адрес доставки (район, улица, дом)');return;}
+    if(n.length<2){popup('Укажите имя');return;}
+    if(!validUzPhone(p)){popup('Введите корректный номер: +998 и 9 цифр\nнапример +998 90 123 45 67');return;}
+    if(!(h>=100&&h<=230)){popup('Укажите корректный рост в см (от 100 до 230)');return;}
+    if(!(w>=30&&w<=250)){popup('Укажите корректный вес в кг (от 30 до 250)');return;}
+    S.order.address=a;S.order.name=n;S.order.phone=normUzPhone(p);S.order.height=h;S.order.weight=w;S.order.detailsDone=true; haptic('light'); softRender('order-inner',orderStep);
   };
   const orderBack=app.querySelector('[data-act="orderback"]');
   if(orderBack) orderBack.onclick=()=>{

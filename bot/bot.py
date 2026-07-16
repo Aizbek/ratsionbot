@@ -235,6 +235,8 @@ def build_card(d, order_no, user=None):
         lines.append(f"Telegram: {uname}")
     elif uid:
         lines.append(f"Telegram ID: {uid}")
+    lines.append(f"Рост: {d.get('height') or '—'} см")
+    lines.append(f"Вес: {d.get('weight') or '—'} кг")
     lines += [
         "━━━━━━━━━━━━━━",
         f"Программа: {d.get('category', '—')}",

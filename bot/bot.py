@@ -257,6 +257,52 @@ def build_card(d, order_no, user=None):
     return "\n".join(lines)
 
 
+def build_contact_message(user, phone):
+    """Message the manager gets when a customer taps 'Написать менеджеру'.
+
+    Field order per client request (July 2026):
+      1. the customer's Telegram name (clickable when Telegram can resolve them),
+      2. the phone number they entered (this is the reliable way to reach them),
+      3. their @username — or, if they have none, a clear note that their profile
+         has no @username, so there is NO direct way to open a Telegram chat and
+         the manager must call the phone instead.
+
+    This is intentionally SEPARATE from build_card() (the order message) so the
+    two never affect each other.
+    """
+    if user:
+        uid = user.get("id")
+        name = (user.get("first_name", "") + " " + user.get("last_name", "")).strip()
+        username = user.get("username")
+    else:
+        uid, name, username = None, "", None
+
+    display = html.escape(name) if name else "—"
+    if uid and name:
+        name_line = f'Имя: <a href="tg://user?id={uid}">{display}</a>'
+    else:
+        name_line = f"Имя: {display}"
+
+    lines = [
+        "📞 НОВЫЙ ЗАПРОС НА СВЯЗЬ",
+        "━━━━━━━━━━━━━━",
+        name_line,
+        f"Телефон: {html.escape(phone) if phone else '—'}",
+    ]
+    if username:
+        lines.append(f"Telegram: @{html.escape(username)}")
+    else:
+        lines.append(
+            "Telegram: у клиента не задан @username (профиль скрыт), "
+            "поэтому написать ему напрямую в Telegram нельзя — свяжитесь по телефону."
+        )
+    lines += [
+        "━━━━━━━━━━━━━━",
+        "Свяжитесь с клиентом.",
+    ]
+    return "\n".join(lines)
+
+
 # ----------------------------- bot commands -----------------------------
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -306,14 +352,16 @@ async def on_webapp_data(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_dict = {"id": user.id, "username": user.username} if user else None
 
     if d.get("type") == "contact_manager":
-        uname = f"@{user.username}" if user and user.username else f"id {user.id}"
         if MANAGER_CHAT_ID:
-            display = html.escape(user.full_name or uname)
+            contact_user = {
+                "id": user.id,
+                "username": user.username,
+                "first_name": user.first_name,
+                "last_name": user.last_name,
+            } if user else None
             await context.bot.send_message(
                 MANAGER_CHAT_ID,
-                f'📞 Клиент <a href="tg://user?id={user.id}">{display}</a> '
-                f"({uname}) хочет связаться с менеджером.\n"
-                f"👉 Нажмите на имя, чтобы открыть чат.",
+                build_contact_message(contact_user, (d.get("phone") or "").strip()),
                 parse_mode="HTML",
             )
         await update.effective_message.reply_text(
@@ -419,29 +467,15 @@ async def handle_contact(request):
 
     auth = verify_init_data(body.get("initData", ""))
     user = (auth or {}).get("user")
+    phone = (body.get("phone") or "").strip()
 
     if not MANAGER_CHAT_ID:
         return _cors(web.json_response({"ok": False, "error": "no_manager"}, status=500))
 
-    if user:
-        uid = user.get("id")
-        uname = f"@{user['username']}" if user.get("username") else f"id {uid}"
-        name = (user.get("first_name", "") + " " + user.get("last_name", "")).strip()
-    else:
-        uid = None
-        uname, name = "неизвестный клиент", ""
-
-    if uid:
-        display = html.escape(name or uname)
-        who = f'<a href="tg://user?id={uid}">{display}</a> ({html.escape(uname)})'
-        tail = "\n👉 Нажмите на имя, чтобы открыть чат."
-    else:
-        who = html.escape(uname)
-        tail = ""
     try:
         await bot.send_message(
             MANAGER_CHAT_ID,
-            f"📞 Клиент {who} хочет связаться с менеджером.{tail}",
+            build_contact_message(user, phone),
             parse_mode="HTML",
         )
     except Exception as e:

@@ -745,6 +745,18 @@ contacts:()=>`<div class="screen" id="contacts">
   <div style="margin-top:16px" class="fade-up d3"><button class="cta cta-green" data-act="manager">${ic('send')} Написать менеджеру</button></div>
 </div>`,
 
+/* ===== CONTACT MANAGER (collect phone so the manager can call back) ===== */
+contactManager:()=>`<div class="screen" id="contactManager">
+  ${topbar('Написать менеджеру')}
+  <div class="content-card fade-up d1" style="padding:22px">
+    <div class="q" style="margin-bottom:18px">Оставьте свой номер телефона</div>
+    <div class="field-label">Телефон</div>
+    <input class="t-input" id="mgrPhone" type="tel" inputmode="tel" placeholder="+998 __ ___ __ __" value="">
+    <div style="font-size:12.5px;color:var(--muted);margin:10px 2px 0;line-height:1.45">Номер нужен, чтобы менеджер мог связаться с вами и помочь с заказом.</div>
+  </div>
+  <div style="margin-top:16px" class="fade-up d3"><button class="cta cta-green" data-act="contactsubmit">${ic('send')} Отправить</button></div>
+</div>`,
+
 /* ===== CALCULATOR (multi-step, one screen) ===== */
 calc:()=>{
   if(S.calc.result!==null) return SCREENS._calcResult();
@@ -1250,23 +1262,37 @@ function attach(cur){
   app.querySelectorAll('[data-go]').forEach(el=>el.onclick=()=>go(el.dataset.go));
   app.querySelectorAll('[data-act="back"]').forEach(el=>el.onclick=back);
   const homeBtn=app.querySelector('[data-act="home"]'); if(homeBtn) homeBtn.onclick=()=>{S.stack=['menu'];render();};
-  const mgr=app.querySelector('[data-act="manager"]'); if(mgr) mgr.onclick=async()=>{
+  // 'Написать менеджеру' now opens a small screen that asks for the phone first
+  const mgr=app.querySelector('[data-act="manager"]'); if(mgr) mgr.onclick=()=>{ go('contactManager'); };
+
+  // phone field on the contact-manager screen (reuses the order phone helpers)
+  const mgrPhoneEl=document.getElementById('mgrPhone');
+  if(mgrPhoneEl){
+    if(!mgrPhoneEl.value.trim()) mgrPhoneEl.value='+998 ';
+    mgrPhoneEl.oninput=()=>{ mgrPhoneEl.value=fmtUzPhone(mgrPhoneEl.value); };
+    mgrPhoneEl.onfocus=()=>{ if(!mgrPhoneEl.value.trim()) mgrPhoneEl.value='+998 '; };
+  }
+  const mgrSubmit=app.querySelector('[data-act="contactsubmit"]');
+  if(mgrSubmit) mgrSubmit.onclick=async()=>{
+    const raw=(document.getElementById('mgrPhone')||{}).value||'';
+    if(!validUzPhone(raw.trim())){ alert('Введите корректный номер: +998 и 9 цифр\nнапример +998 90 123 45 67'); return; }
+    const phone=normUzPhone(raw.trim());
     haptic('light');
-    // primary: backend forwards the request to the manager and confirms
+    // primary: backend forwards the request (with the phone) to the manager and confirms
     if(CONFIG.apiBase){
       try{
         const res=await fetch(CONFIG.apiBase.replace(/\/$/,'')+'/contact',{
           method:'POST', headers:{'Content-Type':'application/json'},
-          body:JSON.stringify({ initData:(tg&&tg.initData)||'' })
+          body:JSON.stringify({ initData:(tg&&tg.initData)||'', phone:phone })
         });
         if(res.ok){ const d=await res.json().catch(()=>null);
-          if(d&&d.ok){ alert('Готово! Менеджер свяжется с вами в ближайшее время.'); return; } }
+          if(d&&d.ok){ alert('Готово! Менеджер свяжется с вами в ближайшее время.'); back(); return; } }
       }catch(e){ /* fall through to fallbacks */ }
     }
     // fallback: open the manager chat directly
     if(CONFIG.managerUsername){ const url='https://t.me/'+CONFIG.managerUsername; try{ tg?.openTelegramLink ? tg.openTelegramLink(url) : window.open(url,'_blank'); }catch(e){ window.open(url,'_blank'); } return; }
     // last resort: legacy sendData (only if the app was opened from a reply-keyboard button)
-    try{ if(tg&&typeof tg.sendData==='function'){ tg.sendData(JSON.stringify({type:'contact_manager'})); return; } }catch(e){}
+    try{ if(tg&&typeof tg.sendData==='function'){ tg.sendData(JSON.stringify({type:'contact_manager', phone:phone})); back(); return; } }catch(e){}
     alert('Свяжитесь с нами по телефону '+CONFIG.phoneText);
   };
 

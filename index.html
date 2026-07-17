@@ -564,7 +564,7 @@ function tierForKcal(cat,kcal){
 }
 
 /* ---------- app state ---------- */
-const S = { stack:['menu'], calc:{gender:null,age:25,height:170,weight:65,activity:null,goal:null,result:null,bmr:0,tdee:0,recCat:null,recTier:null}, order:{cat:null,tier:null,duration:null,date:null,time:null,timeH:null,timeM:null,detailsDone:false,pay:null,address:'',name:'',phone:'',height:'',weight:''}, hasOrders:false };
+const S = { stack:['menu'], calc:{gender:null,age:25,height:170,weight:65,activity:null,goal:null,result:null,bmr:0,tdee:0,recCat:null,recTier:null}, order:{cat:null,tier:null,duration:null,date:null,time:null,timeH:null,timeM:null,detailsDone:false,pay:null,address:'',name:'',surname:'',phone:'',height:'',weight:''}, hasOrders:false };
 const ACT = {min:{k:1.2,label:'Минимальный',sub:'сидячий образ жизни',icon:'sofa'},light:{k:1.375,label:'Лёгкий',sub:'1–3 трен/нед',icon:'walk'},mid:{k:1.55,label:'Средний',sub:'3–5 трен/нед',icon:'run'},high:{k:1.725,label:'Высокий',sub:'6–7 трен/нед',icon:'dumbbell'},vhigh:{k:1.9,label:'Очень высокий',sub:'спорт + физ. труд',icon:'flame'}};
 
 const app = document.getElementById('app');
@@ -1038,8 +1038,10 @@ function orderStep(){
     <div class="q fade-up d1">Контакты и доставка</div>
     <div class="fade-up d2" style="margin-bottom:16px"><div class="field-label">Адрес доставки</div>
       <input class="t-input" id="address" placeholder="Город, район, улица, дом, кв." value="${o.address}"></div>
-    <div class="fade-up d3" style="margin-bottom:16px"><div class="field-label">Имя и фамилия</div>
-      <input class="t-input" id="name" placeholder="Как к вам обращаться?" value="${o.name}"></div>
+    <div class="fade-up d3" style="margin-bottom:16px"><div class="field-label">Имя</div>
+      <input class="t-input" id="name" placeholder="Ваше имя" value="${o.name}"></div>
+    <div class="fade-up d3" style="margin-bottom:16px"><div class="field-label">Фамилия</div>
+      <input class="t-input" id="surname" placeholder="Ваша фамилия" value="${o.surname}"></div>
     <div class="fade-up d4" style="margin-bottom:16px"><div class="field-label">Телефон</div>
       <input class="t-input" id="phone" type="tel" inputmode="tel" placeholder="+998 __ ___ __ __" value="${o.phone}"></div>
     <div class="fade-up d5" style="margin-bottom:16px"><div class="field-label">Рост, см</div>
@@ -1069,7 +1071,7 @@ function orderStep(){
       <div class="sum-row"><span class="k">Начало</span><span class="vv">${o.date}</span></div>
       <div class="sum-row"><span class="k">Время доставки</span><span class="vv">${o.time}</span></div>
       <div class="sum-row"><span class="k">Адрес</span><span class="vv">${o.address}</span></div>
-      <div class="sum-row"><span class="k">Получатель</span><span class="vv">${o.name}</span></div>
+      <div class="sum-row"><span class="k">Получатель</span><span class="vv">${o.name} ${o.surname}</span></div>
       <div class="sum-row"><span class="k">Телефон</span><span class="vv">${o.phone}</span></div>
       <div class="sum-row"><span class="k">Рост</span><span class="vv">${o.height} см</span></div>
       <div class="sum-row"><span class="k">Вес</span><span class="vv">${o.weight} кг</span></div>
@@ -1181,7 +1183,7 @@ async function submitOrder(btn){
     price_per_day:o.tier.price, days:o.days, duration:o.duration,
     subtotal:pr.subtotal, discount_pct:pr.discountPct, discount_amt:pr.discountAmt, total:pr.total,
     date:o.date, delivery_time:o.time, payment:payLabel(o.pay),
-    address:o.address, name:o.name, phone:o.phone, height:o.height, weight:o.weight,
+    address:o.address, name:o.name, surname:o.surname, phone:o.phone, height:o.height, weight:o.weight,
     tg_id: tgUser?tgUser.id:null, tg_username: tgUser?tgUser.username:null
   };
   let _lbl;
@@ -1321,10 +1323,10 @@ function attach(cur){
     if(!cat) return;
     if(el.dataset.tier!==undefined && el.dataset.tier!==''){
       const t=cat.tiers.find(x=>String(x.lo)===String(el.dataset.tier)) || cat.tiers[0];
-      S.order={cat:cat,tier:t,duration:null,date:null,time:null,timeH:null,timeM:null,detailsDone:false,pay:null,address:'',name:'',phone:'',height:'',weight:''};
+      S.order={cat:cat,tier:t,duration:null,date:null,time:null,timeH:null,timeM:null,detailsDone:false,pay:null,address:'',name:'',surname:'',phone:'',height:'',weight:''};
       go('order');
     } else {
-      S.order={cat:cat,tier:null,duration:null,date:null,time:null,timeH:null,timeM:null,detailsDone:false,pay:null,address:'',name:'',phone:'',height:'',weight:''};
+      S.order={cat:cat,tier:null,duration:null,date:null,time:null,timeH:null,timeM:null,detailsDone:false,pay:null,address:'',name:'',surname:'',phone:'',height:'',weight:''};
       go('tiers');
     }
   });
@@ -1418,14 +1420,15 @@ function attach(cur){
   }
   const detNext=app.querySelector('[data-act="detailsnext"]');
   if(detNext) detNext.onclick=()=>{
-    const a=document.getElementById('address').value.trim(), n=document.getElementById('name').value.trim(), p=document.getElementById('phone').value.trim();
+    const a=document.getElementById('address').value.trim(), n=document.getElementById('name').value.trim(), s=document.getElementById('surname').value.trim(), p=document.getElementById('phone').value.trim();
     const h=parseInt(document.getElementById('height').value,10), w=parseInt(document.getElementById('weight').value,10);
     if(a.length<6){popup('Укажите полный адрес доставки (район, улица, дом)');return;}
     if(n.length<2){popup('Укажите имя');return;}
+    if(s.length<2){popup('Укажите фамилию');return;}
     if(!validUzPhone(p)){popup('Введите корректный номер: +998 и 9 цифр\nнапример +998 90 123 45 67');return;}
     if(!(h>=100&&h<=300)){popup('Укажите корректный рост в см (от 100 до 300)');return;}
     if(!(w>=30&&w<=300)){popup('Укажите корректный вес в кг (от 30 до 300)');return;}
-    S.order.address=a;S.order.name=n;S.order.phone=normUzPhone(p);S.order.height=h;S.order.weight=w;S.order.detailsDone=true; haptic('light'); softRender('order-inner',orderStep);
+    S.order.address=a;S.order.name=n;S.order.surname=s;S.order.phone=normUzPhone(p);S.order.height=h;S.order.weight=w;S.order.detailsDone=true; haptic('light'); softRender('order-inner',orderStep);
   };
   const orderBack=app.querySelector('[data-act="orderback"]');
   if(orderBack) orderBack.onclick=()=>{

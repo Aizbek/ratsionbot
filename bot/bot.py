@@ -223,13 +223,14 @@ def build_card(d, order_no, user=None):
         uname = "@" + d["tg_username"]
     uid = (user or {}).get("id") or d.get("tg_id")
 
+    full_name = " ".join(p for p in [d.get("name"), d.get("surname")] if p) or "—"
     lines = [
         f"🥗 НОВЫЙ ЗАКАЗ  {order_no}",
         "━━━━━━━━━━━━━━",
         f"Дата начала: {d.get('date', '—')}",
         f"Срок: {d.get('duration', '—')}",
         "━━━━━━━━━━━━━━",
-        f"Имя: {d.get('name', '—')}",
+        f"Имя: {full_name}",
     ]
     if uname:
         lines.append(f"Telegram: {uname}")

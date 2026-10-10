@@ -98,6 +98,8 @@ body{
 .menu-logo-fallback{font-family:Georgia,serif;font-style:italic;font-size:40px;font-weight:500;
   background:linear-gradient(95deg,#E7C66B,#B08D3A);-webkit-background-clip:text;background-clip:text;color:transparent}
 .m-body{padding-top:18px}
+
+/* featured order tile */
 .m-feature{position:relative;display:flex;align-items:center;gap:16px;padding:20px;border-radius:var(--r);overflow:hidden;cursor:pointer;
   background:linear-gradient(120deg,#4CC079,var(--green-d));color:#fff;box-shadow:0 18px 36px -16px rgba(63,176,105,.6);
   margin-bottom:13px;transition:transform .25s,box-shadow .25s}
@@ -110,6 +112,8 @@ body{
 .m-feature h3{font-size:20px;font-weight:800;letter-spacing:-.02em}
 .m-feature p{font-size:13px;opacity:.9;font-weight:500;margin-top:2px}
 .m-feature .f-arrow{position:relative;opacity:.85}
+
+/* 2x2 grid */
 .m-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-bottom:13px}
 .tile{position:relative;background:var(--card);border-radius:var(--r);border:1px solid var(--line);
   padding:18px 16px;cursor:pointer;overflow:hidden;box-shadow:var(--shadow);min-height:118px;isolation:isolate;
@@ -117,6 +121,7 @@ body{
   transition:transform .28s cubic-bezier(.34,1.56,.64,1),box-shadow .28s}
 .tile:active{transform:scale(.96)}
 .tile:hover{transform:translateY(-5px);box-shadow:var(--shadow-lg)}
+/* sharp photo background + white wash at the bottom so dark text stays readable */
 .tile.photo::before{content:'';position:absolute;inset:0;z-index:-2;
   background-image:var(--img);background-size:cover;background-position:center;
   filter:saturate(1.08);opacity:1}
@@ -127,6 +132,8 @@ body{
 .tile-ic .ic{width:25px;height:25px}
 .tile h3{font-size:16px;font-weight:700;letter-spacing:-.02em;text-shadow:0 1px 3px rgba(255,255,255,.95),0 2px 10px rgba(255,255,255,.85)}
 .tile p{font-size:12px;color:#5a635d;font-weight:700;margin-top:3px;line-height:1.3;text-shadow:0 1px 3px rgba(255,255,255,.95),0 2px 10px rgba(255,255,255,.85)}
+
+/* wide list row */
 .m-row{display:flex;align-items:center;gap:14px;background:var(--card);border:1px solid var(--line);border-radius:var(--r);
   padding:16px 18px;cursor:pointer;box-shadow:var(--shadow);transition:transform .25s,box-shadow .25s}
 .m-row:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg)}
@@ -136,11 +143,19 @@ body{
 .m-row p{font-size:12px;color:var(--muted);font-weight:500;margin-top:1px}
 .m-row .r-arrow{margin-left:auto;color:var(--muted)}
 
+/* color variants */
 .v-green .tile-ic,.v-green .r-ic,.v-green.feat-ic{background:var(--green-l);color:var(--green-d)}
+.v-green .glow{background:var(--green)}
 .v-amber .tile-ic,.v-amber.feat-ic{background:#FDF1DD;color:var(--amber-d)}
+.v-amber .glow{background:var(--amber)}
 .v-blue .tile-ic,.v-blue.feat-ic{background:#E6F0FB;color:#2C6FB5}
+.v-blue .glow{background:#3C82D6}
 .v-pink .tile-ic,.v-pink.feat-ic{background:#FCEAF0;color:#C24C73}
+.v-pink .glow{background:#D85A85}
 .v-violet .tile-ic,.v-violet .r-ic,.v-violet.feat-ic{background:#EFEBFB;color:#6A52C2}
+.v-violet .glow{background:#7E63D8}
+
+/* program-list icons get their colour too */
 .v-green .prog-ic{background:var(--green-l);color:var(--green-d)}
 .v-amber .prog-ic{background:#FDF1DD;color:var(--amber-d)}
 .v-blue .prog-ic{background:#E1EFFC;color:#2C6FB5}
@@ -148,6 +163,7 @@ body{
 .v-violet .prog-ic{background:#EFEBFB;color:#6A52C2}
 .v-teal .prog-ic{background:#DCF5EF;color:#0E9C84}
 .v-orange .prog-ic{background:#FFE9D6;color:#E07A1A}
+/* colorful light tints for the program / calorie cards (bright, never dark) */
 .prog.v-green{background:#F2FBF5}
 .prog.v-amber{background:#FFF9EF}
 .prog.v-blue{background:#F1F7FE}
@@ -156,6 +172,34 @@ body{
 .prog.v-teal{background:#EEFBF7}
 .prog.v-orange{background:#FFF6EE}
 
+/* photo cards (real food images fill the whole tile) */
+.ptile{position:relative;border-radius:var(--r);overflow:hidden;cursor:pointer;min-height:152px;
+  box-shadow:var(--shadow);background-color:#EAE7DE;isolation:isolate;
+  display:flex;flex-direction:column;justify-content:flex-end;
+  transition:transform .28s cubic-bezier(.34,1.56,.64,1),box-shadow .28s}
+.ptile:hover{transform:translateY(-5px);box-shadow:var(--shadow-lg)}
+.ptile:active{transform:scale(.97)}
+/* fallback icon shown when the photo file isn't there yet (behind the image layer) */
+.ptile-fallback{position:absolute;inset:0;z-index:0;display:flex;align-items:center;justify-content:center;border-radius:inherit}
+.ptile-fallback .ic{width:46px;height:46px;opacity:.8}
+.v-green.ptile-fallback{background:var(--green-l);color:var(--green-d)}
+.v-amber.ptile-fallback{background:#FDF1DD;color:var(--amber-d)}
+.v-pink.ptile-fallback{background:#FCEAF0;color:#C24C73}
+.v-violet.ptile-fallback{background:#EFEBFB;color:#6A52C2}
+/* the photo itself: a layer above the fallback. If the file 404s, this stays invisible
+   (no background renders) and the fallback icon shows through. */
+.ptile::before{content:'';position:absolute;inset:0;z-index:1;border-radius:inherit;
+  background-image:var(--img);background-size:cover;background-position:center;background-repeat:no-repeat}
+/* dark gradient so white text stays readable over any photo (stronger at the bottom third) */
+.ptile-shade{position:absolute;inset:0;z-index:2;border-radius:inherit;
+  background:linear-gradient(180deg,rgba(0,0,0,0) 30%,rgba(0,0,0,.30) 58%,rgba(0,0,0,.70) 82%,rgba(0,0,0,.80) 100%)}
+.ptile-txt{position:relative;z-index:3;padding:16px}
+.ptile-txt h3{font-size:17px;font-weight:800;letter-spacing:-.02em;color:#fff;text-shadow:0 1px 8px rgba(0,0,0,.55)}
+.ptile-txt p{font-size:12px;font-weight:600;margin-top:2px;color:rgba(255,255,255,.92);text-shadow:0 1px 7px rgba(0,0,0,.55)}
+/* gold logo used as the Контакты icon */
+.tile-logo-ic{width:48px;height:48px;object-fit:contain;flex-shrink:0}
+
+/* off-hours toast */
 #offhours{position:fixed;top:14px;left:14px;right:14px;max-width:452px;margin:0 auto;z-index:900;
   display:flex;align-items:flex-start;gap:11px;padding:13px 15px;border-radius:14px;
   background:#FFF7E6;border:1px solid #F2DCA6;box-shadow:0 10px 28px -12px rgba(120,90,20,.35);
@@ -167,6 +211,7 @@ body{
 #offhours .oh-body span{font-size:12px;color:#9A7B2E;font-weight:500;line-height:1.4}
 #offhours .oh-x{margin-left:auto;color:#C2A55A;font-size:18px;cursor:pointer;flex-shrink:0;line-height:1}
 
+/* ---------- PREMIUM LOADING SCREEN (Lottie handwriting + brand) ---------- */
 #loader{position:fixed;inset:0;z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;
   background:radial-gradient(125% 90% at 50% 38%,#FFFDF8 0%,#FAF4E6 55%,#F1E6CC 100%);
   transition:opacity .7s ease,visibility .7s}
@@ -207,6 +252,9 @@ body{
   background:transparent;width:100%;letter-spacing:-.03em}
 .num-field input::placeholder{color:#C9CEC9}
 .num-field .unit{font-size:15px;color:var(--muted);font-weight:700}
+.slider-readout{text-align:center;margin:6px 0 20px}
+.slider-readout b{font-size:46px;font-weight:800;letter-spacing:-.04em;color:var(--ink)}
+.slider-readout span{font-size:16px;color:var(--muted);font-weight:600;margin-left:4px}
 input[type=range]{-webkit-appearance:none;width:100%;height:8px;border-radius:99px;
   background:linear-gradient(90deg,var(--green) var(--p,40%),#E7EAE6 var(--p,40%));outline:none;margin:8px 0 4px}
 input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:28px;height:28px;border-radius:50%;
@@ -214,6 +262,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:28px;heigh
 input[type=range]::-webkit-slider-thumb:active{transform:scale(1.18)}
 .range-ends{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);font-weight:600}
 
+/* result */
 .result-hero{position:relative;margin:4px 0 14px;padding:30px 22px;border-radius:26px;text-align:center;color:#fff;overflow:hidden;
   background:radial-gradient(130% 120% at 50% 0%,#54C683,var(--green) 55%,var(--green-d));box-shadow:0 20px 44px -18px rgba(63,176,105,.6)}
 .result-hero::before{content:'';position:absolute;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.1);top:-80px;right:-60px}
@@ -273,6 +322,7 @@ input[type=range]::-webkit-slider-thumb:active{transform:scale(1.18)}
 .pay-note .ic{color:var(--amber-d);flex-shrink:0;margin-top:1px}
 .pay-note p{font-size:12.5px;color:#8A6A22;font-weight:600;line-height:1.45}
 
+/* ---------- delivery time wheel picker (watch-style) ---------- */
 .tp-wrap{position:relative;display:flex;justify-content:center;gap:6px;background:var(--card);
   border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);
   padding:8px 20px;margin-bottom:14px;overflow:hidden}
@@ -292,6 +342,7 @@ input[type=range]::-webkit-slider-thumb:active{transform:scale(1.18)}
 .tp-fade-t{top:0;background:linear-gradient(180deg,var(--card) 8%,rgba(255,255,255,0))}
 .tp-fade-b{bottom:0;background:linear-gradient(0deg,var(--card) 8%,rgba(255,255,255,0))}
 .tp-readout{text-align:center;font-size:13px;color:var(--muted);font-weight:600;margin-bottom:16px}
+.tp-readout b{color:var(--green-d);font-size:15px;font-variant-numeric:tabular-nums}
 .tp-hint{display:flex;align-items:center;justify-content:center;gap:7px;text-align:center;
   font-size:12.5px;color:var(--muted);font-weight:600;margin:-2px 0 12px;transition:opacity .45s}
 .tp-hint.off{opacity:0}
@@ -314,7 +365,7 @@ input[type=range]::-webkit-slider-thumb:active{transform:scale(1.18)}
   padding:7px 16px;border-radius:99px;margin:6px 0 16px;letter-spacing:.01em}
 .success-wrap p{font-size:14.5px;color:var(--muted);font-weight:500;max-width:300px;margin:0 auto 8px;line-height:1.55}
 
-/* ---------- CONTENT SECTIONS ---------- */
+/* ---------- CONTENT SECTIONS (about/promo/contacts/orders) ---------- */
 .content-card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:22px;box-shadow:var(--shadow);margin-bottom:13px}
 .content-card .mission{font-size:15px;color:var(--ink);font-weight:500;line-height:1.6}
 .team-row{display:flex;gap:12px;align-items:flex-start;padding:14px 0;border-bottom:1px solid var(--line)}
@@ -359,6 +410,7 @@ input[type=range]::-webkit-slider-thumb:active{transform:scale(1.18)}
 .empty-state h3{font-size:18px;font-weight:700;margin-bottom:6px}
 .empty-state p{font-size:14px;color:var(--muted);font-weight:500;margin-bottom:20px}
 
+/* ---------- about: reasons & service lists ---------- */
 .reason{display:flex;gap:13px;align-items:flex-start;padding:13px 0;border-bottom:1px solid var(--line)}
 .reason:last-child{border-bottom:none}
 .reason-num{width:30px;height:30px;border-radius:9px;background:var(--green-l);color:var(--green-d);flex-shrink:0;
@@ -373,318 +425,36 @@ input[type=range]::-webkit-slider-thumb:active{transform:scale(1.18)}
 .svc-list li:last-child{border-bottom:none}
 .svc-list li .ic{width:18px;height:18px;flex-shrink:0;margin-top:1px;color:var(--c,#2E8E52)}
 
-/* ---------- LANGUAGE SWITCHER ---------- */
-#langSwitcher {
-  position: fixed;
-  top: 14px;
-  right: 14px;
-  z-index: 900;
-  height: 42px;
-  padding: 0 14px;
-  border-radius: 13px;
-  background: var(--card);
-  border: 1px solid var(--line);
-  box-shadow: 0 4px 12px rgba(31,42,36,.15);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  font-weight: 800;
-  letter-spacing: .02em;
-  color: var(--green-d);
-  cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
-  user-select: none;
-}
-#langSwitcher:active { transform: scale(0.92); }
-#langSwitcher::before, #langSwitcher::after { display: none !important; }
 </style>
 </head>
 <body>
 <div id="loader">
   <div class="ld-anim">
-    <lottie-player id="ldLottie" src="loader.json" autoplay speed="1.5" style="width:300px;max-width:78vw;height:auto"></lottie-player>
+    <lottie-player id="ldLottie" src="loader.json" autoplay speed="1.5"
+      style="width:300px;max-width:78vw;height:auto"></lottie-player>
   </div>
   <div class="ld-brand" id="ldBrand">Ratsion</div>
   <div class="ld-tag" id="ldTag">здоровая и вкусная еда</div>
 </div>
 <div class="app" id="app"></div>
-<div id="langSwitcher" onclick="toggleLang()"><span id="langTxt">UZ</span></div>
 <div id="offhours">
   <div class="oh-ic"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><path d="M12 7v5l3 2"/></svg></div>
-  <div class="oh-body"><b id="ohTitle">Сейчас нерабочее время</b><span id="ohDesc">Мы работаем 09:00–18:00, кроме воскресенья. Заказы примем, менеджер ответит в рабочие часы.</span></div>
+  <div class="oh-body"><b>Сейчас нерабочее время</b><span>Мы работаем 09:00–18:00, кроме воскресенья. Заказы примем, менеджер ответит в рабочие часы.</span></div>
   <div class="oh-x" id="ohClose">×</div>
 </div>
 <script>
-/* ---------- LANGUAGE SYSTEM ---------- */
-let currentLang = localStorage.getItem('ratsion_lang') || 'ru';
-const UZ_DICT = {
-  // Главное меню и базовые тексты
-  'Заказать': 'Buyurtma berish',
-  'программы правильного питания': 'sog\'lom ovqatlanish dasturlari',
-  'Калории': 'Kaloriyalar',
-  'расчёт суточной нормы': 'kunlik me\'yorni hisoblash',
-  'Акции': 'Aksiyalar',
-  'спецпредложения': 'maxsus takliflar',
-  'О компании': 'Kompaniya haqida',
-  'наша команда': 'bizning jamoa',
-  'Контакты': 'Aloqa',
-  'связаться с нами': 'biz bilan bog\'lanish',
-  'Кейтеринг и услуги': 'Keytering va xizmatlar',
-  'корпоративное и социальное питание': 'korporativ va ijtimoiy ovqatlanish',
-  'Мои заказы': 'Mening buyurtmalarim',
-  'история и статус': 'tarix va holat',
-  'Кейтеринг и услуги для бизнеса': 'Biznes uchun keytering va xizmatlar',
-  'Заказать питание': 'Ovqat buyurtma qilish',
-  'Написать менеджеру': 'Menejerga yozish',
-
-  // Категории
-  'Прайс по калоражным критериям': 'Kaloriya mezonlari bo\'yicha narxlar',
-  'цена за день · доставка включена': 'kunlik narx · yetkazib berish ichida',
-  'Лечебная диета': 'Davolovchi parhiz',
-  'Стол №5 и №9': '5 va 9-raqamli stol',
-  'Индивидуальный рацион': 'Individual ratsion',
-  'подбор под вашу цель': 'maqsadingizga moslashtirilgan',
-  'Белковая группа': 'Oqsil guruhi',
-  'повышенный белок': 'ko\'paytirilgan oqsil',
-  'Деловой пакет': 'Biznes paket',
-  'бизнес-рацион и кето': 'biznes-ratsion va keto',
-  'Первая группа': 'Birinchi guruh',
-  'Вторая группа': 'Ikkinchi guruh',
-  'Третья группа': 'Uchinchi guruh',
-  'Четвёртая группа': 'To\'rtinchi guruh',
-  'Пятая группа': 'Beshinchi guruh',
-  'Шестая группа': 'Oltinchi guruh',
-  'Деловой': 'Biznes',
-  'Кето диета': 'Keto parhiz',
-  'ккал/день': 'kkal/kun',
-
-  // О компании
-  'Наша цель': 'Bizning maqsadimiz',
-  'Почему именно «Ratsion»?': 'Nega aynan «Ratsion»?',
-  'Наша команда': 'Bizning jamoa',
-  'Что мы предлагаем': 'Biz nima taklif qilamiz',
-  'Компания «Ratsion» начала свою деятельность в 2019 году. Благодаря ответственному и профессиональному подходу мы в короткий срок заняли лидирующую позицию в области здорового питания Республики Узбекистан.<br><br>Основное направление нашей деятельности — разработка, приготовление и доставка рационов здорового и вкусного питания на каждый день.': '«Ratsion» kompaniyasi o\'z faoliyatini 2019-yilda boshlagan. Mas\'uliyatli va professional yondashuv tufayli biz qisqa vaqt ichida O\'zbekiston Respublikasida sog\'lom ovqatlanish sohasida yetakchi o\'rinni egalladik.<br><br>Bizning asosiy faoliyat yo\'nalishimiz — har kun uchun sog\'lom va mazali ovqatlanish ratsionlarini ishlab chiqish, tayyorlash va yetkazib berish.',
-  'Мы хотим изменить стереотипы большинства людей в области правильного питания и вывести здоровый образ жизни на новый уровень. Мы убеждены, что здоровая пища должна быть не только полезной, но и по-настоящему вкусной 💚': 'Biz ko\'pchilikning to\'g\'ri ovqatlanish borasidagi stereotiplarini o\'zgartirib, sog\'lom turmush tarzini yangi darajaga olib chiqmoqchimiz. Biz sog\'lom ovqat nafaqat foydali, balki haqiqatan ham mazali bo\'lishi kerakligiga ishonamiz 💚',
-  'Вы избавлены от подсчёта калорий, изучения состава блюд и взвешивания продуктов — наш диетолог и повара сделают это за вас.': 'Siz kaloriyalarni hisoblash, taomlar tarkibini o\'rganish va mahsulotlarni tortishdan xalos bo\'lasiz — bizning diyetolog va oshpazlarimiz buni siz uchun bajarishadi.',
-  'Мы учитываем ваши предпочтения в еде, возмо аллергические реакции, состояние здоровья и образ жизни.': 'Biz sizning ta\'bingizni, ehtimoliy allergik reaksiyalarni, sog\'lig\'ingiz holati va turmush tarzingizni hisobga olamiz.',
-  'Ежедневно удивляем и балуем вас новым меню. Более 3000 полезных рецептов — вам никогда не надоест правильное питание.': 'Har kuni sizni yangi menyu bilan hayratlantiramiz va xursand qilamiz. 3000 dan ortiq foydali retseptlar — to\'g\'ri ovqatlanish sizni hech qachon zeriktirmaydi.',
-  'Ежедневный закуп свежих продуктов и соблюдение санитарных норм на всех этапах гарантируют гастрономическое удовольствие.': 'Har kuni yangi mahsulotlarni xarid qilish va barcha bosqichlarda sanitariya normalariga rioya etish gastronomik zavqni kafolatlaydi.',
-  '«Ratsion» — это команда из 50 профессионалов в области правильного питания.': '«Ratsion» — bu to\'g\'ri ovqatlanish sohasidagi 50 nafar professionaldan iborat jamoa.',
-  'Повара': 'Oshpazlar',
-  'Профессиональное образование и большой опыт работы в ресторанах высокого уровня': 'Professional ta\'lim va yuqori darajadagi restoranlarda katta ish tajribasi',
-  'Консультанты и диетолог': 'Konsultantlar va diyetolog',
-  'Помогут правильно подобрать программу под ваши цели': 'Maqsadingizga mos dasturni to\'g\'ri tanlashda yordam berishadi',
-  'Курьеры': 'Kuryerlar',
-  'Доставят заказ в нужное время и место': 'Buyurtmani kerakli vaqtda va joyga yetkazib berishadi',
-  'Снижение / набор веса': 'Vaznni kamaytirish / oshirish',
-  'При заболеваниях': 'Kasalliklar bo\'yicha',
-  'Спортивное': 'Sportchilar uchun',
-  'Для беременных и кормящих': 'Homilador va emiziklilar uchun',
-  'Вегетарианское': 'Vegetariancha',
-  'Индивидуальное': 'Individual',
-  'Корпоративное': 'Korporativ',
-  'Детское': 'Bolalar uchun',
-
-  // Кейтеринг
-  'Корпоративное питание': 'Korporativ ovqatlanish',
-  'Помимо основного направления у нас есть отдельная кухня для корпоративного питания, производственные мощности которой позволяют ежедневно обслуживать более 1000 человек. «Ratsion» организует корпоративное питание в различных форматах.': 'Asosiy yo\'nalishdan tashqari, korporativ ovqatlanish uchun alohida oshxonamiz bor, uning ishlab chiqarish quvvati har kuni 1000 dan ortiq kishiga xizmat ko\'rsatish imkonini beradi. "Ratsion" korporativ ovqatlanishni turli formatlarda tashkil etadi.',
-  'Коммерческое питание': 'Tijorat ovqatlanishi',
-  'Социальное питание': 'Ijtimoiy ovqatlanish',
-  'Банкеты и фуршеты': 'Banketlar va furshetlar',
-  'Доставка обедов': 'Tushliklarni yetkazib berish',
-  'Кейтеринг': 'Keytering',
-  'Организация столовой на предприятии': 'Korxonada oshxona tashkil etish',
-  'Доставка питания на строительные объекты': 'Qurilish obyektlariga ovqat yetkazib berish',
-  'Выпечка на заказ': 'Buyurtma asosida pishiriqlar',
-  'Питание в учебных заведениях': 'Ta\'lim muassasalarida ovqatlanish',
-  'Питание в детских учреждениях': 'Bolalar muassasalarida ovqatlanish',
-  'Питание в лечебных учреждениях': 'Davolash muassasalarida ovqatlanish',
-  'Питание в государственных учреждениях': 'Davlat muassasalarida ovqatlanish',
-  'Санаторно-курортное питание': 'Sanatoriya-kurort ovqatlanishi',
-  'Лечебное и диетическое питание': 'Davolash va parhiz ovqati',
-  'Салаты и закуски фуршетные': 'Furshet salatlari va gazaklari',
-  'Канапе, тарталетки, валованы': 'Kanape, tartaletkalar, valovanlar',
-  'Горячие блюда фуршетные': 'Furshet issiq taomlari',
-  'Гарниры фуршетные': 'Furshet garnirlari',
-  'Выпечка фуршетная': 'Furshet pishiriqlari',
-  'Проведение мероприятий': 'Tadbirlarni o\'tkazish',
-
-  // Акции
-  'ЗАКАЗ НА 7 ДНЕЙ': '7 KUNLIK BUYURTMA',
-  '5% скидка': '5% chegirma',
-  'При оформлении программы на 7 дней': 'Dasturni 7 kunga rasmiylashtirganda',
-  'ЗАКАЗ НА 15 ДНЕЙ': '15 KUNLIK BUYURTMA',
-  '10% скидка': '10% chegirma',
-  'При оформлении программы на 15 дней': 'Dasturni 15 kunga rasmiylashtirganda',
-  'ЗАКАЗ НА 30 ДНЕЙ': '30 KUNLIK BUYURTMA',
-  '15% скидка': '15% chegirma',
-  'При оформлении программы на 30 дней': 'Dasturni 30 kunga rasmiylashtirganda',
-  'Скидки и акции на «Деловой рацион» не действуют. Оплата возврату не подлежит.': 'Chegirmalar va aksiyalar «Biznes ratsion» ga taalluqli emas. To\'lov qaytarilmaydi.',
-
-  // Контакты и связь
-  'Телефон': 'Telefon',
-  'Время работы': 'Ish vaqti',
-  '09:00 – 18:00 · Вс — выходной': '09:00 – 18:00 · Yakshanba — dam olish kuni',
-  'Оставьте свой номер телефона': 'Telefon raqamingizni qoldiring',
-  'Номер нужен, чтобы менеджер мог связаться с вами и помочь с заказом.': 'Raqam menejer siz bilan bog\'lanishi va buyurtmada yordam berishi uchun kerak.',
-  'Отправить': 'Yuborish',
-  'Сейчас нерабочее время': 'Hozir ish vaqti emas',
-  'Мы работаем 09:00–18:00, кроме воскресенья. Заказы примем, менеджер ответит в рабочие часы.': 'Biz 09:00 dan 18:00 gacha ishlaymiz (yakshanbadan tashqari). Buyurtmalar qabul qilinadi, menejer ish vaqtida javob beradi.',
-
-  // Калькулятор
-  'Расчёт калорий': 'Kaloriya hisoblash',
-  'Шаг': 'Qadam',
-  'из 4': 'dan (4)',
-  'Укажите ваш пол': 'Jinsingizni ko\'rsating',
-  'Мужской': 'Erkak',
-  'Женский': 'Ayol',
-  'Параметры тела': 'Tana parametrlari',
-  'Возраст': 'Yosh',
-  'лет': 'yosh',
-  'Рост': 'Bo\'yi',
-  'см': 'sm',
-  'Вес': 'Vazni',
-  'кг': 'kg',
-  'Далее': 'Keyingisi',
-  'Уровень активности': 'Faollik darajasi',
-  'Минимальный': 'Minimal',
-  'сидячий образ жизни': 'o\'troq turmush tarzi',
-  'Лёгкий': 'Yengil',
-  '1–3 трен/нед': 'haftasiga 1-3 marta mashg\'ulot',
-  'Средний': 'O\'rtacha',
-  '3–5 трен/нед': 'haftasiga 3-5 marta mashg\'ulot',
-  'Высокий': 'Yuqori',
-  '6–7 трен/нед': 'haftasiga 6-7 marta mashg\'ulot',
-  'Очень высокий': 'Juda yuqori',
-  'спорт + физ. труд': 'sport + jismoniy mehnat',
-  'Какая у вас цель?': 'Maqsadingiz qanday?',
-  'Снижение веса': 'Vaznni kamaytirish',
-  'умеренный дефицит −15%': 'o\'rtacha defitsit −15%',
-  'Поддержание веса': 'Vaznni saqlash',
-  'норма без изменений': 'o\'zgarishsiz me\'yor',
-  'Набор массы': 'Vaznni oshirish',
-  'умеренный профицит +12%': 'o\'rtacha profitsit +12%',
-  'Ваш результат': 'Sizning natijangiz',
-  'Ваша суточная норма': 'Sizning kunlik me\'yoringiz',
-  'ккал': 'kkal',
-  'Рекомендуем для вас': 'Siz uchun tavsiya qilamiz',
-  'Лучший выбор': 'Eng yaxshi tanlov',
-  'Другие программы': 'Boshqa dasturlar',
-  'Рассчитать заново': 'Qaytadan hisoblash',
-  'Цена за день': 'Kunlik narx',
-  'Под вашу цель': 'Sizning maqsadingizga mos',
-  'Калорийность': 'Kaloriyalilik',
-  'от': 'dan',
-  'Поддержание': 'Saqlash',
-
-  // Выбор программ
-  'Программы питания': 'Ovqatlanish dasturlari',
-  'Рекомендовано по вашему расчёту': 'Hisob-kitobingizga asosan tavsiya etiladi',
-  'Цена указана за 1 день. В стоимость входят доставка, контейнеры и приборы.': 'Narx 1 kun uchun ko\'rsatilgan. Narxga yetkazib berish, idishlar va anjomlar kiritilgan.',
-  'Выберите калорийность': 'Kaloriyalilikni tanlang',
-  'Цены этой категории уточняются — менеджер подтвердит при оформлении.': 'Ushbu toifa narxlari aniqlashtirilmoqda — menejer rasmiylashtirish vaqtida tasdiqlaydi.',
-  'Доставка': 'Yetkazib berish',
-  'включена': 'kiritilgan',
-  'Для вас': 'Siz uchun',
-
-  // Оформление заказа
-  'Оформление': 'Rasmiylashtirish',
-  'На какой срок?': 'Qancha muddatga?',
-  '3 дня': '3 kun',
-  '7 дней': '7 kun',
-  '15 дней': '15 kun',
-  '30 дней': '30 kun',
-  'пробный': 'sinov',
-  'Цена указана за 1 день. Итоговая сумма за весь срок — на следующем шаге.': 'Narx 1 kun uchun ko\'rsatilgan. Umumiy summa — keyingi qadamda.',
-  'Дата начала доставки': 'Yetkazib berishni boshlash sanasi',
-  'Завтра': 'Ertaga',
-  'Через 2 дня': '2 kundan keyin',
-  'Или укажите свою дату': 'Yoki o\'z sanangizni kiriting',
-  'Во сколько доставить?': 'Soat nechchida yetkazib berish kerak?',
-  'Листайте колёсики вверх-вниз, чтобы выбрать время': 'Vaqtni tanlash uchun g\'ildiraklarni yuqoriga-pastga aylantiring',
-  'Доставка работает с 07:00 до 09:00': 'Yetkazib berish 07:00 dan 09:00 gacha ishlaydi',
-  'Контакты и доставка': 'Aloqa va yetkazib berish',
-  'Адрес доставки': 'Yetkazib berish manzili',
-  'Город, район, улица, дом, кв.': 'Shahar, tuman, ko\'cha, uy, xonadon',
-  'Имя': 'Ism',
-  'Ваше имя': 'Ismingiz',
-  'Фамилия': 'Familiya',
-  'Ваша фамилия': 'Familiyangiz',
-  'Напр. 175': 'Masalan: 175',
-  'Напр. 70': 'Masalan: 70',
-  'Проверить заказ': 'Buyurtmani tekshirish',
-  'Как будете оплачивать?': 'Qanday to\'lov qilasiz?',
-  'Наличными': 'Naqd pulda',
-  'курьеру при доставке': 'yetkazib berish vaqtida kuryerga',
-  'Онлайн-оплата': 'Onlayn to\'lov',
-  'картой · менеджер отправит реквизиты': 'karta orqali · menejer rekvizitlarni yuboradi',
-  'Проверьте заказ': 'Buyurtmani tekshiring',
-  
-  // Чек и история заказов
-  'Программа': 'Dastur',
-  'Срок': 'Muddat',
-  'Начало': 'Boshlanish',
-  'Время доставки': 'Yetkazish vaqti',
-  'Адрес': 'Manzil',
-  'Получатель': 'Qabul qiluvchi',
-  'Оплата': 'To\'lov turi',
-  'Итого за': 'Jami (',
-  'дн.': 'kun)',
-  'Скидка': 'Chegirma',
-  'Менеджер свяжется с вами в ближайшее время для подтверждения заказа. Доставка по Ташкенту.': 'Menejer buyurtmani tasdiqlash uchun tez orada siz bilan bog\'lanadi. Toshkent bo\'ylab yetkazib beriladi.',
-  'Подтвердить заказ': 'Buyurtmani tasdiqlash',
-  'Изменить': 'O\'zgartirish',
-  'Заказов пока нет': 'Hozircha buyurtmalar yo\'q',
-  'Самое время выбрать программу питания под ваши цели': 'Maqsadingizga mos ovqatlanish dasturini tanlashning ayni vaqti',
-  'Заказ': 'Buyurtma',
-  'В обработке': 'Jarayonda',
-  'Доставляется': 'Yetkazib berilmoqda',
-  'Доставлен': 'Yetkazib berilgan',
-  'Старт': 'Boshlanish',
-  'Итого': 'Jami summa',
-  'Ваш заказ доставляется': 'Buyurtmangiz yetkazilmoqda',
-  'Новый заказ': 'Yangi buyurtma',
-  'Удалить': 'O\'chirish',
-
-  // Успех / Ошибка / Popups
-  'Заказ оформлен!': 'Buyurtma rasmiylashtirildi!',
-  'Менеджер свяжется с вами в ближайшее время и отправит реквизиты для онлайн-оплаты.': 'Menejer tez orada siz bilan bog\'lanadi va onlayn to\'lov uchun rekvizitlarni yuboradi.',
-  'Оплата наличными курьеру при доставке. Менеджер свяжется с вами в ближайшее время для подтверждения.': 'To\'lov yetkazib berilganda kuryerga naqd pulda qilinadi. Menejer buyurtmani tasdiqlash uchun tez orada siz bilan bog\'lanadi.',
-  'Что-то пошло не так': 'Xatolik yuz berdi',
-  'Похоже, нет интернета. Проверьте подключение и попробуйте ещё раз.': 'Aftidan internet yo\'q. Ulanishni tekshiring va qayta urinib ko\'ring.',
-  'Сервер долго не отвечал. Подождите немного и попробуйте снова.': 'Server uzoq vaqt javob bermadi. Biroz kutib, yana urinib ko\'ring.',
-  'Не удалось доставить заказ менеджеру. Попробуйте ещё раз через минуту.': 'Buyurtmani menejerga yetkazib bo\'lmadi. Bir daqiqadan so\'ng yana urinib ko\'ring.',
-  'Возможные причины: нет интернета или слабый сигнал; сервер временно недоступен. Заказ <b>не отправлен</b> — попробуйте ещё раз или свяжитесь с нами по телефону.': 'Ehtimoliy sabablar: internet yo\'q yoki signal zaif; server vaqtincha ishlamayapti. Buyurtma <b>yuborilmadi</b> — qayta urinib ko\'ring yoki telefon orqali biz bilan bog\'laning.',
-  'Повторить отправку': 'Qaytadan yuborish',
-  'Позвонить нам': 'Bizga qo\'ng\'iroq qilish',
-  'На главную': 'Asosiy sahifaga',
-  'сум': 'so\'m',
-  'Отправляем…': 'Yuborilmoqda...',
-  'Введите возраст от 14 до 80': '14 dan 80 gacha bo\'lgan yoshni kiriting',
-  'Введите корректную дату в формате ДД.ММ.ГГГГ\n(от сегодня и не позднее, чем через 90 дней)': 'Sanani to\'g\'ri formatda kiriting (bugundan boshlab 90 kungacha)',
-  'Укажите полный адрес доставки (район, улица, дом)': 'To\'liq yetkazib berish manzilini kiriting (tuman, ko\'cha, uy)',
-  'Укажите имя': 'Ismingizni kiriting',
-  'Укажите фамилию': 'Familiyangizni kiriting',
-  'Введите корректный номер: +998 и 9 цифр\nнапример +998 90 123 45 67': 'To\'g\'ri raqam kiriting: +998 va 9 raqam\nmasalan +998 90 123 45 67',
-  'Укажите корректный рост в см (от 100 до 300)': 'Bo\'yingizni to\'g\'ri kiriting (100 dan 300 gacha)',
-  'Укажите корректный вес в кг (от 30 до 300)': 'Vazningizni to\'g\'ri kiriting (30 dan 300 gacha)',
-  'Готово! Менеджер свяжется с вами в ближайшее время.': 'Tayyor! Menejer tez orada siz bilan bog\'lanadi.',
-  'Свяжитесь с нами по телефону ': 'Biz bilan quyidagi raqam orqali bog\'laning: ',
-  'здоровая и вкусная еда': 'sog\'lom va mazali taomlar'
-};
-
-function T(text) {
-  if (currentLang === 'uz' && UZ_DICT[text]) return UZ_DICT[text];
-  return text;
-}
-
 const tg = window.Telegram?.WebApp;
 try{ tg?.ready(); tg?.expand(); }catch(e){}
 
+/* ---------- config (fill these in) ----------
+   apiBase: публичный URL вашего бота на Render, напр. 'https://ratsion-bot.onrender.com'.
+            ЭТО ГЛАВНЫЙ КАНАЛ доставки заказа менеджеру. Без него заказы НЕ дойдут
+            надёжно (см. ниже про sendData). Без завершающего "/".
+   managerUsername: Telegram @username менеджера БЕЗ "@", напр. 'ratsion_manager'.
+            Используется как запасной вариант, если apiBase недоступен. */
 const CONFIG = { apiBase:'https://ratsionbot.onrender.com', managerUsername:'', phone:'+998999888808', phoneText:'+998 99 988 88 08' };
 
-/* ---------- icon set ---------- */
+/* ---------- icon set (inline SVG, premium thin-line) ---------- */
 const I = {
   salad:'<path d="M7 21h10M12 21a9 9 0 0 0 9-9H3a9 9 0 0 0 9 9Z"/><path d="M11.38 12a2.4 2.4 0 0 1-.4-4.77 2.4 2.4 0 0 1 3.2-2.77 2.4 2.4 0 0 1 3.47 3.27A2.4 2.4 0 0 1 16 12"/><path d="m13 12-4-4M8 9h.01"/>',
   bowl:'<path d="M3 11h18M5 11a7 7 0 0 0 14 0M12 11V4M12 4a2 2 0 1 0 0-.5"/><path d="M19 21H5"/>',
@@ -728,71 +498,82 @@ const I = {
 };
 function ic(name,cls='ic'){return `<svg class="${cls}" viewBox="0 0 24 24">${I[name]||''}</svg>`}
 
-/* ---------- programs data ---------- */
-function getCategories() {
-  return [
-    {
-      id:'kaloraj', name:'Прайс по калоражным критериям', sub:'цена за день · доставка включена', icon:'flame', v:'teal',
-      tiers:[
-        {lo:800,hi:1000,price:165000},{lo:1000,hi:1200,price:185000},{lo:1200,hi:1400,price:205000},
-        {lo:1400,hi:1600,price:215000},{lo:1600,hi:1800,price:225000},{lo:1800,hi:2000,price:245000},
-        {lo:2000,hi:2200,price:260000},{lo:2200,hi:2500,price:275000},{lo:2500,hi:2800,price:285000},
-        {lo:2800,hi:3000,price:305000},{lo:3000,hi:3300,price:320000},{lo:3300,hi:3600,price:330000}
-      ]
-    },
-    {
-      id:'lechebnaya', name:'Лечебная диета', sub:'Стол №5 и №9', icon:'heart', v:'pink',
-      tiers:[
-        {lo:800,hi:1000,price:165000},{lo:1000,hi:1200,price:185000},{lo:1200,hi:1400,price:205000},
-        {lo:1400,hi:1600,price:215000},{lo:1600,hi:1800,price:225000},{lo:1800,hi:2000,price:245000},
-        {lo:2000,hi:2200,price:260000},{lo:2200,hi:2500,price:275000}
-      ]
-    },
-    {
-      id:'individual', name:'Индивидуальный рацион', sub:'подбор под вашу цель', icon:'leaf', v:'green',
-      tiers:[
-        {lo:1000,hi:1500,price:265000,label:'Первая группа'},
-        {lo:1500,hi:2000,price:295000,label:'Вторая группа'},
-        {lo:2000,hi:2500,price:335000,label:'Третья группа'},
-        {lo:2500,hi:3000,price:385000,label:'Четвёртая группа'}
-      ]
-    },
-    {
-      id:'belkovaya', name:'Белковая группа', sub:'повышенный белок', icon:'dumbbell', v:'blue',
-      tiers:[
-        {lo:1000,hi:1200,price:265000,label:'Первая группа'},
-        {lo:1200,hi:1500,price:290000,label:'Вторая группа'},
-        {lo:1500,hi:1800,price:305000,label:'Третья группа'},
-        {lo:1800,hi:2000,price:315000,label:'Четвёртая группа'},
-        {lo:2000,hi:2500,price:345000,label:'Пятая группа'},
-        {lo:2500,hi:3000,price:395000,label:'Шестая группа'}
-      ]
-    },
-    {
-      id:'delovoy', name:'Деловой пакет', sub:'бизнес-рацион и кето', icon:'box', v:'orange',
-      tiers:[
-        {lo:800,hi:1000,price:125000,label:'Деловой'},
-        {lo:1000,hi:1600,price:265000,label:'Кето диета'}
-      ]
-    }
-  ];
-}
+/* ---------- programs data (easily editable / from backend later) ---------- */
+/* ---------- program catalogue (real Ratsion data) ----------
+   Each category has calorie tiers; price is per day (прайс на 1 день).
+   tiers: {lo, hi, price}  — price in сум.
+   *** CATEGORIES MARKED needConfirm:true use placeholder numbers the client must confirm ***/
+const CATEGORIES = [
+  {
+    id:'kaloraj', name:'Прайс по калоражным критериям', sub:'цена за день · доставка включена', icon:'flame', v:'teal',
+    tiers:[
+      {lo:800,hi:1000,price:165000},{lo:1000,hi:1200,price:185000},{lo:1200,hi:1400,price:205000},
+      {lo:1400,hi:1600,price:215000},{lo:1600,hi:1800,price:225000},{lo:1800,hi:2000,price:245000},
+      {lo:2000,hi:2200,price:260000},{lo:2200,hi:2500,price:275000},{lo:2500,hi:2800,price:285000},
+      {lo:2800,hi:3000,price:305000},{lo:3000,hi:3300,price:320000},{lo:3300,hi:3600,price:330000}
+    ]
+  },
+  {
+    id:'lechebnaya', name:'Лечебная диета', sub:'Стол №5 и №9', icon:'heart', v:'pink',
+    tiers:[
+      {lo:800,hi:1000,price:165000},{lo:1000,hi:1200,price:185000},{lo:1200,hi:1400,price:205000},
+      {lo:1400,hi:1600,price:215000},{lo:1600,hi:1800,price:225000},{lo:1800,hi:2000,price:245000},
+      {lo:2000,hi:2200,price:260000},{lo:2200,hi:2500,price:275000}
+    ]
+  },
+  {
+    id:'individual', name:'Индивидуальный рацион', sub:'подбор под вашу цель', icon:'leaf', v:'green',
+    tiers:[
+      {lo:1000,hi:1500,price:265000,label:'Первая группа'},
+      {lo:1500,hi:2000,price:295000,label:'Вторая группа'},
+      {lo:2000,hi:2500,price:335000,label:'Третья группа'},
+      {lo:2500,hi:3000,price:385000,label:'Четвёртая группа'}
+    ]
+  },
+  {
+    id:'belkovaya', name:'Белковая группа', sub:'повышенный белок', icon:'dumbbell', v:'blue',
+    tiers:[
+      {lo:1000,hi:1200,price:265000,label:'Первая группа'},
+      {lo:1200,hi:1500,price:290000,label:'Вторая группа'},
+      {lo:1500,hi:1800,price:305000,label:'Третья группа'},
+      {lo:1800,hi:2000,price:315000,label:'Четвёртая группа'},
+      {lo:2000,hi:2500,price:345000,label:'Пятая группа'},
+      {lo:2500,hi:3000,price:395000,label:'Шестая группа'}
+    ]
+  },
+  {
+    id:'delovoy', name:'Деловой пакет', sub:'бизнес-рацион и кето', icon:'box', v:'orange',
+    tiers:[
+      {lo:800,hi:1000,price:125000,label:'Деловой'},
+      {lo:1000,hi:1600,price:265000,label:'Кето диета'}
+    ]
+  }
+];
+
+/* bright colour cycle for calorie tiers — keeps every program card colourful */
 const PALETTE = ['green','amber','blue','pink','violet','teal','orange'];
 
-function sum(n){ return n.toLocaleString('ru-RU').replace(/,/g,' ')+' '+T('сум'); }
+/* fmt price like "145 000 сум" */
+function sum(n){ return n.toLocaleString('ru-RU').replace(/,/g,' ')+' сум'; }
+/* pick the tier in a category that best fits a kcal value */
 function tierForKcal(cat,kcal){
   for(const t of cat.tiers){ if(kcal>=t.lo && kcal<=t.hi) return t; }
+  // clamp to nearest edge tier
   if(kcal < cat.tiers[0].lo) return cat.tiers[0];
   return cat.tiers[cat.tiers.length-1];
 }
 
+/* ---------- app state ---------- */
 const S = { stack:['menu'], calc:{gender:null,age:25,height:170,weight:65,activity:null,goal:null,result:null,bmr:0,tdee:0,recCat:null,recTier:null}, order:{cat:null,tier:null,duration:null,date:null,time:null,timeH:null,timeM:null,detailsDone:false,pay:null,address:'',name:'',surname:'',phone:'',height:'',weight:''}, hasOrders:false };
 const ACT = {min:{k:1.2,label:'Минимальный',sub:'сидячий образ жизни',icon:'sofa'},light:{k:1.375,label:'Лёгкий',sub:'1–3 трен/нед',icon:'walk'},mid:{k:1.55,label:'Средний',sub:'3–5 трен/нед',icon:'run'},high:{k:1.725,label:'Высокий',sub:'6–7 трен/нед',icon:'dumbbell'},vhigh:{k:1.9,label:'Очень высокий',sub:'спорт + физ. труд',icon:'flame'}};
 
 const app = document.getElementById('app');
 function haptic(t='light'){try{tg?.HapticFeedback?.impactOccurred(t)}catch(e){}}
+/* Telegram's native popup shows only our text (no site domain in the title,
+   unlike the browser's alert()). Falls back to alert() outside Telegram. */
 function popup(msg){ try{ if(tg&&typeof tg.showAlert==='function'){ tg.showAlert(msg); return; } }catch(e){} alert(msg); }
 
+/* ---------- navigation ---------- */
 function go(screen,replace=false){
   haptic('light');
   if(replace){S.stack[S.stack.length-1]=screen}else{S.stack.push(screen)}
@@ -813,6 +594,7 @@ function render(){
 function topbar(title){return `<div class="topbar"><div class="back-btn" data-act="back">${ic('back')}</div><h2>${title}</h2></div>`}
 
 const SCREENS = {
+/* ===== MAIN MENU ===== */
 menu:()=>`<div class="screen" id="menu">
   <div class="m-hero fade-up d1">
     <img class="m-hero-logo" src="logo.png" alt="Ratsion"
@@ -821,178 +603,192 @@ menu:()=>`<div class="screen" id="menu">
   <div class="m-body">
     <div class="m-feature fade-up d2" data-go="programs">
       <div class="f-ic">${ic('bowl')}</div>
-      <div class="f-txt"><h3>${T('Заказать')}</h3><p>${T('программы правильного питания')}</p></div>
+      <div class="f-txt"><h3>Заказать</h3><p>программы правильного питания</p></div>
       <div class="f-arrow">${ic('arrow')}</div>
     </div>
     <div class="m-grid">
       <div class="tile photo v-amber fade-up d3" data-go="calc" style="--img:url('food-order.jpg')">
         <div class="tile-ic">${ic('calc')}</div>
-        <div><h3>${T('Калории')}</h3><p>${T('расчёт суточной нормы')}</p></div>
+        <div><h3>Калории</h3><p>расчёт суточной нормы</p></div>
       </div>
       <div class="tile photo v-pink fade-up d3" data-go="promo" style="--img:url('food-promo.jpg')">
         <div class="tile-ic">${ic('gift')}</div>
-        <div><h3>${T('Акции')}</h3><p>${T('спецпредложения')}</p></div>
+        <div><h3>Акции</h3><p>спецпредложения</p></div>
       </div>
       <div class="tile photo v-blue fade-up d4" data-go="about" style="--img:url('food-calories.jpg')">
         <div class="tile-ic">${ic('info')}</div>
-        <div><h3>${T('О компании')}</h3><p>${T('наша команда')}</p></div>
+        <div><h3>О компании</h3><p>наша команда</p></div>
       </div>
       <div class="tile photo v-green fade-up d4" data-go="contacts" style="--img:url('food-about.jpg')">
         <div class="tile-ic" style="background:var(--green-l);color:var(--green-d)">${ic('phone')}</div>
-        <div><h3>${T('Контакты')}</h3><p>${T('связаться с нами')}</p></div>
+        <div><h3>Контакты</h3><p>связаться с нами</p></div>
       </div>
     </div>
     <div class="m-row v-violet fade-up d5" data-go="catering" style="margin-bottom:12px">
       <div class="r-ic">${ic('chef')}</div>
-      <div><h3>${T('Кейтеринг и услуги')}</h3><p>${T('корпоративное и социальное питание')}</p></div>
+      <div><h3>Кейтеринг и услуги</h3><p>корпоративное и социальное питание</p></div>
       <div class="r-arrow">${ic('arrow')}</div>
     </div>
     <div class="m-row v-green fade-up d6" data-go="orders">
       <div class="r-ic">${ic('box')}</div>
-      <div><h3>${T('Мои заказы')}</h3><p>${T('история и статус')}</p></div>
+      <div><h3>Мои заказы</h3><p>история и статус</p></div>
       <div class="r-arrow">${ic('arrow')}</div>
     </div>
   </div>
 </div>`,
 
+/* ===== ABOUT ===== */
 about:()=>`<div class="screen" id="about">
-  ${topbar(T('О компании'))}
+  ${topbar('О компании')}
   <div class="content-card fade-up d1">
-    <p class="mission">${T('Компания «Ratsion» начала свою деятельность в 2019 году. Благодаря ответственному и профессиональному подходу мы в короткий срок заняли лидирующую позицию в области здорового питания Республики Узбекистан.<br><br>Основное направление нашей деятельности — разработка, приготовление и доставка рационов здорового и вкусного питания на каждый день.')}</p>
+    <p class="mission">Компания «Ratsion» начала свою деятельность в 2019 году. Благодаря ответственному и профессиональному подходу мы в короткий срок заняли лидирующую позицию в области здорового питания Республики Узбекистан.<br><br>Основное направление нашей деятельности — разработка, приготовление и доставка рационов здорового и вкусного питания на каждый день.</p>
   </div>
-  <p class="sec-title fade-up d2" style="margin-top:18px">${T('Наша цель')}</p>
+
+  <p class="sec-title fade-up d2" style="margin-top:18px">Наша цель</p>
   <div class="content-card fade-up d2">
-    <p class="mission">${T('Мы хотим изменить стереотипы большинства людей в области правильного питания и вывести здоровый образ жизни на новый уровень. Мы убеждены, что здоровая пища должна быть не только полезной, но и по-настоящему вкусной 💚')}</p>
+    <p class="mission">Мы хотим изменить стереотипы большинства людей в области правильного питания и вывести здоровый образ жизни на новый уровень. Мы убеждены, что здоровая пища должна быть не только полезной, но и по-настоящему вкусной 💚</p>
   </div>
-  <p class="sec-title fade-up d3" style="margin-top:18px">${T('Почему именно «Ratsion»?')}</p>
+
+  <p class="sec-title fade-up d3" style="margin-top:18px">Почему именно «Ratsion»?</p>
   <div class="content-card fade-up d3">
-    <div class="reason"><div class="reason-num">1</div><p>${T('Вы избавлены от подсчёта калорий, изучения состава блюд и взвешивания продуктов — наш диетолог и повара сделают это за вас.')}</p></div>
-    <div class="reason"><div class="reason-num">2</div><p>${T('Мы учитываем ваши предпочтения в еде, возмо аллергические реакции, состояние здоровья и образ жизни.')}</p></div>
-    <div class="reason"><div class="reason-num">3</div><p>${T('Ежедневно удивляем и балуем вас новым меню. Более 3000 полезных рецептов — вам никогда не надоест правильное питание.')}</p></div>
-    <div class="reason"><div class="reason-num">4</div><p>${T('Ежедневный закуп свежих продуктов и соблюдение санитарных норм на всех этапах гарантируют гастрономическое удовольствие.')}</p></div>
+    <div class="reason"><div class="reason-num">1</div><p>Вы избавлены от подсчёта калорий, изучения состава блюд и взвешивания продуктов — наш диетолог и повара сделают это за вас.</p></div>
+    <div class="reason"><div class="reason-num">2</div><p>Мы учитываем ваши предпочтения в еде, возмо аллергические реакции, состояние здоровья и образ жизни.</p></div>
+    <div class="reason"><div class="reason-num">3</div><p>Ежедневно удивляем и балуем вас новым меню. Более 3000 полезных рецептов — вам никогда не надоест правильное питание.</p></div>
+    <div class="reason"><div class="reason-num">4</div><p>Ежедневный закуп свежих продуктов и соблюдение санитарных норм на всех этапах гарантируют гастрономическое удовольствие.</p></div>
   </div>
-  <p class="sec-title fade-up d4" style="margin-top:18px">${T('Наша команда')}</p>
+
+  <p class="sec-title fade-up d4" style="margin-top:18px">Наша команда</p>
   <div class="content-card fade-up d4">
-    <p class="mission" style="margin-bottom:6px">${T('«Ratsion» — это команда из 50 профессионалов в области правильного питания.')}</p>
-    <div class="team-row"><div class="team-ic v-amber">${ic('chef')}</div><div><h4>${T('Повара')}</h4><p>${T('Профессиональное образование и большой опыт работы в ресторанах высокого уровня')}</p></div></div>
-    <div class="team-row"><div class="team-ic v-green">${ic('heart')}</div><div><h4>${T('Консультанты и диетолог')}</h4><p>${T('Помогут правильно подобрать программу под ваши цели')}</p></div></div>
-    <div class="team-row"><div class="team-ic v-blue">${ic('truck')}</div><div><h4>${T('Курьеры')}</h4><p>${T('Доставят заказ в нужное время и место')}</p></div></div>
+    <p class="mission" style="margin-bottom:6px">«Ratsion» — это команда из 50 профессионалов в области правильного питания.</p>
+    <div class="team-row"><div class="team-ic v-amber">${ic('chef')}</div><div><h4>Повара</h4><p>Профессиональное образование и большой опыт работы в ресторанах высокого уровня</p></div></div>
+    <div class="team-row"><div class="team-ic v-green">${ic('heart')}</div><div><h4>Консультанты и диетолог</h4><p>Помогут правильно подобрать программу под ваши цели</p></div></div>
+    <div class="team-row"><div class="team-ic v-blue">${ic('truck')}</div><div><h4>Курьеры</h4><p>Доставят заказ в нужное время и место</p></div></div>
   </div>
-  <p class="sec-title fade-up d5" style="margin-top:18px">${T('Что мы предлагаем')}</p>
+
+  <p class="sec-title fade-up d5" style="margin-top:18px">Что мы предлагаем</p>
   <div class="content-card fade-up d5">
     <div class="offer-chips">
-      <span>${T('Снижение / набор веса')}</span><span>${T('При заболеваниях')}</span><span>${T('Спортивное')}</span>
-      <span>${T('Для беременных и кормящих')}</span><span>${T('Вегетарианское')}</span><span>${T('Индивидуальное')}</span>
-      <span>${T('Корпоративное')}</span><span>${T('Детское')}</span>
+      <span>Снижение / набор веса</span><span>При заболеваниях</span><span>Спортивное</span>
+      <span>Для беременных и кормящих</span><span>Вегетарианское</span><span>Индивидуальное</span>
+      <span>Корпоративное</span><span>Детское</span>
     </div>
   </div>
+
   <div style="margin-top:18px;display:flex;gap:11px" class="fade-up d6">
-    <button class="cta cta-green" style="flex:1" data-go="programs">${ic('bowl')} ${T('Заказать питание')}</button>
+    <button class="cta cta-green" style="flex:1" data-go="programs">${ic('bowl')} Заказать питание</button>
   </div>
   <div style="margin-top:10px" class="fade-up d6">
-    <button class="cta cta-ghost" data-go="catering">${ic('chef')} ${T('Кейтеринг и услуги для бизнеса')}</button>
+    <button class="cta cta-ghost" data-go="catering">${ic('chef')} Кейтеринг и услуги для бизнеса</button>
   </div>
 </div>`,
 
+/* ===== CATERING / B2B SERVICES ===== */
 catering:()=>`<div class="screen" id="catering">
-  ${topbar(T('Кейтеринг и услуги'))}
+  ${topbar('Кейтеринг и услуги')}
   <div class="content-card fade-up d1">
-    <h4 style="font-size:16px;font-weight:800;margin-bottom:8px;color:var(--ink)">${T('Корпоративное питание')}</h4>
-    <p class="mission">${T('Помимо основного направления у нас есть отдельная кухня для корпоративного питания, производственные мощности которой позволяют ежедневно обслуживать более 1000 человек. «Ratsion» организует корпоративное питание в различных форматах.')}</p>
+    <h4 style="font-size:16px;font-weight:800;margin-bottom:8px;color:var(--ink)">Корпоративное питание</h4>
+    <p class="mission">Помимо основного направления у нас есть отдельная кухня для корпоративного питания, производственные мощности которой позволяют ежедневно обслуживать более 1000 человек. «Ratsion» организует корпоративное питание в различных форматах.</p>
   </div>
-  <p class="sec-title fade-up d2" style="margin-top:18px">${T('Коммерческое питание')}</p>
+
+  <p class="sec-title fade-up d2" style="margin-top:18px">Коммерческое питание</p>
   <div class="content-card fade-up d2">
     <ul class="svc-list" style="--c:#2C6FB5">
-      <li>${ic('check')} ${T('Доставка обедов')}</li>
-      <li>${ic('check')} ${T('Корпоративное питание')}</li>
-      <li>${ic('check')} ${T('Кейтеринг')}</li>
-      <li>${ic('check')} ${T('Организация столовой на предприятии')}</li>
-      <li>${ic('check')} ${T('Доставка питания на строительные объекты')}</li>
-      <li>${ic('check')} ${T('Выпечка на заказ')}</li>
+      <li>${ic('check')} Доставка обедов</li>
+      <li>${ic('check')} Корпоративное питание</li>
+      <li>${ic('check')} Кейтеринг</li>
+      <li>${ic('check')} Организация столовой на предприятии</li>
+      <li>${ic('check')} Доставка питания на строительные объекты</li>
+      <li>${ic('check')} Выпечка на заказ</li>
     </ul>
   </div>
-  <p class="sec-title fade-up d3" style="margin-top:18px">${T('Социальное питание')}</p>
+
+  <p class="sec-title fade-up d3" style="margin-top:18px">Социальное питание</p>
   <div class="content-card fade-up d3">
     <ul class="svc-list" style="--c:#0E9C84">
-      <li>${ic('check')} ${T('Питание в учебных заведениях')}</li>
-      <li>${ic('check')} ${T('Питание в детских учреждениях')}</li>
-      <li>${ic('check')} ${T('Питание в лечебных учреждениях')}</li>
-      <li>${ic('check')} ${T('Питание в государственных учреждениях')}</li>
-      <li>${ic('check')} ${T('Санаторно-курортное питание')}</li>
-      <li>${ic('check')} ${T('Лечебное и диетическое питание')}</li>
+      <li>${ic('check')} Питание в учебных заведениях</li>
+      <li>${ic('check')} Питание в детских учреждениях</li>
+      <li>${ic('check')} Питание в лечебных учреждениях</li>
+      <li>${ic('check')} Питание в государственных учреждениях</li>
+      <li>${ic('check')} Санаторно-курортное питание</li>
+      <li>${ic('check')} Лечебное и диетическое питание</li>
     </ul>
   </div>
-  <p class="sec-title fade-up d4" style="margin-top:18px">${T('Банкеты и фуршеты')}</p>
+
+  <p class="sec-title fade-up d4" style="margin-top:18px">Банкеты и фуршеты</p>
   <div class="content-card fade-up d4">
     <ul class="svc-list" style="--c:#E0921A">
-      <li>${ic('check')} ${T('Салаты и закуски фуршетные')}</li>
-      <li>${ic('check')} ${T('Канапе, тарталетки, валованы')}</li>
-      <li>${ic('check')} ${T('Горячие блюда фуршетные')}</li>
-      <li>${ic('check')} ${T('Гарниры фуршетные')}</li>
-      <li>${ic('check')} ${T('Выпечка фуршетная')}</li>
-      <li>${ic('check')} ${T('Проведение мероприятий')}</li>
+      <li>${ic('check')} Салаты и закуски фуршетные</li>
+      <li>${ic('check')} Канапе, тарталетки, валованы</li>
+      <li>${ic('check')} Горячие блюда фуршетные</li>
+      <li>${ic('check')} Гарниры фуршетные</li>
+      <li>${ic('check')} Выпечка фуршетная</li>
+      <li>${ic('check')} Проведение мероприятий</li>
     </ul>
   </div>
+
 </div>`,
 
+/* ===== PROMO (real Ratsion discounts) ===== */
 promo:()=>`<div class="screen" id="promo">
-  ${topbar(T('Акции'))}
-  <div class="promo promo-3 fade-up d1"><span class="ptag">${T('ЗАКАЗ НА 7 ДНЕЙ')}</span><h3>${T('5% скидка')}</h3><p>${T('При оформлении программы на 7 дней')}</p></div>
-  <div class="promo promo-2 fade-up d2"><span class="ptag">${T('ЗАКАЗ НА 15 ДНЕЙ')}</span><h3>${T('10% скидка')}</h3><p>${T('При оформлении программы на 15 дней')}</p></div>
-  <div class="promo promo-1 fade-up d3"><span class="ptag">${T('ЗАКАЗ НА 30 ДНЕЙ')}</span><h3>${T('15% скидка')}</h3><p>${T('При оформлении программы на 30 дней')}</p></div>
-  <p style="font-size:12px;color:var(--muted);text-align:center;margin:14px 6px 0;font-weight:500;line-height:1.5" class="fade-up d4">${T('Скидки и акции на «Деловой рацион» не действуют. Оплата возврату не подлежит.')}</p>
+  ${topbar('Акции')}
+  <div class="promo promo-3 fade-up d1"><span class="ptag">ЗАКАЗ НА 7 ДНЕЙ</span><h3>5% скидка</h3><p>При оформлении программы на 7 дней</p></div>
+  <div class="promo promo-2 fade-up d2"><span class="ptag">ЗАКАЗ НА 15 ДНЕЙ</span><h3>10% скидка</h3><p>При оформлении программы на 15 дней</p></div>
+  <div class="promo promo-1 fade-up d3"><span class="ptag">ЗАКАЗ НА 30 ДНЕЙ</span><h3>15% скидка</h3><p>При оформлении программы на 30 дней</p></div>
+  <p style="font-size:12px;color:var(--muted);text-align:center;margin:14px 6px 0;font-weight:500;line-height:1.5" class="fade-up d4">Скидки и акции на «Деловой рацион» не действуют. Оплата возврату не подлежит.</p>
 </div>`,
 
+/* ===== CONTACTS ===== */
 contacts:()=>`<div class="screen" id="contacts">
-  ${topbar(T('Контакты'))}
+  ${topbar('Контакты')}
   <div class="content-card fade-up d1" style="padding:6px 22px">
-    <div class="contact-row" data-link="tel:+998999888808" style="cursor:pointer"><div class="contact-ic v-green">${ic('phone')}</div><div><div class="ck">${T('Телефон')}</div><div class="cv">+998 99 988 88 08</div></div><div class="ca">${ic('arrow')}</div></div>
-    <div class="contact-row"><div class="contact-ic v-amber">${ic('clock')}</div><div><div class="ck">${T('Время работы')}</div><div class="cv">${T('09:00 – 18:00 · Вс — выходной')}</div></div></div>
+    <div class="contact-row" data-link="tel:+998999888808" style="cursor:pointer"><div class="contact-ic v-green">${ic('phone')}</div><div><div class="ck">Телефон</div><div class="cv">+998 99 988 88 08</div></div><div class="ca">${ic('arrow')}</div></div>
+    <div class="contact-row"><div class="contact-ic v-amber">${ic('clock')}</div><div><div class="ck">Время работы</div><div class="cv">09:00 – 18:00 · Вс — выходной</div></div></div>
     <div class="contact-row" data-link="https://instagram.com/ratsion.uzb" style="cursor:pointer"><div class="contact-ic v-pink">${ic('insta')}</div><div><div class="ck">Instagram</div><div class="cv">@ratsion.uzb</div></div><div class="ca">${ic('arrow')}</div></div>
     <div class="contact-row" data-link="https://taplink.cc/ratsion.uz" style="cursor:pointer"><div class="contact-ic v-blue">${ic('link')}</div><div><div class="ck">Taplink</div><div class="cv">Ratsion.uz</div></div><div class="ca">${ic('arrow')}</div></div>
   </div>
-  <div style="margin-top:16px" class="fade-up d3"><button class="cta cta-green" data-act="manager">${ic('send')} ${T('Написать менеджеру')}</button></div>
+  <div style="margin-top:16px" class="fade-up d3"><button class="cta cta-green" data-act="manager">${ic('send')} Написать менеджеру</button></div>
 </div>`,
 
+/* ===== CONTACT MANAGER (collect phone so the manager can call back) ===== */
 contactManager:()=>`<div class="screen" id="contactManager">
-  ${topbar(T('Написать менеджеру'))}
+  ${topbar('Написать менеджеру')}
   <div class="content-card fade-up d1" style="padding:22px">
-    <div class="q" style="margin-bottom:18px">${T('Оставьте свой номер телефона')}</div>
-    <div class="field-label">${T('Телефон')}</div>
+    <div class="q" style="margin-bottom:18px">Оставьте свой номер телефона</div>
+    <div class="field-label">Телефон</div>
     <input class="t-input" id="mgrPhone" type="tel" inputmode="tel" placeholder="+998 __ ___ __ __" value="">
-    <div style="font-size:12.5px;color:var(--muted);margin:10px 2px 0;line-height:1.45">${T('Номер нужен, чтобы менеджер мог связаться с вами и помочь с заказом.')}</div>
+    <div style="font-size:12.5px;color:var(--muted);margin:10px 2px 0;line-height:1.45">Номер нужен, чтобы менеджер мог связаться с вами и помочь с заказом.</div>
   </div>
-  <div style="margin-top:16px" class="fade-up d3"><button class="cta cta-green" data-act="contactsubmit">${ic('send')} ${T('Отправить')}</button></div>
+  <div style="margin-top:16px" class="fade-up d3"><button class="cta cta-green" data-act="contactsubmit">${ic('send')} Отправить</button></div>
 </div>`,
 
+/* ===== CALCULATOR (multi-step, one screen) ===== */
 calc:()=>{
   if(S.calc.result!==null) return SCREENS._calcResult();
   return `<div class="screen" id="calc"><div id="calc-inner">${calcStep()}</div></div>`;
 },
 _calcResult:()=>{
   const c=S.calc, cat=c.recCat, t=c.recTier;
-  const categories = getCategories();
   return `<div class="screen" id="calc">
-    ${topbar(T('Ваш результат'))}
+    ${topbar('Ваш результат')}
     <div class="result-hero fade-up d1">
-      <div class="lbl">${T('Ваша суточная норма')}</div>
-      <div class="big">${c.result.toLocaleString('ru')}<small>${T('ккал')}</small></div>
+      <div class="lbl">Ваша суточная норма</div>
+      <div class="big">${c.result.toLocaleString('ru')}<small>ккал</small></div>
     </div>
     <div class="stat-row fade-up d2">
       <div class="stat"><div class="sv">${c.bmr.toLocaleString('ru')}</div><div class="sl">BMR</div></div>
       <div class="stat"><div class="sv">${c.tdee.toLocaleString('ru')}</div><div class="sl">TDEE</div></div>
     </div>
-    <p class="sec-title fade-up d3">${T('Рекомендуем для вас')}</p>
-    <div class="prog v-${cat.v} rec fade-up d3" data-cat="${cat.id}" data-tier="${t.lo}"><span class="rec-badge">${T('Лучший выбор')}</span>
-      <div class="prog-top"><div class="prog-ic">${ic(cat.icon)}</div><div><h3>${T(cat.name)}</h3><div class="kcal">${t.label?T(t.label)+' · ':''}${t.lo}–${t.hi} ${T('ккал/день')}</div></div></div>
-      <div class="prog-meta"><div>${T('Цена за день')}<b>${sum(t.price)}</b></div><div>${T('Под вашу цель')}<b>${T(goalLabel(c.goal))}</b></div></div>
+    <p class="sec-title fade-up d3">Рекомендуем для вас</p>
+    <div class="prog v-${cat.v} rec fade-up d3" data-cat="${cat.id}" data-tier="${t.lo}"><span class="rec-badge">Лучший выбор</span>
+      <div class="prog-top"><div class="prog-ic">${ic(cat.icon)}</div><div><h3>${cat.name}</h3><div class="kcal">${t.label?t.label+' · ':''}${t.lo}–${t.hi} ккал/день</div></div></div>
+      <div class="prog-meta"><div>Цена за день<b>${sum(t.price)}</b></div><div>Под вашу цель<b>${goalLabel(c.goal)}</b></div></div>
     </div>
-    <p class="sec-title fade-up d4" style="margin-top:16px">${T('Другие программы')}</p>
-    ${categories.filter(x=>x.id!==cat.id).map((o,i)=>{const ot=tierForKcal(o,c.result);return `<div class="prog v-${o.v} fade-up d4" data-cat="${o.id}" data-tier="${ot.lo}">
-      <div class="prog-top"><div class="prog-ic">${ic(o.icon)}</div><div><h3>${T(o.name)}</h3><div class="kcal">${T(o.sub)} · ${T('от')} ${sum(o.tiers[0].price)}</div></div></div>
+    <p class="sec-title fade-up d4" style="margin-top:16px">Другие программы</p>
+    ${CATEGORIES.filter(x=>x.id!==cat.id).map((o,i)=>{const ot=tierForKcal(o,c.result);return `<div class="prog v-${o.v} fade-up d4" data-cat="${o.id}" data-tier="${ot.lo}">
+      <div class="prog-top"><div class="prog-ic">${ic(o.icon)}</div><div><h3>${o.name}</h3><div class="kcal">${o.sub} · от ${sum(o.tiers[0].price)}</div></div></div>
     </div>`}).join('')}
     <div style="margin-top:6px" class="fade-up d5">
-      <button class="cta cta-ghost" data-act="recalc">${ic('refresh')} ${T('Рассчитать заново')}</button>
+      <button class="cta cta-ghost" data-act="recalc">${ic('refresh')} Рассчитать заново</button>
     </div>
   </div>`;
 },
@@ -1000,111 +796,117 @@ _calcResult:()=>{
 orders:()=>{
   const list=loadOrders();
   if(!list.length) return `<div class="screen" id="orders">
-    ${topbar(T('Мои заказы'))}
+    ${topbar('Мои заказы')}
     <div class="empty-state fade-up d1">
       <div class="es-ic">${ic('box')}</div>
-      <h3>${T('Заказов пока нет')}</h3>
-      <p>${T('Самое время выбрать программу питания под ваши цели')}</p>
-      <button class="cta cta-green" data-go="programs">${ic('bowl')} ${T('Заказать питание')}</button>
+      <h3>Заказов пока нет</h3>
+      <p>Самое время выбрать программу питания под ваши цели</p>
+      <button class="cta cta-green" data-go="programs">${ic('bowl')} Заказать питание</button>
     </div>
   </div>`;
   return `<div class="screen" id="orders">
-    ${topbar(T('Мои заказы'))}
+    ${topbar('Мои заказы')}
     ${list.map((od,i)=>{
       const st=od.status||'В обработке';
       const cls = st==='Доставляется'?'ship' : st==='Доставлен'?'done' : 'proc';
+      // orders in motion or already delivered can't be removed from history
       const canDelete = st!=='Доставляется' && st!=='Доставлен';
       return `<div class="order-hist fade-up d${Math.min(i+1,6)}">
-      <div class="oh-top"><h4>${T('Заказ')} ${od.no}</h4>
+      <div class="oh-top"><h4>Заказ ${od.no}</h4>
         <div style="display:flex;align-items:center">
-          <span class="status-pill ${cls}"><span class="dot"></span>${T(st)}</span>
-          ${canDelete?`<div class="oh-del" data-del="${od.no}" title="${T('Удалить')}">×</div>`:''}
+          <span class="status-pill ${cls}"><span class="dot"></span>${st}</span>
+          ${canDelete?`<div class="oh-del" data-del="${od.no}" title="Удалить">×</div>`:''}
         </div>
       </div>
       <div class="prog-meta" style="border:none;padding:0">
-        <div>${T('Программа')}<b>${T(od.category)}</b></div><div>${T('Срок')}<b>${T(od.duration)}</b></div><div>${T('Старт')}<b>${od.date}${od.time?' · '+od.time:''}</b></div>
+        <div>Программа<b>${od.category}</b></div><div>Срок<b>${od.duration}</b></div><div>Старт<b>${od.date}${od.time?' · '+od.time:''}</b></div>
       </div>
-      <div class="total-line grand" style="border-top:1px dashed #BFD9A8;margin-top:10px;padding-top:10px"><span>${T('Итого')}</span><span>${sum(od.total)}</span></div>
-      ${st==='Доставляется'?`<div class="ship-banner">${ic('truck')} ${T('Ваш заказ доставляется')}</div>`:''}
+      <div class="total-line grand" style="border-top:1px dashed #BFD9A8;margin-top:10px;padding-top:10px"><span>Итого</span><span>${sum(od.total)}</span></div>
+      ${st==='Доставляется'?`<div class="ship-banner">${ic('truck')} Ваш заказ доставляется</div>`:''}
     </div>`}).join('')}
     <div style="display:flex;gap:11px;margin-top:4px" class="fade-up d6">
-      <button class="cta cta-green" style="flex:1" data-go="programs">${ic('refresh')} ${T('Новый заказ')}</button>
+      <button class="cta cta-green" style="flex:1" data-go="programs">${ic('refresh')} Новый заказ</button>
     </div>
   </div>`;
 },
 
+/* ===== PROGRAM LIST (categories) ===== */
 programs:()=>{
-  const categories = getCategories();
   const recId = S.calc.recCat ? S.calc.recCat.id : null;
-  const ordered = recId ? [categories.find(c=>c.id===recId),...categories.filter(c=>c.id!==recId)] : categories;
+  const ordered = recId ? [CATEGORIES.find(c=>c.id===recId),...CATEGORIES.filter(c=>c.id!==recId)] : CATEGORIES;
   return `<div class="screen" id="programs">
-    ${topbar(T('Программы питания'))}
-    ${recId?`<p class="sec-title fade-up d1" style="margin-top:4px">${T('Рекомендовано по вашему расчёту')}</p>`:''}
+    ${topbar('Программы питания')}
+    ${recId?`<p class="sec-title fade-up d1" style="margin-top:4px">Рекомендовано по вашему расчёту</p>`:''}
     ${ordered.map((cat,i)=>{
       const lo=cat.tiers[0].price, hi=cat.tiers[cat.tiers.length-1].price;
       const priceRange = lo===hi?sum(lo):`${sum(lo)} – ${sum(hi)}`;
       return `<div class="prog v-${cat.v} ${recId&&cat.id===recId?'rec':''} fade-up d${Math.min(i+1,6)}" data-cat="${cat.id}">
-      ${recId&&cat.id===recId?`<span class="rec-badge">${T('Для вас')}</span>`:''}
-      <div class="prog-top"><div class="prog-ic">${ic(cat.icon)}</div><div><h3>${T(cat.name)}</h3><div class="kcal">${T(cat.sub)}</div></div></div>
-      <div class="prog-meta"><div>${T('Калорийность')}<b>${cat.tiers[0].lo}–${cat.tiers[cat.tiers.length-1].hi} ${T('ккал')}</b></div><div>${T('Цена за день')}<b>${priceRange}</b></div></div>
+      ${recId&&cat.id===recId?'<span class="rec-badge">Для вас</span>':''}
+      <div class="prog-top"><div class="prog-ic">${ic(cat.icon)}</div><div><h3>${cat.name}</h3><div class="kcal">${cat.sub}</div></div></div>
+      <div class="prog-meta"><div>Калорийность<b>${cat.tiers[0].lo}–${cat.tiers[cat.tiers.length-1].hi} ккал</b></div><div>Цена за день<b>${priceRange}</b></div></div>
     </div>`}).join('')}
-    <p style="font-size:12px;color:var(--muted);text-align:center;margin:12px 6px 0;font-weight:500" class="fade-up d6">${T('Цена указана за 1 день. В стоимость входят доставка, контейнеры и приборы.')}</p>
+    <p style="font-size:12px;color:var(--muted);text-align:center;margin:12px 6px 0;font-weight:500" class="fade-up d6">Цена указана за 1 день. В стоимость входят доставка, контейнеры и приборы.</p>
   </div>`;
 },
 
+/* ===== TIER SELECTION (pick calorie tier within a category) ===== */
 tiers:()=>{
   const cat=S.order.cat;
   if(!cat) return SCREENS.programs();
-  const categories = getCategories();
   const recLo = (S.calc.recCat&&S.calc.recCat.id===cat.id&&S.calc.recTier)?S.calc.recTier.lo:null;
-  const gi = Math.max(0, categories.findIndex(c=>c.id===cat.id));
+  // each group starts the colour cycle at a different point, so every group's
+  // calorie list has its own look while tiers within a group still differ
+  const gi = Math.max(0, CATEGORIES.findIndex(c=>c.id===cat.id));
   return `<div class="screen" id="tiers">
-    ${topbar(T(cat.name))}
-    ${cat.needConfirm?`<div class="pay-note fade-up d1" style="margin-bottom:14px">${ic('info')}<p>${T('Цены этой категории уточняются — менеджер подтвердит при оформлении.')}</p></div>`:''}
-    <p class="sec-title fade-up d1">${T('Выберите калорийность')}</p>
+    ${topbar(cat.name)}
+    ${cat.needConfirm?`<div class="pay-note fade-up d1" style="margin-bottom:14px">${ic('info')}<p>Цены этой категории уточняются — менеджер подтвердит при оформлении.</p></div>`:''}
+    <p class="sec-title fade-up d1">Выберите калорийность</p>
     ${cat.tiers.map((t,i)=>`<div class="prog v-${PALETTE[(i+gi*2)%PALETTE.length]} ${recLo===t.lo?'rec':''} fade-up d${Math.min(i+1,6)}" data-cat="${cat.id}" data-tier="${t.lo}">
-      ${recLo===t.lo?`<span class="rec-badge">${T('Для вас')}</span>`:''}
-      <div class="prog-top"><div class="prog-ic">${ic(cat.icon)}</div><div><h3>${t.label?T(t.label):t.lo+'–'+t.hi+' '+T('ккал')}</h3><div class="kcal">${t.lo}–${t.hi} ${T('ккал/день')}</div></div></div>
-      <div class="prog-meta"><div>${T('Цена за день')}<b>${sum(t.price)}</b></div><div>${T('Доставка')}<b>${T('включена')}</b></div></div>
+      ${recLo===t.lo?'<span class="rec-badge">Для вас</span>':''}
+      <div class="prog-top"><div class="prog-ic">${ic(cat.icon)}</div><div><h3>${t.label?t.label:t.lo+'–'+t.hi+' ккал'}</h3><div class="kcal">${t.lo}–${t.hi} ккал/день</div></div></div>
+      <div class="prog-meta"><div>Цена за день<b>${sum(t.price)}</b></div><div>Доставка<b>включена</b></div></div>
     </div>`).join('')}
   </div>`;
 },
 
+/* ===== ORDER FLOW (multi-step) ===== */
 order:()=>`<div class="screen" id="order"><div id="order-inner">${orderStep()}</div></div>`,
 
+/* ===== SUCCESS ===== */
 success:()=>{
   const n = S.order.orderNo || '#—';
   const delivered = S.order.delivered;
   if(delivered){
     const payMsg = S.order.pay==='online'
-      ? T('Менеджер свяжется с вами в ближайшее время и отправит реквизиты для онлайн-оплаты.')
-      : T('Оплата наличными курьеру при доставке. Менеджер свяжется с вами в ближайшее время для подтверждения.');
+      ? 'Менеджер свяжется с вами в ближайшее время и отправит реквизиты для онлайн-оплаты.'
+      : 'Оплата наличными курьеру при доставке. Менеджер свяжется с вами в ближайшее время для подтверждения.';
     return `<div class="screen" id="success">
       <div class="success-wrap">
         <div class="check-ring fade-up d1">${ic('check')}</div>
-        <h1 class="fade-up d2">${T('Заказ оформлен!')}</h1>
+        <h1 class="fade-up d2">Заказ оформлен!</h1>
         <div class="order-no fade-up d2">${n}</div>
-        <p class="fade-up d3">${T('Ваш заказ принят.')} ${payMsg}</p>
+        <p class="fade-up d3">Ваш заказ принят. ${payMsg}</p>
         <div style="margin-top:24px" class="fade-up d4">
-          <button class="cta cta-ghost" data-act="home">${T('На главную')}</button>
+          <button class="cta cta-ghost" data-act="home">На главную</button>
         </div>
       </div>
     </div>`;
   }
+  // delivery failed — be honest, explain, and let them retry (no manual texting)
   const fr = S.order.failReason;
-  const msg = fr==='network' ? T('Похоже, нет интернета. Проверьте подключение и попробуйте ещё раз.')
-            : fr==='timeout' ? T('Сервер долго не отвечал. Подождите немного и попробуйте снова.')
-            : T('Не удалось доставить заказ менеджеру. Попробуйте ещё раз через минуту.');
+  const msg = fr==='network' ? 'Похоже, нет интернета. Проверьте подключение и попробуйте ещё раз.'
+            : fr==='timeout' ? 'Сервер долго не отвечал. Подождите немного и попробуйте снова.'
+            : 'Не удалось доставить заказ менеджеру. Попробуйте ещё раз через минуту.';
   return `<div class="screen" id="success">
     <div class="success-wrap">
       <div class="check-ring err fade-up d1">${ic('info')}</div>
-      <h1 class="fade-up d2">${T('Что-то пошло не так')}</h1>
+      <h1 class="fade-up d2">Что-то пошло не так</h1>
       <p class="fade-up d3">${msg}</p>
-      <div class="pay-note fade-up d3" style="text-align:left;margin:12px 0 2px">${ic('info')}<p>${T('Возможные причины: нет интернета или слабый сигнал; сервер временно недоступен. Заказ <b>не отправлен</b> — попробуйте ещё раз или свяжитесь с нами по телефону.')}</p></div>
+      <div class="pay-note fade-up d3" style="text-align:left;margin:12px 0 2px">${ic('info')}<p>Возможные причины: нет интернета или слабый сигнал; сервер временно недоступен. Заказ <b>не отправлен</b> — попробуйте ещё раз или свяжитесь с нами по телефону.</p></div>
       <div style="margin-top:20px" class="fade-up d4">
-        <button class="cta cta-green" data-act="retryorder">${ic('refresh')} ${T('Повторить отправку')}</button>
-        <a href="tel:${CONFIG.phone}" class="cta cta-ghost" style="text-decoration:none;margin-top:8px">${ic('phone')} ${T('Позвонить нам')}</a>
-        <button class="cta cta-ghost" data-act="home" style="margin-top:4px">${T('На главную')}</button>
+        <button class="cta cta-green" data-act="retryorder">${ic('refresh')} Повторить отправку</button>
+        <a href="tel:${CONFIG.phone}" class="cta cta-ghost" style="text-decoration:none;margin-top:8px">${ic('phone')} Позвонить нам</a>
+        <button class="cta cta-ghost" data-act="home" style="margin-top:4px">На главную</button>
       </div>
     </div>
   </div>`;
@@ -1112,7 +914,6 @@ success:()=>{
 };
 
 function goalLabel(g){return {loss:'Снижение веса',maint:'Поддержание',gain:'Набор массы'}[g]||''}
-function payLabel(p){return p==='online'?'Онлайн-оплата':p==='cash'?'Наличными при доставке':'—'}
 
 function calcStep(){
   const c=S.calc;
@@ -1123,48 +924,48 @@ function calcStep(){
   const steps=['gender','body','activity','goal'];
   const idx=steps.indexOf(step);
   const pct=((idx+1)/steps.length)*100;
-  const head=`<div class="topbar"><div class="back-btn" data-act="calcback">${ic('back')}</div><h2>${T('Расчёт калорий')}</h2></div>
+  const head=`<div class="topbar"><div class="back-btn" data-act="calcback">${ic('back')}</div><h2>Расчёт калорий</h2></div>
     <div class="progress-wrap"><div class="progress-track"><div class="progress-bar" style="width:${pct}%"></div></div>
-    <div class="step-label"><span>${T('Шаг')} ${idx+1} ${T('из 4')}</span><span>${Math.round(pct)}%</span></div></div>`;
+    <div class="step-label"><span>Шаг ${idx+1} из 4</span><span>${Math.round(pct)}%</span></div></div>`;
 
   if(step==='gender') return head+`
-    <div class="q fade-up d1">${T('Укажите ваш пол')}</div>
+    <div class="q fade-up d1">Укажите ваш пол</div>
     <div class="opt-grid two">
-      <div class="opt center ${c.gender==='m'?'sel':''} fade-up d2" data-gender="m"><div class="o-ic">${ic('man')}</div>${T('Мужской')}</div>
-      <div class="opt center ${c.gender==='f'?'sel':''} fade-up d3" data-gender="f"><div class="o-ic">${ic('woman')}</div>${T('Женский')}</div>
+      <div class="opt center ${c.gender==='m'?'sel':''} fade-up d2" data-gender="m"><div class="o-ic">${ic('man')}</div>Мужской</div>
+      <div class="opt center ${c.gender==='f'?'sel':''} fade-up d3" data-gender="f"><div class="o-ic">${ic('woman')}</div>Женский</div>
     </div>`;
 
   if(step==='body') return head+`
-    <div class="q fade-up d1">${T('Параметры тела')}</div>
+    <div class="q fade-up d1">Параметры тела</div>
     <div class="fade-up d2" style="margin-bottom:22px">
-      <div class="field-label">${T('Возраст')}</div>
-      <div class="num-field"><input id="age" type="number" inputmode="numeric" value="${c.age}" min="14" max="80"><span class="unit">${T('лет')}</span></div>
+      <div class="field-label">Возраст</div>
+      <div class="num-field"><input id="age" type="number" inputmode="numeric" value="${c.age}" min="14" max="80"><span class="unit">лет</span></div>
     </div>
     <div class="fade-up d3" style="margin-bottom:22px">
-      <div class="field-label">${T('Рост')} · <span id="hVal" style="color:var(--green-d)">${c.height} ${T('см')}</span></div>
+      <div class="field-label">Рост · <span id="hVal" style="color:var(--green-d)">${c.height} см</span></div>
       <input id="height" type="range" min="140" max="210" value="${c.height}" style="--p:${(c.height-140)/70*100}%">
       <div class="range-ends"><span>140</span><span>210</span></div>
     </div>
     <div class="fade-up d4" style="margin-bottom:26px">
-      <div class="field-label">${T('Вес')} · <span id="wVal" style="color:var(--green-d)">${c.weight} ${T('кг')}</span></div>
+      <div class="field-label">Вес · <span id="wVal" style="color:var(--green-d)">${c.weight} кг</span></div>
       <input id="weight" type="range" min="40" max="150" value="${c.weight}" style="--p:${(c.weight-40)/110*100}%">
       <div class="range-ends"><span>40</span><span>150</span></div>
     </div>
-    <button class="cta cta-green fade-up d5" data-act="bodynext">${T('Далее')} ${ic('arrow')}</button>`;
+    <button class="cta cta-green fade-up d5" data-act="bodynext">Далее ${ic('arrow')}</button>`;
 
   if(step==='activity') return head+`
-    <div class="q fade-up d1">${T('Уровень активности')}</div>
+    <div class="q fade-up d1">Уровень активности</div>
     <div class="opt-grid">
       ${Object.entries(ACT).map(([k,a],i)=>`<div class="opt ${c.activity===k?'sel':''} fade-up d${i+1}" data-act-level="${k}">
-        <div class="o-ic">${ic(a.icon)}</div><div><div>${T(a.label)}</div><div class="o-sub">${T(a.sub)}</div></div></div>`).join('')}
+        <div class="o-ic">${ic(a.icon)}</div><div><div>${a.label}</div><div class="o-sub">${a.sub}</div></div></div>`).join('')}
     </div>`;
 
   if(step==='goal') return head+`
-    <div class="q fade-up d1">${T('Какая у вас цель?')}</div>
+    <div class="q fade-up d1">Какая у вас цель?</div>
     <div class="opt-grid">
-      <div class="opt ${c.goal==='loss'?'sel':''} fade-up d2" data-goal="loss"><div class="o-ic">${ic('trenddown')}</div><div>${T('Снижение веса')}<div class="o-sub">${T('умеренный дефицит −15%')}</div></div></div>
-      <div class="opt ${c.goal==='maint'?'sel':''} fade-up d3" data-goal="maint"><div class="o-ic">${ic('equal')}</div><div>${T('Поддержание веса')}<div class="o-sub">${T('норма без изменений')}</div></div></div>
-      <div class="opt ${c.goal==='gain'?'sel':''} fade-up d4" data-goal="gain"><div class="o-ic">${ic('trend')}</div><div>${T('Набор массы')}<div class="o-sub">${T('умеренный профицит +12%')}</div></div></div>
+      <div class="opt ${c.goal==='loss'?'sel':''} fade-up d2" data-goal="loss"><div class="o-ic">${ic('trenddown')}</div><div>Снижение веса<div class="o-sub">умеренный дефицит −15%</div></div></div>
+      <div class="opt ${c.goal==='maint'?'sel':''} fade-up d3" data-goal="maint"><div class="o-ic">${ic('equal')}</div><div>Поддержание веса<div class="o-sub">норма без изменений</div></div></div>
+      <div class="opt ${c.goal==='gain'?'sel':''} fade-up d4" data-goal="gain"><div class="o-ic">${ic('trend')}</div><div>Набор массы<div class="o-sub">умеренный профицит +12%</div></div></div>
     </div>`;
   return head;
 }
@@ -1179,8 +980,9 @@ function computeCalories(){
   const floor = c.gender==='f'?1200:1500;
   result = Math.max(result, floor);
   c.bmr=Math.round(bmr); c.tdee=Math.round(tdee); c.result=Math.round(result/10)*10;
-  const categories = getCategories();
-  const cat = categories.find(x=>x.id==='kaloraj') || categories[0];
+  // recommend the "Прайс по калоражным критериям" (kaloraj) category by default,
+  // and the tier matching the kcal — it covers the widest calorie range
+  const cat = CATEGORIES.find(x=>x.id==='kaloraj') || CATEGORIES[0];
   c.recCat = cat;
   c.recTier = tierForKcal(cat, c.result);
 }
@@ -1194,33 +996,33 @@ function orderStep(){
   else if(o.duration&&o.date&&o.time&&o.detailsDone&&!o.pay) step='pay';
   else if(o.duration&&o.date&&o.time&&o.detailsDone&&o.pay) step='confirm';
 
-  const head=`<div class="topbar"><div class="back-btn" data-act="orderback">${ic('back')}</div><h2>${o.cat?T(o.cat.name):T('Оформление')}</h2></div>`;
+  const head=`<div class="topbar"><div class="back-btn" data-act="orderback">${ic('back')}</div><h2>${o.cat?o.cat.name:'Оформление'}</h2></div>`;
 
   if(step==='duration') return head+`
-    <div class="q fade-up d1">${T('На какой срок?')}</div>
+    <div class="q fade-up d1">На какой срок?</div>
     <div class="chip-row fade-up d2">
-      <div class="chip" data-dur="3 дня" data-days="3">${T('3 дня')}<small>${T('пробный')}</small></div>
-      <div class="chip" data-dur="7 дней" data-days="7">${T('7 дней')}<small>${T('−5% скидка')}</small></div>
-      <div class="chip" data-dur="15 дней" data-days="15">${T('15 дней')}<small>${T('−10% скидка')}</small></div>
-      <div class="chip" data-dur="30 дней" data-days="30">${T('30 дней')}<small>${T('−15% скидка')}</small></div>
+      <div class="chip" data-dur="3 дня (пробный)" data-days="3">3 дня<small>пробный</small></div>
+      <div class="chip" data-dur="7 дней" data-days="7">7 дней<small>−5% скидка</small></div>
+      <div class="chip" data-dur="15 дней" data-days="15">15 дней<small>−10% скидка</small></div>
+      <div class="chip" data-dur="30 дней" data-days="30">30 дней<small>−15% скидка</small></div>
     </div>
-    <p style="font-size:12px;color:var(--muted);margin:4px 6px 0;font-weight:500" class="fade-up d3">${T('Цена указана за 1 день. Итоговая сумма за весь срок — на следующем шаге.')}</p>`;
+    <p style="font-size:12px;color:var(--muted);margin:4px 6px 0;font-weight:500" class="fade-up d3">Цена указана за 1 день. Итоговая сумма за весь срок — на следующем шаге.</p>`;
 
   if(step==='date') return head+`
-    <div class="q fade-up d1">${T('Дата начала доставки')}</div>
+    <div class="q fade-up d1">Дата начала доставки</div>
     <div class="chip-row fade-up d2" style="margin-bottom:14px">
-      <div class="chip" data-date="tomorrow">${T('Завтра')}</div>
-      <div class="chip" data-date="day2">${T('Через 2 дня')}</div>
+      <div class="chip" data-date="tomorrow">Завтра</div>
+      <div class="chip" data-date="day2">Через 2 дня</div>
     </div>
     <div class="fade-up d3">
-      <div class="field-label">${T('Или укажите свою дату')}</div>
+      <div class="field-label">Или укажите свою дату</div>
       <input class="t-input" id="customDate" placeholder="ДД.ММ.ГГГГ" inputmode="numeric">
-      <button class="cta cta-green" data-act="datenext" style="margin-top:12px">${T('Далее')} ${ic('arrow')}</button>
+      <button class="cta cta-green" data-act="datenext" style="margin-top:12px">Далее ${ic('arrow')}</button>
     </div>`;
 
   if(step==='time'){
     return head+`
-    <div class="q fade-up d1">${T('Во сколько доставить?')}</div>
+    <div class="q fade-up d1">Во сколько доставить?</div>
     <div class="tp-wrap fade-up d2">
       <div class="tp-hl"></div>
       <div class="tp-col" id="tpH"></div>
@@ -1228,71 +1030,75 @@ function orderStep(){
       <div class="tp-col" id="tpM"></div>
       <div class="tp-fade-t"></div><div class="tp-fade-b"></div>
     </div>
-    <p class="tp-hint fade-up d3" id="tpHint">${ic('updown')} ${T('Листайте колёсики вверх-вниз, чтобы выбрать время')}</p>
-    <p class="tp-readout fade-up d3">${T('Доставка работает с 07:00 до 09:00')}</p>
-    <button class="cta cta-green fade-up d3" data-act="timenext">${T('Далее')} ${ic('arrow')}</button>`;
+    <p class="tp-hint fade-up d3" id="tpHint">${ic('updown')} Листайте колёсики вверх-вниз, чтобы выбрать время</p>
+    <p class="tp-readout fade-up d3">Доставка работает с 07:00 до 09:00</p>
+    <button class="cta cta-green fade-up d3" data-act="timenext">Далее ${ic('arrow')}</button>`;
   }
 
   if(step==='details') return head+`
-    <div class="q fade-up d1">${T('Контакты и доставка')}</div>
-    <div class="fade-up d2" style="margin-bottom:16px"><div class="field-label">${T('Адрес доставки')}</div>
-      <input class="t-input" id="address" placeholder="${T('Город, район, улица, дом, кв.')}" value="${o.address}"></div>
-    <div class="fade-up d3" style="margin-bottom:16px"><div class="field-label">${T('Имя')}</div>
-      <input class="t-input" id="name" placeholder="${T('Ваше имя')}" value="${o.name}"></div>
-    <div class="fade-up d3" style="margin-bottom:16px"><div class="field-label">${T('Фамилия')}</div>
-      <input class="t-input" id="surname" placeholder="${T('Ваша фамилия')}" value="${o.surname}"></div>
-    <div class="fade-up d4" style="margin-bottom:16px"><div class="field-label">${T('Телефон')}</div>
+    <div class="q fade-up d1">Контакты и доставка</div>
+    <div class="fade-up d2" style="margin-bottom:16px"><div class="field-label">Адрес доставки</div>
+      <input class="t-input" id="address" placeholder="Город, район, улица, дом, кв." value="${o.address}"></div>
+    <div class="fade-up d3" style="margin-bottom:16px"><div class="field-label">Имя</div>
+      <input class="t-input" id="name" placeholder="Ваше имя" value="${o.name}"></div>
+    <div class="fade-up d3" style="margin-bottom:16px"><div class="field-label">Фамилия</div>
+      <input class="t-input" id="surname" placeholder="Ваша фамилия" value="${o.surname}"></div>
+    <div class="fade-up d4" style="margin-bottom:16px"><div class="field-label">Телефон</div>
       <input class="t-input" id="phone" type="tel" inputmode="tel" placeholder="+998 __ ___ __ __" value="${o.phone}"></div>
-    <div class="fade-up d5" style="margin-bottom:16px"><div class="field-label">${T('Рост, см')}</div>
-      <input class="t-input" id="height" type="number" inputmode="numeric" placeholder="${T('Напр. 175')}" value="${o.height}"></div>
-    <div class="fade-up d5" style="margin-bottom:22px"><div class="field-label">${T('Вес, кг')}</div>
-      <input class="t-input" id="weight" type="number" inputmode="numeric" placeholder="${T('Напр. 70')}" value="${o.weight}"></div>
-    <button class="cta cta-green fade-up d6" data-act="detailsnext">${T('Проверить заказ')} ${ic('arrow')}</button>`;
+    <div class="fade-up d5" style="margin-bottom:16px"><div class="field-label">Рост, см</div>
+      <input class="t-input" id="height" type="number" inputmode="numeric" placeholder="Напр. 175" value="${o.height}"></div>
+    <div class="fade-up d5" style="margin-bottom:22px"><div class="field-label">Вес, кг</div>
+      <input class="t-input" id="weight" type="number" inputmode="numeric" placeholder="Напр. 70" value="${o.weight}"></div>
+    <button class="cta cta-green fade-up d6" data-act="detailsnext">Проверить заказ ${ic('arrow')}</button>`;
 
   if(step==='pay') return head+`
-    <div class="q fade-up d1">${T('Как будете оплачивать?')}</div>
+    <div class="q fade-up d1">Как будете оплачивать?</div>
     <div class="opt-grid">
       <div class="opt ${o.pay==='cash'?'sel':''} fade-up d2" data-pay="cash">
-        <div class="o-ic">${ic('cash')}</div><div>${T('Наличными')}<div class="o-sub">${T('курьеру при доставке')}</div></div></div>
+        <div class="o-ic">${ic('cash')}</div><div>Наличными<div class="o-sub">курьеру при доставке</div></div></div>
       <div class="opt ${o.pay==='online'?'sel':''} fade-up d3" data-pay="online">
-        <div class="o-ic">${ic('cardpay')}</div><div>${T('Онлайн-оплата')}<div class="o-sub">${T('картой · менеджер отправит реквизиты')}</div></div></div>
+        <div class="o-ic">${ic('cardpay')}</div><div>Онлайн-оплата<div class="o-sub">картой · менеджер отправит реквизиты</div></div></div>
     </div>`;
 
   if(step==='confirm'){
     const pr=orderPricing(o);
     return head+`
-    <div class="q fade-up d1">${T('Проверьте заказ')}</div>
+    <div class="q fade-up d1">Проверьте заказ</div>
     <div class="summary fade-up d2">
-      <div class="sum-row"><span class="k">${T('Программа')}</span><span class="vv">${T(o.cat.name)}</span></div>
-      <div class="sum-row"><span class="k">${T('Калорийность')}</span><span class="vv">${o.tier.lo}–${o.tier.hi} ${T('ккал/день')}</span></div>
-      <div class="sum-row"><span class="k">${T('Цена за день')}</span><span class="vv">${sum(o.tier.price)}</span></div>
-      <div class="sum-row"><span class="k">${T('Срок')}</span><span class="vv">${T(o.duration)}</span></div>
-      <div class="sum-row"><span class="k">${T('Начало')}</span><span class="vv">${o.date}</span></div>
-      <div class="sum-row"><span class="k">${T('Время доставки')}</span><span class="vv">${o.time}</span></div>
-      <div class="sum-row"><span class="k">${T('Адрес')}</span><span class="vv">${o.address}</span></div>
-      <div class="sum-row"><span class="k">${T('Получатель')}</span><span class="vv">${o.name} ${o.surname}</span></div>
-      <div class="sum-row"><span class="k">${T('Телефон')}</span><span class="vv">${o.phone}</span></div>
-      <div class="sum-row"><span class="k">${T('Рост')}</span><span class="vv">${o.height} ${T('см')}</span></div>
-      <div class="sum-row"><span class="k">${T('Вес')}</span><span class="vv">${o.weight} ${T('кг')}</span></div>
-      <div class="sum-row"><span class="k">${T('Оплата')}</span><span class="vv">${T(payLabel(o.pay))}</span></div>
+      <div class="sum-row"><span class="k">Программа</span><span class="vv">${o.cat.name}</span></div>
+      <div class="sum-row"><span class="k">Калорийность</span><span class="vv">${o.tier.lo}–${o.tier.hi} ккал/день</span></div>
+      <div class="sum-row"><span class="k">Цена за день</span><span class="vv">${sum(o.tier.price)}</span></div>
+      <div class="sum-row"><span class="k">Срок</span><span class="vv">${o.duration}</span></div>
+      <div class="sum-row"><span class="k">Начало</span><span class="vv">${o.date}</span></div>
+      <div class="sum-row"><span class="k">Время доставки</span><span class="vv">${o.time}</span></div>
+      <div class="sum-row"><span class="k">Адрес</span><span class="vv">${o.address}</span></div>
+      <div class="sum-row"><span class="k">Получатель</span><span class="vv">${o.name} ${o.surname}</span></div>
+      <div class="sum-row"><span class="k">Телефон</span><span class="vv">${o.phone}</span></div>
+      <div class="sum-row"><span class="k">Рост</span><span class="vv">${o.height} см</span></div>
+      <div class="sum-row"><span class="k">Вес</span><span class="vv">${o.weight} кг</span></div>
+      <div class="sum-row"><span class="k">Оплата</span><span class="vv">${payLabel(o.pay)}</span></div>
     </div>
     <div class="total-box fade-up d3">
       <div class="total-line"><span>${o.days} × ${sum(o.tier.price)}</span><span>${sum(pr.subtotal)}</span></div>
-      ${pr.discountPct>0?`<div class="total-line disc"><span>${T('Скидка')} ${pr.discountPct}%</span><span>−${sum(pr.discountAmt)}</span></div>`:''}
-      <div class="total-line grand"><span>${T('Итого за')} ${o.days} ${T('дн.')}</span><span>${sum(pr.total)}</span></div>
+      ${pr.discountPct>0?`<div class="total-line disc"><span>Скидка ${pr.discountPct}%</span><span>−${sum(pr.discountAmt)}</span></div>`:''}
+      <div class="total-line grand"><span>Итого за ${o.days} дн.</span><span>${sum(pr.total)}</span></div>
     </div>
-    <div class="pay-note fade-up d3">${ic('info')}<p>${T('Менеджер свяжется с вами в ближайшее время для подтверждения заказа. Доставка по Ташкенту.')}</p></div>
-    <button class="cta cta-amber fade-up d4" data-act="placeorder">${ic('check')} ${T('Подтвердить заказ')}</button>
-    <button class="cta cta-ghost fade-up d4" data-act="orderback">${ic('edit')} ${T('Изменить')}</button>`;
+    <div class="pay-note fade-up d3">${ic('info')}<p>Менеджер свяжется с вами в ближайшее время для подтверждения заказа. Доставка по Ташкенту.</p></div>
+    <button class="cta cta-amber fade-up d4" data-act="placeorder">${ic('check')} Подтвердить заказ</button>
+    <button class="cta cta-ghost fade-up d4" data-act="orderback">${ic('edit')} Изменить</button>`;
   }
   return head;
 }
 
+function payLabel(p){return p==='online'?'Онлайн-оплата':p==='cash'?'Наличными при доставке':'—'}
+
+/* compute order pricing: subtotal, discount, total */
 function orderPricing(o){
   const days=o.days||1;
   const subtotal=o.tier.price*days;
   let discountPct=0;
   if(days>=30) discountPct=15; else if(days>=15) discountPct=10; else if(days>=7) discountPct=5;
+  // discount does not apply to Деловой пакет
   if(o.cat && o.cat.id==='delovoy') discountPct=0;
   const discountAmt=Math.round(subtotal*discountPct/100);
   const total=subtotal-discountAmt;
@@ -1301,8 +1107,10 @@ function orderPricing(o){
 
 function dateFrom(days){const d=new Date();d.setDate(d.getDate()+days);return String(d.getDate()).padStart(2,'0')+'.'+String(d.getMonth()+1).padStart(2,'0')+'.'+d.getFullYear();}
 
+/* watch-style scroll wheel: values snap to the highlighted middle row.
+   Returns {set(v)} so wheels can correct each other (the 21:30 case). */
 function buildWheel(el,values,selected,onChange){
-  const IH=44;
+  const IH=44; // must match .tp-item height
   el.innerHTML='<div class="tp-item pad"></div><div class="tp-item pad"></div>'+
     values.map(v=>`<div class="tp-item">${String(v).padStart(2,'0')}</div>`).join('')+
     '<div class="tp-item pad"></div><div class="tp-item pad"></div>';
@@ -1327,14 +1135,18 @@ function softRender(innerId,builder){
     attach(S.stack[S.stack.length-1]); },210);
 }
 
+/* ---------- order persistence (real "Мои заказы" history) ---------- */
 function rawOrders(){ try{ return JSON.parse(localStorage.getItem('ratsion_orders')||'[]'); }catch(e){ return []; } }
 function writeOrders(list){ try{ localStorage.setItem('ratsion_orders', JSON.stringify(list.slice(0,20))); }catch(e){} }
-function parseStoredDate(v){ const m=/^(\d{2})\.(\d{2})\.(\d{4})$/.exec(v||''); if(!m) return null; const d=+m[3],+m[2]-1,+m[1]; return isNaN(d)?null:d; }
+/* parse stored "ДД.ММ.ГГГГ" -> Date (or null) */
+function parseStoredDate(v){ const m=/^(\d{2})\.(\d{2})\.(\d{4})$/.exec(v||''); if(!m) return null; const d=new Date(+m[3],+m[2]-1,+m[1]); return isNaN(d)?null:d; }
+/* load orders, auto-dropping any whose delivery period (start + срок) has fully passed,
+   and anything already marked доставлен more than a day ago */
 function loadOrders(){
   const today=new Date(); today.setHours(0,0,0,0);
   const kept=rawOrders().filter(od=>{
     const start=parseStoredDate(od.date);
-    if(start){ const end=new Date(start); end.setDate(end.getDate()+(od.days||1)); if(end<today) return false; }
+    if(start){ const end=new Date(start); end.setDate(end.getDate()+(od.days||1)); if(end<today) return false; } // period passed → drop
     return true;
   });
   if(kept.length!==rawOrders().length) writeOrders(kept);
@@ -1343,6 +1155,7 @@ function loadOrders(){
 function saveOrder(rec){ const list=rawOrders(); list.unshift(rec); writeOrders(list); }
 function deleteOrder(no){ writeOrders(rawOrders().filter(o=>o.no!==no)); haptic('light'); render(); }
 function nextOrderNo(){ let n=+(localStorage.getItem('ratsion_orderseq')||'1041')+1; try{ localStorage.setItem('ratsion_orderseq',String(n)); }catch(e){} return '#'+n; }
+/* pull live delivery statuses from the bot for this user's orders, then refresh the screen */
 async function syncOrderStatuses(){
   if(!CONFIG.apiBase) return;
   let data=null;
@@ -1360,6 +1173,8 @@ async function syncOrderStatuses(){
   if(changed){ writeOrders(list); if(S.stack[S.stack.length-1]==='orders') render(); }
 }
 
+/* submit the current order to the bot, record it, and show the result screen.
+   Used by both "Подтвердить заказ" and the "Повторить отправку" retry. */
 async function submitOrder(btn){
   const o=S.order; const pr=orderPricing(o);
   const tgUser=(tg&&tg.initDataUnsafe&&tg.initDataUnsafe.user)?tg.initDataUnsafe.user:null;
@@ -1373,10 +1188,12 @@ async function submitOrder(btn){
     tg_id: tgUser?tgUser.id:null, tg_username: tgUser?tgUser.username:null
   };
   let _lbl;
-  if(btn){ btn.disabled=true; _lbl=btn.innerHTML; btn.style.opacity='.7'; btn.innerHTML=T('Отправляем…'); }
+  if(btn){ btn.disabled=true; _lbl=btn.innerHTML; btn.style.opacity='.7'; btn.innerHTML='Отправляем…'; }
 
   let delivered=false, orderNo=null, failReason='server';
   if(CONFIG.apiBase){
+    // generous timeout so a cold-starting server still has time, but the button
+    // can't hang on "Отправляем…" forever if the network is dead
     const ctrl=new AbortController(); const to=setTimeout(()=>ctrl.abort(),90000);
     try{
       const res=await fetch(CONFIG.apiBase.replace(/\/$/,'')+'/order',{
@@ -1387,16 +1204,19 @@ async function submitOrder(btn){
       if(res.ok){ const data=await res.json().catch(()=>null);
         if(data&&data.ok&&data.orderNo){ delivered=true; orderNo=data.orderNo; }
         else { failReason='server'; } }
-      else { failReason='server'; }
+      else { failReason='server'; }   // server reachable but couldn't deliver (e.g. менеджер не нажал «Старт» у бота)
     }catch(e){ failReason = (e&&e.name==='AbortError') ? 'timeout' : 'network'; }
     finally{ clearTimeout(to); }
   } else {
+    // legacy degraded mode (no backend configured): try sendData (can't confirm)
     try{ if(tg&&typeof tg.sendData==='function'){ tg.sendData(JSON.stringify(payload)); } }catch(e){}
   }
 
-  if(!orderNo) orderNo=nextOrderNo();
+  if(!orderNo) orderNo=nextOrderNo();      // local fallback number if API didn't assign one
   o.orderNo=orderNo; o.delivered=delivered; o.failReason = delivered?null:failReason;
 
+  // record it locally only once it actually went through, so a failed attempt
+  // doesn't leave a stuck "Ожидает отправки" order behind
   if(delivered){
     saveOrder({ no:orderNo, category:o.cat.name, kcal:o.tier.lo+'–'+o.tier.hi,
       duration:o.duration, days:o.days, date:o.date, time:o.time, pay:o.pay, total:pr.total, ts:Date.now(), status:'Принят' });
@@ -1408,34 +1228,56 @@ async function submitOrder(btn){
   go('success');
 }
 
+/* parse & validate ДД.ММ.ГГГГ — must be a real calendar date, today..+90 days */
 function parseRuDate(v){
   const m=/^(\d{2})\.(\d{2})\.(\d{4})$/.exec(v); if(!m) return null;
   const d=+m[1], mo=+m[2], y=+m[3];
   const dt=new Date(y,mo-1,d);
-  if(dt.getFullYear()!==y||dt.getMonth()!==mo-1||dt.getDate()!==d) return null;
+  if(dt.getFullYear()!==y||dt.getMonth()!==mo-1||dt.getDate()!==d) return null; // rejects 31.02 etc.
   const today=new Date(); today.setHours(0,0,0,0);
-  if(dt<today) return null;
+  if(dt<today) return null;                                                     // rejects past dates
   const max=new Date(today); max.setDate(max.getDate()+90);
-  if(dt>max) return null;
+  if(dt>max) return null;                                                       // rejects far-future
   return dt;
 }
+/* live mask: types "25062026" -> "25.06.2026" */
 function maskRuDate(v){ const d=(v||'').replace(/\D/g,'').slice(0,8);
   let out=d.slice(0,2); if(d.length>2) out+='.'+d.slice(2,4); if(d.length>4) out+='.'+d.slice(4,8); return out; }
 
+/* ---------- phone (Uzbekistan +998 + 9 digits, valid operator code) ---------- */
 const UZ_CODES=['20','33','50','55','61','62','65','66','67','69','70','71','72','73','74','75','76','77','78','79','88','90','91','93','94','95','97','98','99'];
 function phoneDigits(v){ let d=(v||'').replace(/\D/g,''); if(d.startsWith('998')) d=d.slice(3); return d; }
 function validUzPhone(v){ const d=phoneDigits(v); return d.length===9 && UZ_CODES.includes(d.slice(0,2)); }
 function normUzPhone(v){ return '+998'+phoneDigits(v).slice(0,9); }
+/* live mask: formats as "+998 90 123 45 67" while typing */
 function fmtUzPhone(v){ const d=phoneDigits(v).slice(0,9);
   let out='+998'; if(d.length) out+=' '+d.slice(0,2); if(d.length>2) out+=' '+d.slice(2,5);
   if(d.length>5) out+=' '+d.slice(5,7); if(d.length>7) out+=' '+d.slice(7,9); return out; }
+
+/* human-readable order for the fallback channel (mirrors the manager card order) */
+function buildOrderText(o,pr){
+  return `🥗 Новый заказ ${o.orderNo}\n`+
+    `Дата начала: ${o.date}\n`+
+    `Срок: ${o.duration} (${o.days} дн.)\n`+
+    `Имя: ${o.name}\n`+
+    `Программа: ${o.cat.name}\n`+
+    `Калорийность: ${o.tier.lo}–${o.tier.hi} ккал/день\n`+
+    `Цена за день: ${sum(o.tier.price)}\n`+
+    `Итого: ${sum(pr.total)}\n`+
+    `Адрес: ${o.address}\n`+
+    `Телефон: ${o.phone}\n`+
+    `Оплата: ${payLabel(o.pay)}\n`+
+    `Время доставки: ${o.time||'—'}`;
+}
 
 function attach(cur){
   app.querySelectorAll('[data-go]').forEach(el=>el.onclick=()=>go(el.dataset.go));
   app.querySelectorAll('[data-act="back"]').forEach(el=>el.onclick=back);
   const homeBtn=app.querySelector('[data-act="home"]'); if(homeBtn) homeBtn.onclick=()=>{S.stack=['menu'];render();};
+  // 'Написать менеджеру' now opens a small screen that asks for the phone first
   const mgr=app.querySelector('[data-act="manager"]'); if(mgr) mgr.onclick=()=>{ go('contactManager'); };
 
+  // phone field on the contact-manager screen (reuses the order phone helpers)
   const mgrPhoneEl=document.getElementById('mgrPhone');
   if(mgrPhoneEl){
     if(!mgrPhoneEl.value.trim()) mgrPhoneEl.value='+998 ';
@@ -1445,9 +1287,10 @@ function attach(cur){
   const mgrSubmit=app.querySelector('[data-act="contactsubmit"]');
   if(mgrSubmit) mgrSubmit.onclick=async()=>{
     const raw=(document.getElementById('mgrPhone')||{}).value||'';
-    if(!validUzPhone(raw.trim())){ popup(T('Введите корректный номер: +998 и 9 цифр\nнапример +998 90 123 45 67')); return; }
+    if(!validUzPhone(raw.trim())){ popup('Введите корректный номер: +998 и 9 цифр\nнапример +998 90 123 45 67'); return; }
     const phone=normUzPhone(raw.trim());
     haptic('light');
+    // primary: backend forwards the request (with the phone) to the manager and confirms
     if(CONFIG.apiBase){
       try{
         const res=await fetch(CONFIG.apiBase.replace(/\/$/,'')+'/contact',{
@@ -1455,14 +1298,17 @@ function attach(cur){
           body:JSON.stringify({ initData:(tg&&tg.initData)||'', phone:phone })
         });
         if(res.ok){ const d=await res.json().catch(()=>null);
-          if(d&&d.ok){ popup(T('Готово! Менеджер свяжется с вами в ближайшее время.')); back(); return; } }
-      }catch(e){}
+          if(d&&d.ok){ popup('Готово! Менеджер свяжется с вами в ближайшее время.'); back(); return; } }
+      }catch(e){ /* fall through to fallbacks */ }
     }
+    // fallback: open the manager chat directly
     if(CONFIG.managerUsername){ const url='https://t.me/'+CONFIG.managerUsername; try{ tg?.openTelegramLink ? tg.openTelegramLink(url) : window.open(url,'_blank'); }catch(e){ window.open(url,'_blank'); } return; }
+    // last resort: legacy sendData (only if the app was opened from a reply-keyboard button)
     try{ if(tg&&typeof tg.sendData==='function'){ tg.sendData(JSON.stringify({type:'contact_manager', phone:phone})); back(); return; } }catch(e){}
-    popup(T('Свяжитесь с нами по телефону ') + CONFIG.phoneText);
+    popup('Свяжитесь с нами по телефону '+CONFIG.phoneText);
   };
 
+  // contact links — open reliably inside Telegram
   app.querySelectorAll('[data-link]').forEach(el=>el.onclick=()=>{
     const url=el.dataset.link; haptic('light');
     try{
@@ -1472,9 +1318,9 @@ function attach(cur){
     }catch(e){ window.open(url,'_blank'); }
   });
 
-  const categories = getCategories();
+  // category tap (no tier) -> go choose a tier; category+tier tap -> start order
   app.querySelectorAll('[data-cat]').forEach(el=>el.onclick=()=>{
-    const cat=categories.find(x=>x.id===el.dataset.cat);
+    const cat=CATEGORIES.find(x=>x.id===el.dataset.cat);
     if(!cat) return;
     if(el.dataset.tier!==undefined && el.dataset.tier!==''){
       const t=cat.tiers.find(x=>String(x.lo)===String(el.dataset.tier)) || cat.tiers[0];
@@ -1493,12 +1339,12 @@ function attach(cur){
   const bodyNext=app.querySelector('[data-act="bodynext"]');
   if(bodyNext) bodyNext.onclick=()=>{
     const age=+document.getElementById('age').value;
-    if(age<14||age>80||!age){ popup(T('Введите возраст от 14 до 80')); return; }
+    if(age<14||age>80||!age){ popup('Введите возраст от 14 до 80'); return; }
     S.calc.age=age; S.calc.bodyDone=true; haptic('light'); softRender('calc-inner',calcStep);
   };
   const hEl=document.getElementById('height'), wEl=document.getElementById('weight');
-  if(hEl) hEl.oninput=()=>{ S.calc.height=+hEl.value; document.getElementById('hVal').textContent=hEl.value+' '+T('см'); hEl.style.setProperty('--p',(hEl.value-140)/70*100+'%'); };
-  if(wEl) wEl.oninput=()=>{ S.calc.weight=+wEl.value; document.getElementById('wVal').textContent=wEl.value+' '+T('кг'); wEl.style.setProperty('--p',(wEl.value-40)/110*100+'%'); };
+  if(hEl) hEl.oninput=()=>{ S.calc.height=+hEl.value; document.getElementById('hVal').textContent=hEl.value+' см'; hEl.style.setProperty('--p',(hEl.value-140)/70*100+'%'); };
+  if(wEl) wEl.oninput=()=>{ S.calc.weight=+wEl.value; document.getElementById('wVal').textContent=wEl.value+' кг'; wEl.style.setProperty('--p',(wEl.value-40)/110*100+'%'); };
 
   const calcBack=app.querySelector('[data-act="calcback"]');
   if(calcBack) calcBack.onclick=()=>{
@@ -1515,6 +1361,7 @@ function attach(cur){
   app.querySelectorAll('[data-dur]').forEach(el=>el.onclick=()=>{ S.order.duration=el.dataset.dur; S.order.days=parseInt(el.dataset.days)||1; haptic('light'); softRender('order-inner',orderStep); });
   app.querySelectorAll('[data-date]').forEach(el=>el.onclick=()=>{ S.order.date = el.dataset.date==='tomorrow'?dateFrom(1):dateFrom(2); haptic('light'); softRender('order-inner',orderStep); });
 
+  // delivery-time wheel picker (07:00–09:00 delivery window)
   const tpH=document.getElementById('tpH'), tpM=document.getElementById('tpM');
   if(tpH&&tpM){
     const o=S.order;
@@ -1523,6 +1370,7 @@ function attach(cur){
     const HOURS=[7,8,9], MAX_H=9;
     const MINS=[0,30];
     const mW=buildWheel(tpM,MINS,o.timeM,v=>{
+      // 09:00 is the latest slot — bounce 09:30 back
       if(o.timeH===MAX_H&&v!==0){ mW.set(0); return; }
       o.timeM=v;
     });
@@ -1531,6 +1379,7 @@ function attach(cur){
       if(v===MAX_H&&o.timeM!==0){ o.timeM=0; mW.set(0); }
     });
 
+    // the hint has done its job once the user touches a wheel
     const hint=document.getElementById('tpHint');
     const hideHint=()=>{ if(hint) hint.classList.add('off'); };
     [tpH,tpM].forEach(el=>{
@@ -1538,6 +1387,8 @@ function attach(cur){
       el.addEventListener('wheel',hideHint,{once:true});
     });
 
+    // discoverability nudge (once per session): the hour wheel dips a notch
+    // and rolls back, so users see it's a scrollable dial. Any touch cancels it.
     if(!S.tpNudged){
       S.tpNudged=true;
       const homeTop=HOURS.indexOf(o.timeH)*44;
@@ -1550,17 +1401,18 @@ function attach(cur){
   const timeNext=app.querySelector('[data-act="timenext"]');
   if(timeNext) timeNext.onclick=()=>{
     const o=S.order;
-    if(o.timeH===9) o.timeM=0;
+    if(o.timeH===9) o.timeM=0;   // window ends at 09:00 sharp
     o.time=String(o.timeH).padStart(2,'0')+':'+String(o.timeM).padStart(2,'0');
     haptic('light'); softRender('order-inner',orderStep);
   };
 
+  // payment method choice
   app.querySelectorAll('[data-pay]').forEach(el=>el.onclick=()=>{ S.order.pay=el.dataset.pay; haptic('medium'); softRender('order-inner',orderStep); });
   const cDate=document.getElementById('customDate');
   if(cDate) cDate.oninput=()=>{ cDate.value=maskRuDate(cDate.value); };
   const dateNext=app.querySelector('[data-act="datenext"]');
-  if(dateNext) dateNext.onclick=()=>{ const v=document.getElementById('customDate').value.trim(); if(!parseRuDate(v)){popup(T('Введите корректную дату в формате ДД.ММ.ГГГГ\n(от сегодня и не позднее, чем через 90 дней)'));return;} S.order.date=v; softRender('order-inner',orderStep); };
-  
+  if(dateNext) dateNext.onclick=()=>{ const v=document.getElementById('customDate').value.trim(); if(!parseRuDate(v)){popup('Введите корректную дату в формате ДД.ММ.ГГГГ\n(от сегодня и не позднее, чем через 90 дней)');return;} S.order.date=v; softRender('order-inner',orderStep); };
+  // live input masks on the details step
   const phoneEl=document.getElementById('phone');
   if(phoneEl){
     if(!phoneEl.value.trim()) phoneEl.value='+998 ';
@@ -1571,20 +1423,20 @@ function attach(cur){
   if(detNext) detNext.onclick=()=>{
     const a=document.getElementById('address').value.trim(), n=document.getElementById('name').value.trim(), s=document.getElementById('surname').value.trim(), p=document.getElementById('phone').value.trim();
     const h=parseInt(document.getElementById('height').value,10), w=parseInt(document.getElementById('weight').value,10);
-    if(a.length<6){popup(T('Укажите полный адрес доставки (район, улица, дом)'));return;}
-    if(n.length<2){popup(T('Укажите имя'));return;}
-    if(s.length<2){popup(T('Укажите фамилию'));return;}
-    if(!validUzPhone(p)){popup(T('Введите корректный номер: +998 и 9 цифр\nнапример +998 90 123 45 67'));return;}
-    if(!(h>=100&&h<=300)){popup(T('Укажите корректный рост в см (от 100 до 300)'));return;}
-    if(!(w>=30&&w<=300)){popup(T('Укажите корректный вес в кг (от 30 до 300)'));return;}
+    if(a.length<6){popup('Укажите полный адрес доставки (район, улица, дом)');return;}
+    if(n.length<2){popup('Укажите имя');return;}
+    if(s.length<2){popup('Укажите фамилию');return;}
+    if(!validUzPhone(p)){popup('Введите корректный номер: +998 и 9 цифр\nнапример +998 90 123 45 67');return;}
+    if(!(h>=100&&h<=300)){popup('Укажите корректный рост в см (от 100 до 300)');return;}
+    if(!(w>=30&&w<=300)){popup('Укажите корректный вес в кг (от 30 до 300)');return;}
     S.order.address=a;S.order.name=n;S.order.surname=s;S.order.phone=normUzPhone(p);S.order.height=h;S.order.weight=w;S.order.detailsDone=true; haptic('light'); softRender('order-inner',orderStep);
   };
   const orderBack=app.querySelector('[data-act="orderback"]');
   if(orderBack) orderBack.onclick=()=>{
     const o=S.order;
-    if(o.pay){o.pay=null;softRender('order-inner',orderStep);}
-    else if(o.detailsDone){o.detailsDone=false;softRender('order-inner',orderStep);}
-    else if(o.time){o.time=null;softRender('order-inner',orderStep);}
+    if(o.pay){o.pay=null;softRender('order-inner',orderStep);}                 // confirm -> payment
+    else if(o.detailsDone){o.detailsDone=false;softRender('order-inner',orderStep);} // payment -> details (keeps typed values)
+    else if(o.time){o.time=null;softRender('order-inner',orderStep);}          // details -> time
     else if(o.date){o.date=null;softRender('order-inner',orderStep);}
     else if(o.duration){o.duration=null;softRender('order-inner',orderStep);}
     else back();
@@ -1592,10 +1444,13 @@ function attach(cur){
   const place=app.querySelector('[data-act="placeorder"]');
   if(place) place.onclick=()=>submitOrder(place);
 
+  // success screen: retry sending after a failed attempt
   const retry=app.querySelector('[data-act="retryorder"]');
   if(retry) retry.onclick=()=>submitOrder(retry);
 
+  // delete an order from "Мои заказы"
   app.querySelectorAll('[data-del]').forEach(el=>el.onclick=(e)=>{ e.stopPropagation(); deleteOrder(el.dataset.del); });
+  // on the orders screen, pull live delivery statuses from the bot
   if(cur==='orders') syncOrderStatuses();
 
   try{
@@ -1604,61 +1459,53 @@ function attach(cur){
   }catch(e){}
 }
 
+// register the hardware/Telegram back button ONCE (not per screen — that stacked handlers)
 try{ tg?.BackButton?.onClick(()=>back()); }catch(e){}
 
-function updateLangIcon() {
-  const txt = document.getElementById('langTxt');
-  if (txt) txt.textContent = currentLang === 'ru' ? 'UZ' : 'RUS';
-  
-  const ohTitle = document.getElementById('ohTitle');
-  const ohDesc = document.getElementById('ohDesc');
-  if(ohTitle) ohTitle.textContent = T('Сейчас нерабочее время');
-  if(ohDesc) ohDesc.textContent = T('Мы работаем 09:00–18:00, кроме воскресенья. Заказы примем, менеджер ответит в рабочие часы.');
-  
-  const ldTag = document.getElementById('ldTag');
-  if(ldTag) ldTag.textContent = T('здоровая и вкусная еда');
-}
-
-function toggleLang() {
-  currentLang = currentLang === 'ru' ? 'uz' : 'ru';
-  localStorage.setItem('ratsion_lang', currentLang);
-  updateLangIcon();
-  render();
-}
-
-updateLangIcon();
 render();
 
+/* ---------- off-hours notice (Tashkent UTC+5, 09:00–18:00, Sun off) ---------- */
 (function(){
   const el=document.getElementById('offhours');
   if(!el) return;
+  // Tashkent has no DST; UTC+5 year-round
   const now=new Date();
   const tash=new Date(now.getTime() + (now.getTimezoneOffset()*60000) + (5*3600000));
-  const day=tash.getDay();
+  const day=tash.getDay();      // 0 = Sunday
   const hr=tash.getHours();
   const closed = (day===0) || (hr<9) || (hr>=18);
   if(closed){
-    setTimeout(()=>el.classList.add('show'), 1200);
-    setTimeout(()=>el.classList.remove('show'), 8000);
+    setTimeout(()=>el.classList.add('show'), 1200);          // appear after loader
+    setTimeout(()=>el.classList.remove('show'), 8000);       // auto-hide
   }
   const x=document.getElementById('ohClose');
   if(x) x.onclick=()=>el.classList.remove('show');
 })();
 
+/* ---------- Lottie loading screen (event-driven timing) ---------- */
 (function(){
   const loader=document.getElementById('loader');
   const brand=document.getElementById('ldBrand');
   const tag=document.getElementById('ldTag');
   const player=document.getElementById('ldLottie');
   if(!loader) return;
+
   let finished=false;
   function finish(){
     if(finished) return; finished=true;
+    // reveal Ratsion + tagline AFTER the handwriting is done
     brand&&brand.classList.add('show');
     setTimeout(()=>{ tag&&tag.classList.add('show'); }, 300);
+    // hold a beat so the brand is readable, THEN dissolve into the menu
     setTimeout(()=>{ loader.classList.add('hide'); setTimeout(()=>loader.remove(),600); }, 900);
   }
-  if(player){ player.addEventListener('complete', finish); player.addEventListener('error', finish); }
+
+  // primary: fire when the Lottie animation actually completes
+  if(player){
+    player.addEventListener('complete', finish);
+    player.addEventListener('error', finish);
+  }
+  // safety net: if the event never fires (CDN blocked, etc.), finish after 5s max
   setTimeout(finish, 5000);
 })();
 </script>

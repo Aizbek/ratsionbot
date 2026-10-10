@@ -425,6 +425,27 @@ input[type=range]::-webkit-slider-thumb:active{transform:scale(1.18)}
 .svc-list li:last-child{border-bottom:none}
 .svc-list li .ic{width:18px;height:18px;flex-shrink:0;margin-top:1px;color:var(--c,#2E8E52)}
 
+/* ---------- LANGUAGE SWITCHER ---------- */
+#langBtn {
+  position: fixed;
+  top: 14px;
+  right: 14px;
+  z-index: 900;
+  width: 42px;
+  height: 42px;
+  border-radius: 13px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  box-shadow: 0 4px 12px rgba(31,42,36,.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  user-select: none;
+}
+#langBtn:active { transform: scale(0.92); }
 </style>
 </head>
 <body>
@@ -437,6 +458,7 @@ input[type=range]::-webkit-slider-thumb:active{transform:scale(1.18)}
   <div class="ld-tag" id="ldTag">здоровая и вкусная еда</div>
 </div>
 <div class="app" id="app"></div>
+<div id="langBtn" onclick="toggleLang()"></div>
 <div id="offhours">
   <div class="oh-ic"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><path d="M12 7v5l3 2"/></svg></div>
   <div class="oh-body"><b>Сейчас нерабочее время</b><span>Мы работаем 09:00–18:00, кроме воскресенья. Заказы примем, менеджер ответит в рабочие часы.</span></div>
@@ -1508,6 +1530,80 @@ render();
   // safety net: if the event never fires (CDN blocked, etc.), finish after 5s max
   setTimeout(finish, 5000);
 })();
+
+/* ---------- LANGUAGE TRANSLATOR ---------- */
+let currentLang = localStorage.getItem('ratsion_lang') || 'ru';
+
+// Словарь переводов. Добавьте сюда остальные слова в формате "Русский": "O'zbekcha"
+const UZ_DICT = {
+  "Заказать": "Buyurtma berish",
+  "программы правильного питания": "sog'lom ovqatlanish dasturlari",
+  "Калории": "Kaloriyalar",
+  "расчёт суточной нормы": "kunlik me'yorni hisoblash",
+  "Акции": "Aksiyalar",
+  "спецпредложения": "maxsus takliflar",
+  "О компании": "Kompaniya haqida",
+  "наша команда": "bizning jamoa",
+  "Контакты": "Aloqa",
+  "связаться с нами": "biz bilan bog'lanish",
+  "Кейтеринг и услуги": "Keytering va xizmatlar",
+  "корпоративное и социальное питание": "korporativ va ijtimoiy ovqatlanish",
+  "Мои заказы": "Mening buyurtmalarim",
+  "история и статус": "tarix va holat",
+  "Заказать питание": "Ovqat buyurtma qilish",
+  "Кейтеринг и услуги для бизнеса": "Biznes uchun keytering",
+  "Написать менеджеру": "Menejerga yozish"
+};
+
+function toggleLang() {
+  currentLang = currentLang === 'ru' ? 'uz' : 'ru';
+  localStorage.setItem('ratsion_lang', currentLang);
+  updateLangIcon();
+  render(); // Перерисовываем экран, чтобы применить перевод
+}
+
+function updateLangIcon() {
+  const btn = document.getElementById('langBtn');
+  // Если сейчас русский, показываем флаг Узбекистана (предлагаем переключить), и наоборот
+  if (btn) btn.innerHTML = currentLang === 'ru' ? '🇺🇿' : '🇷🇺';
+}
+
+function translateDOM(node) {
+  if (currentLang === 'ru') return;
+  if (node.nodeType === Node.TEXT_NODE) {
+    const text = node.nodeValue.trim();
+    if (text && UZ_DICT[text]) {
+      node.nodeValue = node.nodeValue.replace(text, UZ_DICT[text]);
+    }
+  } else if (node.nodeType === Node.ELEMENT_NODE) {
+    if(node.tagName === 'SCRIPT' || node.tagName === 'STYLE') return;
+    if(node.placeholder && UZ_DICT[node.placeholder]) {
+       node.placeholder = UZ_DICT[node.placeholder];
+    }
+    node.childNodes.forEach(translateDOM);
+  }
+}
+
+// Наблюдатель (Observer) следит за изменениями на экране и переводит текст на лету
+const langObserver = new MutationObserver(() => {
+   if (currentLang === 'uz') {
+      langObserver.disconnect(); 
+      translateDOM(document.body);
+      langObserver.observe(document.body, { childList: true, subtree: true, characterData: true });
+   }
+});
+
+updateLangIcon();
+langObserver.observe(document.body, { childList: true, subtree: true, characterData: true });
+
+// Если при загрузке уже выбран узбекский, переводим стартовый экран
+if (currentLang === 'uz') {
+  setTimeout(() => {
+    langObserver.disconnect();
+    translateDOM(document.body);
+    langObserver.observe(document.body, { childList: true, subtree: true, characterData: true });
+  }, 50);
+}
 </script>
 </body>
 </html>

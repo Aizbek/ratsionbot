@@ -10,6 +10,11 @@ What it does:
   /delivered  <order#>  -> mark an order as "Доставлен"   + notify the customer
   /orders               -> list recent orders and their statuses
 
+  The Mini App is bilingual (RU / UZ). Every order it POSTs carries a
+  "lang" field, which is stored with the order and used for every message the
+  CUSTOMER receives (confirmation, "out for delivery", "delivered").
+  The manager's order card and the manager's own replies are always RUSSIAN.
+
   The Mini App sends an order to this bot through TWO possible channels:
 
     1. HTTP API  (PRIMARY, reliable)
@@ -83,6 +88,41 @@ SEQ_START = 1041  # first order will be SEQ_START + 1
 # ===============================================================
 
 TASHKENT = timezone(timedelta(hours=5))  # Uzbekistan, no DST
+
+# ======================= customer-facing text (RU / UZ) =======================
+# Only messages sent TO THE CUSTOMER live here. The manager's card (build_card)
+# and the manager's command replies stay Russian on purpose, so switching the
+# app language never changes what the kitchen reads.
+CUST = {
+    "ru": {
+        "order_ok": "✅ Ваш заказ {no} принят!\n"
+                    "Менеджер свяжется с вами в ближайшее время для подтверждения. Спасибо!",
+        "contact_ok": "Спасибо! Менеджер свяжется с вами в ближайшее время.",
+        "shipping": "🚗 Ваш заказ {no} передан в доставку. Курьер уже в пути!",
+        "delivered": "✅ Ваш заказ {no} доставлен. "
+                     "Приятного аппетита, и спасибо, что выбрали Ratsion 💚",
+    },
+    "uz": {
+        "order_ok": "✅ {no} raqamli buyurtmangiz qabul qilindi!\n"
+                    "Menejer tasdiqlash uchun tez orada siz bilan bog'lanadi. Rahmat!",
+        "contact_ok": "Rahmat! Menejer tez orada siz bilan bog'lanadi.",
+        "shipping": "🚗 {no} raqamli buyurtmangiz yetkazishga topshirildi. Kuryer yo'lda!",
+        "delivered": "✅ {no} raqamli buyurtmangiz yetkazib berildi. "
+                     "Yoqimli ishtaha, va Ratsion'ni tanlaganingiz uchun rahmat 💚",
+    },
+}
+
+
+def norm_lang(v):
+    """Anything the app/Telegram sends -> 'uz' or 'ru' (the safe default)."""
+    return "uz" if str(v or "").strip().lower().startswith("uz") else "ru"
+
+
+def ct(lang, key, **kw):
+    """Customer text in `lang`, falling back to Russian for unknown keys."""
+    table = CUST.get(norm_lang(lang), CUST["ru"])
+    return table.get(key, CUST["ru"][key]).format(**kw)
+# =============================================================================
 
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
@@ -319,6 +359,9 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         [[KeyboardButton("🍽 Открыть Ratsion", web_app=WebAppInfo(url=WEBAPP_URL))]],
         resize_keyboard=True,
     )
+    # /start happens before the Mini App is open, so we do not know the
+    # customer's language yet -> greet in both. Inside the app they pick RU/UZ
+    # and every later message follows that choice.
     await update.message.reply_text(
         "Добро пожаловать в *Ratsion* — здоровая и вкусная еда \n\n"
         "Здесь вы можете:\n"
@@ -326,12 +369,23 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "• Рассчитать суточную норму калорий\n"
         "• Узнать о наших акциях\n"
         "• Связаться с нами\n\n"
-        "Нажмите кнопку ниже, чтобы начать ",
+        "Нажмите кнопку ниже, чтобы начать \n"
+        "В приложении можно переключить язык на узбекский (кнопка UZ).\n\n"
+        "— — —\n\n"
+        "*Ratsion*ga xush kelibsiz — foydali va mazali taomlar \n\n"
+        "Bu yerda siz:\n"
+        "• To'g'ri ovqatlanish programmasiga buyurtma berasiz\n"
+        "• Kunlik kaloriya normasini hisoblaysiz\n"
+        "• Aksiyalarimiz haqida bilib olasiz\n"
+        "• Biz bilan bog'lanasiz\n\n"
+        "Boshlash uchun pastdagi tugmani bosing \n"
+        "Ilovada tilni o'zbekchaga almashtirish mumkin (UZ tugmasi).",
         parse_mode="Markdown",
         reply_markup=kb,
     )
     await update.message.reply_text(
-        "Открыть приложение:", reply_markup=InlineKeyboardMarkup([[open_btn]])
+        "Открыть приложение · Ilovani ochish:",
+        reply_markup=InlineKeyboardMarkup([[open_btn]]),
     )
 
 
@@ -354,6 +408,8 @@ async def on_webapp_data(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     user_dict = {"id": user.id, "username": user.username} if user else None
 
+    lang = norm_lang(d.get("lang"))
+
     if d.get("type") == "contact_manager":
         if MANAGER_CHAT_ID:
             contact_user = {
@@ -367,9 +423,7 @@ async def on_webapp_data(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 build_contact_message(contact_user, (d.get("phone") or "").strip()),
                 parse_mode="HTML",
             )
-        await update.effective_message.reply_text(
-            "Спасибо! Менеджер свяжется с вами в ближайшее время."
-        )
+        await update.effective_message.reply_text(ct(lang, "contact_ok"))
         return
 
     if d.get("type") != "new_order":
@@ -382,10 +436,7 @@ async def on_webapp_data(update: Update, context: ContextTypes.DEFAULT_TYPE):
         except Exception as e:
             log.error("Could not send order to manager (sendData channel): %s", e)
 
-    await update.effective_message.reply_text(
-        f"✅ Ваш заказ {order_no} принят!\n"
-        f"Менеджер свяжется с вами в ближайшее время для подтверждения. Спасибо!"
-    )
+    await update.effective_message.reply_text(ct(lang, "order_ok", no=order_no))
 
 
 # ----------------------------- HTTP API -----------------------------
@@ -438,22 +489,21 @@ async def handle_order(request):
         log.error("Could not send order to manager (API channel): %s", e)
         return _cors(web.json_response({"ok": False, "error": "send_failed"}, status=502))
 
-    # remember the order so the manager can update its status later
+    # remember the order so the manager can update its status later. `lang` is
+    # kept so the delivery notifications reach the customer in their language.
+    lang = norm_lang(order.get("lang") or body.get("lang"))
     await store_order(order_no, (user or {}).get("id"), {
         "category": order.get("category"),
         "date": order.get("date"),
         "days": order.get("days"),
         "total": order.get("total"),
+        "lang": lang,
     })
 
     # best-effort confirmation back to the customer (needs them to have started the bot)
     if user and user.get("id"):
         try:
-            await bot.send_message(
-                user["id"],
-                f"✅ Ваш заказ {order_no} принят!\n"
-                f"Менеджер свяжется с вами в ближайшее время для подтверждения. Спасибо!",
-            )
+            await bot.send_message(user["id"], ct(lang, "order_ok", no=order_no))
         except Exception as e:
             log.info("Could not send confirmation to customer: %s", e)
 
@@ -471,6 +521,7 @@ async def handle_contact(request):
     auth = verify_init_data(body.get("initData", ""))
     user = (auth or {}).get("user")
     phone = (body.get("phone") or "").strip()
+    lang = norm_lang(body.get("lang"))
 
     if not MANAGER_CHAT_ID:
         return _cors(web.json_response({"ok": False, "error": "no_manager"}, status=500))
@@ -484,6 +535,14 @@ async def handle_contact(request):
     except Exception as e:
         log.error("Could not forward contact request: %s", e)
         return _cors(web.json_response({"ok": False, "error": "send_failed"}, status=502))
+
+    # best-effort thank-you in the customer's language (needs them to have
+    # started the bot; the app also shows its own confirmation popup)
+    if user and user.get("id"):
+        try:
+            await bot.send_message(user["id"], ct(lang, "contact_ok"))
+        except Exception as e:
+            log.info("Could not send contact confirmation: %s", e)
 
     return _cors(web.json_response({"ok": True}))
 
@@ -523,11 +582,11 @@ async def _set_status_cmd(update, context, status, verb):
         return
     uid = rec.get("uid")
     if uid:
+        # notify the customer in the language they used when ordering
+        lang = norm_lang(rec.get("lang"))
+        key = "shipping" if status == "Доставляется" else "delivered"
         try:
-            if status == "Доставляется":
-                await context.bot.send_message(uid, f"🚗 Ваш заказ {order_no} передан в доставку. Курьер уже в пути!")
-            else:
-                await context.bot.send_message(uid, f"✅ Ваш заказ {order_no} доставлен. Приятного аппетита, и спасибо, что выбрали Ratsion 💚")
+            await context.bot.send_message(uid, ct(lang, key, no=order_no))
         except Exception as e:
             log.info("Could not notify customer %s: %s", uid, e)
     await update.message.reply_text(f"Готово ✅ Заказ {order_no}: статус «{status}».")
